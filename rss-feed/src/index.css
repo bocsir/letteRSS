@@ -4,10 +4,10 @@
 
 body {
   margin: 0;
-  background-color: black;
+  background-color: rgb(29, 26, 26);
   font-family: monospace;
-  letter-spacing: .5px;
   color: white;
+  box-sizing: border-box;
 }
 
 code {

@@ -2,25 +2,38 @@ import RSSParser from "rss-parser";
 import cors from "cors";
 import express from "express";
 
-const feedURL = "https://netflixtechblog.com/feed";
-const parser = new RSSParser();
-let articles = [];
-
-const parse = async url => {
-    const feed = await parser.parseURL(url);
-
-    feed.items.forEach(item => {
-        articles.push({item});
-    })
-}
-
-parse(feedURL);
-
 let app = express();
 app.use(cors());
 
+// const feedURL = "https://netflixtechblog.com/feed";
+let feedURLs = ["https://netflixtechblog.com/feed", "https://psychcool.org/index.xml"];
+let allArticles = {};
+
+const parser = new RSSParser();
+
+//get all articles from feed url and store in allArticles{}
+const parse = async (url) => {
+
+    //parse out each <item> in feed items. <item> represents an article
+    const feed = await parser.parseURL(url);
+    console.log()
+    allArticles[feedIndex] = [];
+
+    feed.items.forEach(item => {
+        allArticles[feedIndex].push({item});
+    });
+
+    feedIndex++;
+
+}
+
+let feedIndex = 0;
+feedURLs.forEach(async feedURL => {
+    await parse(feedURL);
+});
+
 app.get('/', (req, res) => {
-    res.send(articles);
+    res.send(allArticles);
 })
 
 const server = app.listen("4000", () => {
