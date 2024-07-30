@@ -5,14 +5,18 @@ import Feed from "./Feed";
 function App() {
   const [articles, setArticles] = useState({});
   const [feedVisibility, setFeedVisibility] = useState({});
+  const [feedUrl, setFeedUrl] = useState('');
 
+  //request to allAritcles endpoint
   const getArticles = async () => {
     try {
       const res = await axios.get("http://localhost:4000/");
+      console.log("fetched articles: ", res.data);
       setArticles(res.data);
-      // Initialize visibility state for each feed
+
+      //feed visibility
       const initialVisibility = Object.keys(res.data).reduce((acc, key) => {
-        acc[key] = false; // Set to true to show all feeds initially
+        acc[key] = false;
         return acc;
       }, {});
       setFeedVisibility(initialVisibility);
@@ -37,6 +41,23 @@ function App() {
     setMenuVis(!menuVisible);
   };
 
+  const sendURL = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('http://localhost:4000/newFeed', 
+        { feedUrl: feedUrl },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      console.log("feed added: ", res.data);
+
+      await getArticles();
+    } catch(error) {
+      console.log(error);
+    }
+
+    setFeedUrl(''); //clear feedUrl
+  };
+
   return (
     <>
       <div className="absolute w-full flex flex-col items-end">
@@ -46,15 +67,15 @@ function App() {
             <form className="flex flex-col">
               <label htmlFor="feed-url" className="text-lg font-bold">Add a feed:</label>
               <div className="flex items center">
-                <input className="text-black p-1 rounded-sm" id="feed-url" name="feed-url" type="text" placeholder="Enter new feed URL"></input>
-                <button className="text-base font-bold bg-amber-300 ml-4 pl-1 pr-1 rounded-md leading-3">submit</button>
+                <input value={feedUrl} onChange={(e) => setFeedUrl(e.target.value)} className="text-black p-1 rounded-sm" id="feed-url" name="feed-url" type="text" placeholder="Enter new feed URL"></input>
+                <button onClick={sendURL} className="text-bases font-bold bg-amber-300 ml-4 pl-1 pr-1 rounded-md leading-3">submit</button>
             </div>
             </form>
           </div>
         )}
       </div>
       
-      <h1 className="text-xl text-center font-semibold mt-0 m-2 text-amber-300">super simple RSS</h1>
+      <h1 className="text-xl text-center font-semibold pt-2 pb-2 mb-2 text-amber-300">super simple RSS</h1>
       <h2 className="text-2xl font-bold ml-3 mb-2">Feeds:</h2>
       {Object.entries(articles).map(([feedIndex, feedArray]) => (
         <div
@@ -63,7 +84,7 @@ function App() {
         >
           <div onClick={() => toggleFeedVisibility(feedIndex)} className="h-7 cursor-pointer flex justify-between items-center relative">
             <h3 className={`text-xl font-semibold select-none ${feedVisibility[feedIndex]? "text-amber-300" : "text-white" }`}>Feed {parseInt(feedIndex) + 1}</h3>
-            <button className="text-3xl top-1/2 right-0">
+            <button className="text-xl">
               {feedVisibility[feedIndex] ? '-' : '+'}
             </button>
           </div>
