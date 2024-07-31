@@ -3,28 +3,23 @@ import { useEffect, useState } from "react";
 import Feed from "./Feed";
 
 function App() {
+  //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState({});
-  const [feedVisibility, setFeedVisibility] = useState({});
   const [feedUrl, setFeedUrl] = useState('');
+  const [feedVisibility, setFeedVisibility] = useState({});
 
-  //request to allAritcles endpoint
+  //request to allAritcles endpoint for articles
   const getArticles = async () => {
     try {
       const res = await axios.get("http://localhost:4000/");
       console.log("fetched articles: ", res.data);
       setArticles(res.data);
-
-      //feed visibility
-      const initialVisibility = Object.keys(res.data).reduce((acc, key) => {
-        acc[key] = false;
-        return acc;
-      }, {});
-      setFeedVisibility(initialVisibility);
     } catch (error) {
       console.error(error);
     }
   };
 
+  //get articles once on mount
   useEffect(() => {
     getArticles();
   }, []);
