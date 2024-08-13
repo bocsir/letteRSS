@@ -1,3 +1,6 @@
+//top section with menu to add feeds
+//calling feedComponent logic could be a separate component 
+
 import axios from "axios";
 import { useState } from "react";
 

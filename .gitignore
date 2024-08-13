@@ -1,2 +1,3 @@
-/rss-feed/node_modules
-/rss-server/node_modules
+rss-feed/node_modules
+rss-server/node_modules
+rss-server/.env
