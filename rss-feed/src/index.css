@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   background-color: rgb(36, 31, 31);
@@ -10,7 +14,7 @@ body {
 }
 
 html {
-  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 html, body {

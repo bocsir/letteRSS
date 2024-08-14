@@ -1,30 +1,34 @@
 /*TODODODOODOL:
 
-*in site view for posts----
-  *background blur with centered view for reading on large screen
-    *top right X
+*Fix netflix tech blog not working with in-site reader
+
+
 
 *database for feeds - mysql
-  *ability to remove feeds
+*mysql-workbench
+*ability to remove feeds
+
   *user auth - JWT
+
+  *add to database in Server the array 
 
 *keybinds for each click. 
   *alt text describing bind
 
-*future:
+*extra:
   *ai summary of posts
   *save read / unread posts
   *red dot for new posts
 
 */
 
-//components: App > Nav
-
+//components: App > Nav, App > Feed > ReaderButton > ReaderPortal
 
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Feed from "./components/Feed";
 import Nav from './components/Nav';
+import Auth from './components/Auth';
 
 function App() {
   //useState is useful because calling its update function will trigger re-render
@@ -54,9 +58,10 @@ function App() {
       [feedIndex]: !prev[feedIndex],
     }));
   };
-  console.log(feedVisibility);
   return (
     <>
+      <Auth/>
+
       <Nav callGetArticles={getArticles}/>
 
       {/* feed list */}
@@ -65,7 +70,7 @@ function App() {
         {Object.entries(articles).map(([feedIndex, feedArray]) => (
           <div
             key={feedIndex}
-            className="cursor-pointer w-fit border ml-3 pl-3 pr-3 pt-1 pb-1 bg-black"
+            className="cursor-pointer w-fit border ml-3 mr-3 pl-3 pr-3 pt-1 pb-1 bg-black"
           >
             <div
               className="h-7 flex justify-between items-center relative"                  
@@ -85,7 +90,7 @@ function App() {
               </button>
             </div>
             {feedVisibility[feedIndex] && (
-              <div className="font-semibold flex flex-col">
+              <div className="font-semibold flex flex-col ml-3">
                 {feedArray.map((item, itemIndex) => (
                   <Feed
                     key={`${feedIndex}-${itemIndex}`}

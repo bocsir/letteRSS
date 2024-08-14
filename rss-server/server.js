@@ -1,12 +1,15 @@
 import RSSParser from "rss-parser";
 import cors from "cors";
 import express from "express";
+import { asyncFunction } from "./db.js";
+
+asyncFunction();
 
 let app = express();
 app.use(cors());
 app.use(express.json());
 
-//fill with feeds from db in future  , 
+//fill with feeds from db in future 
 let feedURLs = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed"];
 //items are individual articles/ blog posts
 let allItems = {};

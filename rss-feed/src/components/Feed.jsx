@@ -11,11 +11,6 @@ const Feed = ({ title, link, date, item }) => {
 
   return (
     <>
-      <ReaderButton 
-        item={articleContent} 
-        isHovered={isHovered} 
-        setIsHovered={setIsHovered} 
-      />
       <a
         href={link}
         target="_blank"
@@ -26,10 +21,18 @@ const Feed = ({ title, link, date, item }) => {
       >
         <h3 className="text-lg leading-4">
           {title}
-          <FontAwesomeIcon icon={faLink} className="text-xs -ml-2"/>
+          <FontAwesomeIcon icon={faLink} className="text-xs ml-1"/>
         </h3>
         <p>{articleDate}</p>
       </a>
+      <ReaderButton 
+        item={articleContent} 
+        link={link}
+        date={articleDate}
+        isHovered={isHovered} 
+        setIsHovered={setIsHovered} 
+      />
+
     </>
   );
 };

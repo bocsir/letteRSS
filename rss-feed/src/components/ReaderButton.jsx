@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import DOMPurify from "dompurify";
 import ReaderPortal from "./ReaderPortal";
 
-const ReaderButton = ({ item, isHovered, setIsHovered }) => {
+const ReaderButton = ({ item, link, date, isHovered, setIsHovered }) => {
   const [isPortalVisible, setIsPortalVisible] = useState(false);
 
   const sanitizedContent = useMemo(() => {
@@ -16,14 +16,14 @@ const ReaderButton = ({ item, isHovered, setIsHovered }) => {
     <>
       <button
         onClick={() => setIsPortalVisible(true)}
-        className={`flex items-center text-lg hover:bg-stone-800 mb-px rounded relative z-2 ${isHovered ? 'text-amber-300' : ''}`}
+        className={`mb-2 flex items-center text-lg hover:bg-stone-800 rounded relative z-2 ${isHovered ? 'text-amber-300' : ''}`}
         data-title="open here"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <FontAwesomeIcon icon={faAnglesRight} />
       </button>
-      {(isPortalVisible) && <ReaderPortal sanitizedContent={sanitizedContent}/>}
+      {(isPortalVisible) && <ReaderPortal link={link} date={date} sanitizedContent={sanitizedContent}/>}
     </>
   );
 };
