@@ -1,21 +1,17 @@
-/*TODODODOODOL:
+/*
 
-*Fix netflix tech blog not working with in-site reader
+*DATABASE FOR FEED
+  *mysql-workbench
+  *ability to remove feeds
+  *add to db from server array
+    *user auth - JWT
 
-
-
-*database for feeds - mysql
-*mysql-workbench
-*ability to remove feeds
-
-  *user auth - JWT
-
-  *add to database in Server the array 
-
-*keybinds for each click. 
-  *alt text describing bind
-
+*READER VIEW
+  *drag to resize reader view
+  
 *extra:
+  *keybinds for each click. 
+    *alt text describing bind
   *ai summary of posts
   *save read / unread posts
   *red dot for new posts

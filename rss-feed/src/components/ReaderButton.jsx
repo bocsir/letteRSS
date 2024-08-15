@@ -9,8 +9,12 @@ const ReaderButton = ({ item, link, date, isHovered, setIsHovered }) => {
   const [isPortalVisible, setIsPortalVisible] = useState(false);
 
   const sanitizedContent = useMemo(() => {
-    return DOMPurify.sanitize(item.content);
-  }, [item.content]);
+    let content = DOMPurify.sanitize(item.content);
+
+    return content
+    ? ( content )
+    : ( DOMPurify.sanitize(item['content:encoded']) )
+  }, [item]);
 
   return (
     <>
@@ -23,7 +27,7 @@ const ReaderButton = ({ item, link, date, isHovered, setIsHovered }) => {
       >
         <FontAwesomeIcon icon={faAnglesRight} />
       </button>
-      {(isPortalVisible) && <ReaderPortal link={link} date={date} sanitizedContent={sanitizedContent}/>}
+      {(isPortalVisible) && <ReaderPortal item={item} link={link} date={date} sanitizedContent={sanitizedContent} isPortalVisible={isPortalVisible} setIsPortalVisible={setIsPortalVisible}/>}
     </>
   );
 };
