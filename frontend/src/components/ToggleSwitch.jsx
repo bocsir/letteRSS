@@ -1,5 +1,3 @@
-import React, { useState } from 'react'
-
 export const ToggleSwitch = ({ isChecked, setIsChecked }) => {
 
   const handleCheckboxChange = () => {

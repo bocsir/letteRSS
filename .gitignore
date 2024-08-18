@@ -1,4 +1,4 @@
-rss-feed/node_modules
-rss-server/node_modules
-rss-server/.env
-node_modules
+frontend/node_modules
+
+server/node_modules
+server/.env
