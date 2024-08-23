@@ -1,18 +1,18 @@
 /*
+*jsx -> tsx
 
 *DATABASE FOR FEED
-  *mysql-workbench
   *ability to remove feeds
   *add to db from server array
-    *user auth - JWT
 
 *READER VIEW
   *drag to resize reader view
+    *save in localstorage
+  *next, prev buttons for feed
   
 *extra:
   *keybinds for each click. 
     *alt text describing bind
-  *ai summary of posts
   *save read / unread posts
   *red dot for new posts
 
@@ -24,7 +24,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Feed from "./components/Feed";
 import Nav from './components/Nav';
-import Auth from './components/Auth';
+import SignUp from './components/SignUp';
 
 function App() {
   //useState is useful because calling its update function will trigger re-render
@@ -56,7 +56,7 @@ function App() {
   };
   return (
     <>
-      <Auth/>
+      <SignUp/>
 
       <Nav callGetArticles={getArticles}/>
 

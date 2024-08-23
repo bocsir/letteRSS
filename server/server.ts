@@ -6,29 +6,25 @@
 
 import RSSParser from "rss-parser";
 import cors from "cors";
-import express from "express";
-import mariadb from 'mariadb';
+import express, { Express } from "express";
+import mariadb, { Connection, Pool } from 'mariadb';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
  
-let app = express();
+let app: Express = express();
 app.use(cors());
 app.use(express.json());
 
 //db
-let connection;
-
-const pool = mariadb.createPool({
+let connection: Connection | null = null;
+const pool: Pool = mariadb.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.USER_PW,
     database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10),
+    port: parseInt(process.env.DB_PORT || '3306', 10),
     connectionLimit: 5
 });
-
-//auth
-const saltRounds = 10;
 
 (async () => {
     try {
@@ -39,14 +35,15 @@ const saltRounds = 10;
     } catch (err) {
         console.error('Error connecting to the database:', err);
     } finally {
-        if (connection) connection.release(); // Release the connection back to the pool
+        if (connection) connection.end(); // Release the connection back to the pool
     }
 })();
 
 //hash password with bcrypt
-async function getHashedPw(password, saltRounds) {
+async function getHashedPw(password: string, saltRounds: number): Promise<string> {
     try {
         const hashedPw = await bcrypt.hash(password, saltRounds)
+        console.log(hashedPw);
         return hashedPw;
     } catch (err) {
         console.log('Error retrieving hashed password, ', err);
@@ -54,62 +51,61 @@ async function getHashedPw(password, saltRounds) {
     }
 }
 
+const saltRounds: number = 10;
+
 //login form submit endpoint
-app.post('/login', async (req, res) => {    
-    let hashedPw = getHashedPw(req.body.password, saltRounds);
+app.post("/signup", async (req: Request) => {
+    let signupValues: [any, string];
+    console.log(req.body);
+    let body: any = req.body!;
 
-    const loginValues = [ req.body.email, hashedPw ];
+    if (connection) {
+        let hashedPw = await getHashedPw(body.password, saltRounds);
+        signupValues = [body.email, hashedPw];
 
-    //send loginValues to db
-    const query = 'INSERT INTO user (email, password) VALUES (?, ?)';
+        //send signupValues to db
+        const query = "INSERT INTO user (email, password) VALUES (?, ?)";
 
-    connection.query(query, loginValues, (err, res) => {
-        if (err) {
-            throw new Error('Error adding loginValues: ', err);
-        } else {
-            console.log('Sent login info to db. InsertID: ', res.insertId);            
-        }
-    });
+        const queryRes = connection.query(query, signupValues);
+    }
 });
 
-//singup form submit endpoint
+//login form submit endpoint
 //check that password is good
-app.post('/singup', async (req, res) => {
+app.post('/login', async (req, res) => {
     //get hashed password from db
     const query = 'SELECT password FROM user WHERE email = (?)';
-    let hashedPw;
-    connection.query(query, req.body.email, (err, res) => {
-        if (err) {
-            throw new Error('Error retrieving hashed password: ', err);
-        } else {
-            console.log('Got hashed password from db, ', res);
+    
+    if (connection) {
+        const queryRes = connection.query(query, req.body.email)
+        console.log(queryRes);
 
-            hashedPw = res.password;
-        }
-    });
+        //const hashedPw: string = queryRes.?
 
-    //check password
-    if (bcrypt.compare(req.body.password, hashedPw, saltRounds)){
-        //good password
-        console.log('good pw');
-    } else {
-        //bad password
-        console.error('bad pw');
+        //check password
+        // if (bcrypt.compare(req.body.password, hashedPw, saltRounds)){
+        //     //good password
+        //     console.log('good pw');
+        // } else {
+        //     //bad password
+        //     console.error('bad pw');
+    // }
     }
 });
 
 //rss feed handling*********************************************************************
 //fill with feeds from db in future 
-let feedURLs = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed"];
+let feedURLs: string[] = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
-let allItems = {};
+let allItems: { [key: string]: any[] } = {};
 const parser = new RSSParser();
 
+
 //get all Items from feed url and store in allItems{}
-const parse = async (url) => {
+const parse = async (url: string) => {
     //parse out each <item> in feed items. <item> represents an article
     const feed = await parser.parseURL(url);
-    const fTitle = feed.title;
+    const fTitle = feed.title || '';
     allItems[fTitle] = feed.items.map(item => ({ item }));
 }
 
@@ -121,6 +117,7 @@ renderFeed();
 
 //endpoint to send Items
 app.get('/', async (req, res) => {
+    console.log(req);
     await renderFeed();
     res.send(allItems);
 })
@@ -139,5 +136,11 @@ app.post('/newFeed', async (req, res) => {
 const server = app.listen("4000", () => {
     console.log("app listening at http://localhost:4000");
 });
+
+interface AuthValues {
+    email: string,
+    password: string
+}
+
 
 export default server;
