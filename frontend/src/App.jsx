@@ -24,7 +24,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Feed from "./components/Feed";
 import Nav from './components/Nav';
-import SignUp from './components/SignUp';
+import SignUp from './components/pages/SignUp';
 
 function App() {
   //useState is useful because calling its update function will trigger re-render
@@ -56,8 +56,6 @@ function App() {
   };
   return (
     <>
-      <SignUp/>
-
       <Nav callGetArticles={getArticles}/>
 
       {/* feed list */}

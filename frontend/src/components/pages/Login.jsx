@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import grid2 from "../assets/images/darkgrid.svg";
+import grid2 from "../../assets/images/darkgrid.svg";
 import { useState } from "react";
+import {Link} from 'react-router-dom';
 
-export const Login = () => {
+const Login = () => {
   const [eyeIcon, setEyeIcon] = useState(faEye);
   const [passVis, setPassVis] = useState("password");
 
@@ -41,27 +42,23 @@ export const Login = () => {
         style={{ backgroundImage: `url(${grid2})` }}
         alt="grid background"
       >
-        <div className="absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
+        <Link to="/" className="[320px]:text-left absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
           <h2 className="text-3xl -mb-2">letteRSS</h2>
           <p>RSS Reader</p>
-        </div>
-        <div className="mt-36 sm:mt-0 flex flex-col items-center h-max w-32 bg-stone-800 rounded text-white p-4">
-          <h1 className="text-3xl">Create an account</h1>
+        </Link>
+        <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-stone-800 rounded text-white p-4">
+          <h1 className="text-3xl text-center">Login to your account</h1>
           <span className="text-sm">
-            Already have one?{" "}
-            <a className="underline decoration-solid" href="/login">
-              login
-            </a>
+            Don't have one?{" "}
+            <Link className="underline decoration-solid" to="/signup">
+              sign up
+            </Link>
           </span>
 
-          <form className="flex flex-col h-5/6 w-5/6 text-lg mt-4 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
+          <form
+            className="flex flex-col h-5/6 w-full text-lg mt-2 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
             <label htmlFor="email">Email:</label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
             <label htmlFor="password">Password:</label>
             <span className="flex justify-between h-min items-center mb-4">
               <input
@@ -69,7 +66,7 @@ export const Login = () => {
                 type={passVis}
                 id="password"
                 name="password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
               />
               <FontAwesomeIcon
                 className="cursor-pointer w-6 mr-2 ml-2"
@@ -82,7 +79,7 @@ export const Login = () => {
                 className="bg-amber-300 w-min p-3 mt-3 mb-2 rounded-lg leading-3 cursor-pointer text-stone-800 font-bold transition-all hover:shadow-[0px_0px_10px_2px_rgb(147,91,9)] hover:text-amber-800"
                 type="submit"
                 value="Submit"
-                onClick={handleSubmit}
+                onClick={handleSubmit} 
               />
             </div>
           </form>
@@ -91,3 +88,5 @@ export const Login = () => {
     </>
   );
 };
+
+export default Login

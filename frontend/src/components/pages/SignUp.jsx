@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
-import grid2 from "../assets/images/darkgrid.svg";
+import grid2 from "../../assets/images/darkgrid.svg";
 import { useState } from "react";
+import {Link} from 'react-router-dom';
 
 const SignUp = () => {
   const [eyeIcon, setEyeIcon] = useState(faEye);
@@ -42,17 +43,17 @@ const SignUp = () => {
         style={{ backgroundImage: `url(${grid2})` }}
         alt="grid background"
       >
-        <div className="[320px]:text-left absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
+        <Link to="/" className="[320px]:text-left absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
           <h2 className="text-3xl -mb-2">letteRSS</h2>
           <p>RSS Reader</p>
-        </div>
+        </Link>
         <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-stone-800 rounded text-white p-4">
           <h1 className="text-3xl">Create an account</h1>
           <span className="text-sm">
             Already have one?{" "}
-            <a className="underline decoration-solid" href="/login">
+            <Link className="underline decoration-solid" to="/login">
               login
-            </a>
+            </Link>
           </span>
 
           <form

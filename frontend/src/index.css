@@ -2,7 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'ibm-mono';
+  src: url(./assets/fonts/IBMPlexMono-Regular.ttf);
+  font-weight: 400;
+  font-style: normal;
+}
+
 * {
+  font-family: 'ibm-mono';
   box-sizing: border-box;
 }
 
@@ -15,6 +23,7 @@ body {
 
 html {
   overflow-x: hidden;
+  background-color: black;
 }
 
 html, body {

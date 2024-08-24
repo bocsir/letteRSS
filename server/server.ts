@@ -133,8 +133,8 @@ app.post('/newFeed', async (req, res) => {
 
 
 //express server*************************
-const server = app.listen("4000", () => {
-    console.log("app listening at http://localhost:4000");
+const server = app.listen("3000", () => {
+    console.log("app listening at http://localhost:3000");
 });
 
 interface AuthValues {
