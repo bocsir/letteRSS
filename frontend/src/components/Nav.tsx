@@ -2,22 +2,24 @@
 //calling feedComponent logic could be a separate component 
 
 import axios from "axios";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faEllipsis } from '@fortawesome/free-solid-svg-icons';
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
 
-const Nav = ({ callGetArticles }) => {
-    const [menuVisible, setMenuVis] = useState(false);
+interface NavProps {
+  callGetArticles: any;
+}
+
+const Nav: React.FC<NavProps> = ({ callGetArticles }) => {
+    const [menuVisible, setMenuVis] = useState<boolean>(false);
     const toggleMenuVis = () => {
       setMenuVis(!menuVisible);
     };
 
-    const [newFeedUrl, setNewFeedUrl] = useState("");
+    const [newFeedUrl, setNewFeedUrl] = useState<string>("");
 
-    const sendURL = async (e) => {
+    const sendURL = async (e: FormEvent) => {
       e.preventDefault();
       try {
         //send new url to server
@@ -82,9 +84,9 @@ const Nav = ({ callGetArticles }) => {
             <div className="flex flex-col">
               <p className="text-base">Register to save feeds to your account:</p>
               <div className="flex items-center gap-2 mt-1">
-                <Link className="bg-amber-300 p-1 rounded-md text-black text-base font-semibold hover:bg-amber-400" to="/login" element={<Login/>}>Login</Link>
+                <Link className="bg-amber-300 p-1 rounded-md text-black text-base font-semibold hover:bg-amber-400" to="/login" >Login</Link>
                 <p className="text-base">or</p>
-                <Link className="bg-amber-300 p-1 rounded-md text-black text-base font-semibold hover:bg-amber-400" to="/singup" element={<SignUp/>}>Sign Up</Link>
+                <Link className="bg-amber-300 p-1 rounded-md text-black text-base font-semibold hover:bg-amber-400" to="/singup">Sign Up</Link>
               </div>
 
             </div>

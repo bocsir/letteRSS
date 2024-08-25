@@ -24,18 +24,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Feed from "./components/Feed";
 import Nav from './components/Nav';
-import SignUp from './components/pages/SignUp';
+import { ArticleItem, Articles } from "./interfaces";
 
 function App() {
   //useState is useful because calling its update function will trigger re-render
-  const [articles, setArticles] = useState({});
-  const [feedVisibility, setFeedVisibility] = useState({});
+  const [articles, setArticles] = useState<Articles>({});
+  const [feedVisibility, setFeedVisibility] = useState<{[key: string]: boolean}>({});
 
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
     console.log('gettingarticles');
     try {
-      const res = await axios.get("http://localhost:4000/");
+      const res = await axios.get("http://localhost:3000/");
       console.log("fetched articles: ", res.data);
       setArticles(res.data);
     } catch (error) {
@@ -48,11 +48,12 @@ function App() {
     getArticles();
   }, []);
 
-  const toggleFeedVisibility = (feedIndex) => {
-    setFeedVisibility((prev) => ({
+  const toggleFeedVisibility = (feedIndex: string) => {
+    setFeedVisibility((prev: {[key: string]: boolean}) => ({
       ...prev,
       [feedIndex]: !prev[feedIndex],
     }));
+    console.log(feedVisibility);
   };
   return (
     <>
@@ -61,7 +62,7 @@ function App() {
       {/* feed list */}
       <div className="mb-5">
         <h2 className="text-2xl font-bold ml-4 ">Feeds:</h2>
-        {Object.entries(articles).map(([feedIndex, feedArray]) => (
+        {Object.entries(articles).map(([feedIndex, feedArray]: [string, ArticleItem[]]) => (
           <div
             key={feedIndex}
             className="cursor-pointer w-fit border ml-3 mr-3 pl-3 pr-3 pt-1 pb-1 bg-black"
@@ -85,12 +86,9 @@ function App() {
             </div>
             {feedVisibility[feedIndex] && (
               <div className="font-semibold flex flex-col ml-3">
-                {feedArray.map((item, itemIndex) => (
+                {feedArray.map((item: ArticleItem) => (
                   <Feed
-                    key={`${feedIndex}-${itemIndex}`}
-                    title={item.item.title}
-                    link={item.item.link}
-                    date={item.item.pubDate}
+                    key={item.item.title}
                     item={item.item}
                   />
                 ))}

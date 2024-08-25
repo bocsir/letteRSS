@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
 import grid2 from "../../assets/images/darkgrid.svg";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import {Link} from 'react-router-dom';
 
 const SignUp = () => {
@@ -25,7 +25,7 @@ const SignUp = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     axios.post('http://localhost:4000/signup', {
         email,
@@ -41,7 +41,6 @@ const SignUp = () => {
       <div
         className="flex sm:items-center justify-center relative w-screen h-screen z-2 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${grid2})` }}
-        alt="grid background"
       >
         <Link to="/" className="[320px]:text-left absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
           <h2 className="text-3xl -mb-2">letteRSS</h2>

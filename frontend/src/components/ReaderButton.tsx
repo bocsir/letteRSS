@@ -1,20 +1,18 @@
 //shows in feed list and when clicked passes article details to ReaderPortal
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesRight } from '@fortawesome/free-solid-svg-icons';
-import { useState, useMemo } from "react";
-import DOMPurify from "dompurify";
+import { useState } from "react";
 import ReaderPortal from "./ReaderPortal";
+import { FeedItem } from "../interfaces";
 
-const ReaderButton = ({ item, link, date, isHovered, setIsHovered }) => {
-  const [isPortalVisible, setIsPortalVisible] = useState(false);
+interface ReaderButtonProps {
+  item: FeedItem;
+  isHovered: boolean;
+  setIsHovered: any;
+}
 
-  const sanitizedContent = useMemo(() => {
-    let content = DOMPurify.sanitize(item.content);
-
-    return content
-    ? ( content )
-    : ( DOMPurify.sanitize(item['content:encoded']) )
-  }, [item]);
+const ReaderButton: React.FC<ReaderButtonProps> = ({ item, isHovered, setIsHovered }) => {
+  const [isPortalVisible, setIsPortalVisible] = useState<boolean>(false);
 
   return (
     <>
@@ -27,7 +25,7 @@ const ReaderButton = ({ item, link, date, isHovered, setIsHovered }) => {
       >
         <FontAwesomeIcon icon={faAnglesRight} />
       </button>
-      {(isPortalVisible) && <ReaderPortal item={item} link={link} date={date} sanitizedContent={sanitizedContent} isPortalVisible={isPortalVisible} setIsPortalVisible={setIsPortalVisible}/>}
+      {(isPortalVisible) && <ReaderPortal item={item} setIsPortalVisible={setIsPortalVisible}/>}
     </>
   );
 };

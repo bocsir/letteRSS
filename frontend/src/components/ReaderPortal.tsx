@@ -2,10 +2,26 @@ import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { ToggleSwitch } from './ToggleSwitch';
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { FeedItem } from "../interfaces";
+import DOMPurify from "dompurify";
 
-const ReaderPortal = ({ item, link, date, sanitizedContent, setIsPortalVisible }) => {
-  const [isChecked, setIsChecked] = useState(false);
+interface ReaderPortalProps {
+  item: FeedItem;
+  setIsPortalVisible: any
+}
+
+const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible }) => {
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+
+  const sanitizedContent = useMemo(() => {
+    let content = DOMPurify.sanitize(item.content!);
+
+    return content
+    ? ( content )
+    : ( DOMPurify.sanitize(item['content:encoded']!));
+  }, [item]);
+
 
   const changePortalState = () => {
     setIsPortalVisible(false);
@@ -15,8 +31,8 @@ const ReaderPortal = ({ item, link, date, sanitizedContent, setIsPortalVisible }
     <div className="w-screen h-screen fixed inset-0 flex flex-col justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
       <div className="flex justify-between items-center w-3/6 text-sm">
         <div className="flex  gap-2">
-          <a href={link} className="hover:text-amber-300">{link}</a>
-          <p>{date}</p>
+          <a href={item.link} className="hover:text-amber-300">{item.link}</a>
+          <p>{item.date}</p>
         </div>
         <div className="flex justify-end w-3/6">
           <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked}/>
@@ -30,7 +46,7 @@ const ReaderPortal = ({ item, link, date, sanitizedContent, setIsPortalVisible }
       </div>
 
         { isChecked ? (
-            <iframe className="w-full h-full"  src={link} title={link}></iframe>
+            <iframe className="w-full h-full"  src={item.link} title={item.link}></iframe>
           ) : (
             (sanitizedContent) ? ( 
               <>

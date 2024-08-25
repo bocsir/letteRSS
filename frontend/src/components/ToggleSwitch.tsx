@@ -1,4 +1,11 @@
-export const ToggleSwitch = ({ isChecked, setIsChecked }) => {
+import React from "react";
+
+interface ToggleSwitchProps {
+  isChecked: boolean;
+  setIsChecked: any;
+}
+
+export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isChecked, setIsChecked }) => {
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked)

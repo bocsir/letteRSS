@@ -31,7 +31,7 @@ const pool: Pool = mariadb.createPool({
         connection = await pool.getConnection();
         //log users to prove connection
         const rows = await connection.query('SELECT * FROM user');
-        console.log(rows); // [ { val: 1 } ]
+        // console.log(rows); // [ { val: 1 } ]
     } catch (err) {
         console.error('Error connecting to the database:', err);
     } finally {
@@ -43,7 +43,6 @@ const pool: Pool = mariadb.createPool({
 async function getHashedPw(password: string, saltRounds: number): Promise<string> {
     try {
         const hashedPw = await bcrypt.hash(password, saltRounds)
-        console.log(hashedPw);
         return hashedPw;
     } catch (err) {
         console.log('Error retrieving hashed password, ', err);
@@ -56,7 +55,6 @@ const saltRounds: number = 10;
 //login form submit endpoint
 app.post("/signup", async (req: Request) => {
     let signupValues: [any, string];
-    console.log(req.body);
     let body: any = req.body!;
 
     if (connection) {
@@ -97,7 +95,7 @@ app.post('/login', async (req, res) => {
 //fill with feeds from db in future 
 let feedURLs: string[] = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
-let allItems: { [key: string]: any[] } = {};
+let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
 
 
