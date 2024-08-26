@@ -2,8 +2,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import grid2 from "../../assets/images/darkgrid.svg";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import {Link} from 'react-router-dom';
+import { Logo } from "../Logo";
 
 const Login = () => {
   const [eyeIcon, setEyeIcon] = useState(faEye);
@@ -24,7 +25,7 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     axios
       .post("http://localhost:4000/login", {
@@ -38,15 +39,13 @@ const Login = () => {
   return (
     <>
       <div
-        className="flex sm:items-center justify-center relative w-screen h-screen z-2 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${grid2})` }}
-        alt="grid background"
+        className="flex sm:items-center justify-center relative w-screen h-screen"
       >
-        <Link to="/" className="[320px]:text-left absolute flex flex-col text-center text-amber-300 top-0 p-3 bg-stone-800 w-screen">
-          <h2 className="text-3xl -mb-2">letteRSS</h2>
-          <p>RSS Reader</p>
+        <img src={grid2} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30"/>
+        <Link to="/" className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen">
+          <Logo isWhite={false}/>
         </Link>
-        <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-stone-800 rounded text-white p-4">
+        <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-black border rounded-lg text-white p-4 relative z-10">
           <h1 className="text-3xl text-center">Login to your account</h1>
           <span className="text-sm">
             Don't have one?{" "}

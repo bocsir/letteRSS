@@ -5,8 +5,6 @@
 @font-face {
   font-family: 'ibm-mono';
   src: url(./assets/fonts/IBMPlexMono-Regular.ttf);
-  font-weight: 400;
-  font-style: normal;
 }
 
 * {
@@ -16,14 +14,28 @@
 
 body {
   margin: 0;
-  background-color: rgb(36, 31, 31);
+  /* background-color: #030d1b; */
+  background-color: black;
   font-family: monospace;
   color: white;
+  height: 100vh;
 }
 
 html {
   overflow-x: hidden;
   background-color: black;
+  height: 100vh;
+}
+
+#feed-list {
+  scrollbar-width: thin;
+}
+
+#root {
+  height: 100%;
+  margin: 0 !important;
+  position: relative;
+  top: 0;
 }
 
 html, body {

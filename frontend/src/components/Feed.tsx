@@ -16,7 +16,7 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
     month: "long", 
     year: "numeric" 
   }; 
-  let articleDate = new Date(item.date).toLocaleDateString("en-US", dateFormat);
+  let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
 
   return (
@@ -29,11 +29,11 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <h3 className="text-lg leading-4">
+        <h3 className="text-base font-normal leading-4">
           {item.title}
           <FontAwesomeIcon icon={faLink} className="text-xs ml-1"/>
         </h3>
-        <p>{articleDate}</p>
+        <p className="font-light text-sm">{articleDate}</p>
       </a>
       <ReaderButton 
         item={articleContent} 

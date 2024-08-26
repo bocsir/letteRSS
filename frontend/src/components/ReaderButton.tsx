@@ -18,7 +18,7 @@ const ReaderButton: React.FC<ReaderButtonProps> = ({ item, isHovered, setIsHover
     <>
       <button
         onClick={() => setIsPortalVisible(true)}
-        className={`mb-2 flex items-center text-lg hover:bg-stone-800 rounded relative z-2 ${isHovered ? 'text-amber-300' : ''}`}
+        className={`mb-2 flex items-center text-sm h-5 hover:bg-stone-800 rounded relative z-2 ${isHovered ? 'text-amber-300' : ''}`}
         data-title="open here"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

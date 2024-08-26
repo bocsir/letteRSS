@@ -1,7 +1,7 @@
 export interface FeedItem {
     title: string;
     link: string;
-    date: string;
+    pubDate: string;
     content?: string;
     ['content:encoded']?: string
 }
