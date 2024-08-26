@@ -59,6 +59,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
         className={`h-5/6 w-3/6 bg-black content overflow-auto border border-white rounded-lg text-white ${
           isChecked ? "p-0" : "p-4"
         }`}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="relative w-full"></div>
 

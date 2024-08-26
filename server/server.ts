@@ -75,19 +75,25 @@ app.post('/login', async (req, res) => {
     const query = 'SELECT password FROM user WHERE email = (?)';
     
     if (connection) {
-        const queryRes = connection.query(query, req.body.email)
-        console.log(queryRes);
-
-        //const hashedPw: string = queryRes.?
-
-        //check password
-        // if (bcrypt.compare(req.body.password, hashedPw, saltRounds)){
-        //     //good password
-        //     console.log('good pw');
-        // } else {
-        //     //bad password
-        //     console.error('bad pw');
-    // }
+        try {
+            const queryRes = await connection.query(query, req.body.email)
+            const hashedPw = queryRes[0].password;
+                
+            //check password
+            bcrypt.compare(req.body.password, hashedPw, (err, passwordRes) => {
+                if (passwordRes) {
+                    console.log('good pw');
+                    //set current user somehow? JWT? 
+                    //open "/" which shoud automatically load the users feeds from db
+                } else if (err) {
+                    console.error("Error validating password: ", err);
+                }
+                res.json({valid: passwordRes, queryFailed: false});
+            })
+        } catch (err) {
+            console.error(err);
+            res.json({valid: false, queryFailed: true});
+        }
     }
 });
 
