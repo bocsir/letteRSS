@@ -4,7 +4,10 @@ import axios from "axios";
 import Feed from "../components/Feed";
 import Menu from "./Menu";
 
-export const FeedList = () => {
+interface FeedListProps {
+  email: string;
+}
+export const FeedList: React.FC<FeedListProps> = ({email}) => {
   //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState<Articles>({});
   const [feedVisibility, setFeedVisibility] = useState<{
@@ -15,6 +18,9 @@ export const FeedList = () => {
   const getArticles = async () => {
     console.log("gettingarticles");
     try {
+      if (email !== "") {
+        //get users followed feeds by email
+      }
       const res = await axios.get("http://localhost:3000/");
       console.log("fetched articles: ", res.data);
       setArticles(res.data);

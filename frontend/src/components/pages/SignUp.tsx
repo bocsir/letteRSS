@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
-import grid2 from "../../assets/images/darkgrid.svg";
+import grid2 from "../../assets/images/grid-bg_4x.webp";
 import { FormEvent, useState } from "react";
 import {Link} from 'react-router-dom';
 import { Logo } from "../Logo";
@@ -71,11 +71,11 @@ const SignUp = () => {
             {(!emailFormatValid && (
               <span className="text-red-500 text-sm -mt-1">Invalid email format</span>
             ))}
-            <input className={`border-2 ${emailFormatValid ? "border-transparent" : "border-red-500"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
+            <input className={`border ${emailFormatValid ? "border-transparent" : "border-red-500"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
             <label htmlFor="password">Password:</label>
             <span className="flex justify-between h-min items-center mb-4">
               <input
-                className="w-11/12 text-black pl-1 rounded-sm"
+                className="w-11/12 text-black pl-1 rounded-sm border border-transparent"
                 type={passVis}
                 id="password"
                 name="password"

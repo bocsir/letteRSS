@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import grid2 from "../../assets/images/darkgrid.svg";
+import grid2 from "../../assets/images/grid-bg_4x.webp";
 import { FormEvent, useState } from "react";
 import {Link} from 'react-router-dom';
 import { Logo } from "../Logo";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const [eyeIcon, setEyeIcon] = useState(faEye);
@@ -38,6 +39,13 @@ const Login = () => {
         console.log("password valid: ", res.data.valid , ", query failed: ", res.data.queryFailed, ", response: ", res);
         setPasswordValid(res.data.valid);
         setQueryFailed(res.data.queryFailed);
+        //successful login
+        if(passwordValid && !queryFailed) {
+          localStorage.setItem('userToken', res.data.token);
+          localStorage.setItem('userEmail', email);
+
+          window.location.href="/dashboard";
+        }
       })
       .catch((err) => console.log(err));
   };
@@ -63,11 +71,11 @@ const Login = () => {
           <form
             className="flex flex-col h-5/6 w-full text-lg mt-2 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
             <label htmlFor="email">Email:</label>
-            <input className={`border-2 ${queryFailed ? "border-red-500" : "border-transparent"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
+            <input className={`border ${queryFailed ? "border-red-500" : "border-transparent"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
             <label htmlFor="password">Password:</label>
             <span className="flex justify-between h-min items-center mb-4">
               <input
-                className={`w-11/12 text-black pl-1 rounded-sm border-2 ${passwordValid ? "border-transparent" : "border-red-500"}`}
+                className={`w-11/12 text-black pl-1 rounded-sm border ${passwordValid ? "border-transparent" : "border-red-500"}`}
                 type={passVis}
                 id="password"
                 name="password"

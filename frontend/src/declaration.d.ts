@@ -1,4 +1,4 @@
-declare module "*.svg" {
+declare module "*.webp" {
     const content: any;
     export default content;
 }

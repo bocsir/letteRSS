@@ -1,19 +1,16 @@
-/*TODO:
-
-*Separate db, express server, rss feed handling
-
-*/
-
 import RSSParser from "rss-parser";
 import cors from "cors";
-import express, { Express } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import mariadb, { Connection, Pool } from 'mariadb';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
- 
+import jwt from 'jsonwebtoken'; 
+
 let app: Express = express();
 app.use(cors());
 app.use(express.json());
+
+const JWT_SECRET: string = process.env.JWT_SECRET!;
 
 //db
 let connection: Connection | null = null;
@@ -72,24 +69,35 @@ app.post("/signup", async (req: Request) => {
 //check that password is good
 app.post('/login', async (req, res) => {
     //get hashed password from db
-    const query = 'SELECT password FROM user WHERE email = (?)';
-    
+    const query = 'SELECT * FROM user WHERE email = (?)';
     if (connection) {
         try {
             const queryRes = await connection.query(query, req.body.email)
             const hashedPw = queryRes[0].password;
                 
+            let passwordResult: boolean = false;
+            let token: string;
             //check password
             bcrypt.compare(req.body.password, hashedPw, (err, passwordRes) => {
                 if (passwordRes) {
-                    console.log('good pw');
-                    //set current user somehow? JWT? 
                     //open "/" which shoud automatically load the users feeds from db
+                    passwordResult = passwordRes;
+
+                    token = jwt.sign(
+                        //payload
+                        { userId: queryRes[0].id, email: queryRes[0].email },
+                        //key
+                        JWT_SECRET,
+                        //options
+                        { expiresIn: '1h' }
+                    );
+            
                 } else if (err) {
                     console.error("Error validating password: ", err);
                 }
-                res.json({valid: passwordRes, queryFailed: false});
+                res.json({valid: passwordResult, queryFailed: false, token: token});
             })
+
         } catch (err) {
             console.error(err);
             res.json({valid: false, queryFailed: true});
@@ -97,6 +105,34 @@ app.post('/login', async (req, res) => {
     }
 });
 
+interface UserPayload {
+    userId: string;
+    email: string;
+}
+
+interface AuthenticatedRequest extends Request {
+    user?: UserPayload;
+}
+
+function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    console.log('/check-auth called');
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    console.log('token: ', token);
+  
+    if (token == null) return res.sendStatus(401);
+  
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user as UserPayload;
+      next();
+    });
+}
+  
+app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+    res.json({ authenticated: true, user: req.user });
+});
 //rss feed handling*********************************************************************
 //fill with feeds from db in future 
 let feedURLs: string[] = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
@@ -121,7 +157,6 @@ renderFeed();
 
 //endpoint to send Items
 app.get('/', async (req, res) => {
-    console.log(req);
     await renderFeed();
     res.send(allItems);
 })

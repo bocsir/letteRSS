@@ -29,10 +29,38 @@
   *red dot for new posts
 
 */
+import { useEffect, useState } from "react";
 import { FeedList } from "./components/FeedList";
 import { Logo } from "./components/Logo";
+import axios from "axios";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  
+  useEffect(() => {
+    async function checkAuthStatus() {
+      const result = await checkAuth();
+      setIsAuthenticated(result);
+      setUserEmail(localStorage.getItem('userEmail')!);
+    }
+    checkAuthStatus();
+  }, []);
+
+  //call /check-auth
+  const checkAuth = async() : Promise<boolean> => {
+    try {
+      const response = await axios.get('http://localhost:3000/auth', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('userToken')}` }
+      });
+      console.log('/check-auth response: ', response.data);
+      return response.data.authenticated;
+
+    } catch (err) {
+      return false;
+    }
+  }
 
   return (
     <>
@@ -41,7 +69,11 @@ function App() {
         className="absolute top-3 right-3">
         <Logo isWhite={false}/>
       </a>
-      <FeedList/>
+      <FeedList email={userEmail}/>
+
+      {(isAuthenticated && (
+        <div>signed in as: {userEmail}</div>
+      ))}
     </>
   );
 }

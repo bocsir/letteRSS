@@ -59,7 +59,7 @@ const Nav: React.FC<NavProps> = ({ callGetArticles }) => {
 
           </div>
 
-          <div className="flex flex-col gap-3 p-6 pt-4 w-96 h-max shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black rounded-md z-10 inset-x-2/4 inset-y-1/4">
+          <div onClick={(e) => e.stopPropagation()} className="flex flex-col gap-3 p-6 pt-4 w-96 h-max shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black rounded-md z-10 inset-x-2/4 inset-y-1/4">
             <form 
               className="flex flex-col"                   
               onSubmit={sendURL}
