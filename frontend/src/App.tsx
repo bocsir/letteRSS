@@ -1,11 +1,14 @@
 /*
-*TODO:
+*TODO:  
   *auth:
-    *set current user with JWT
-  
+    *refresh toekn that persists for 30 days
+    *what should TOKEN_SECRET look like?
+    *store tokens in httponly cookies
+    *use access token for api requests, when request fails, use refresh token to get new one at /refresh-token
+    *if refresh token fails, logout user
+
   *feed database:
     *URLs table:
-      *
       * id (Primary Key) //user id
       * url
       * title (optional) //if user sets title
@@ -29,39 +32,52 @@
   *red dot for new posts
 
 */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FeedList } from "./components/FeedList";
 import { Logo } from "./components/Logo";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import api from './api';
+import Login from "./components/pages/Login";
 
-function App() {
+const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userEmail, setUserEmail] = useState<string>("");
+ 
 
-  
   useEffect(() => {
-    async function checkAuthStatus() {
-      const result = await checkAuth();
-      setIsAuthenticated(result);
-      setUserEmail(localStorage.getItem('userEmail')!);
-    }
-    checkAuthStatus();
+    getAuthStatus();
   }, []);
 
-  //call /check-auth
-  const checkAuth = async() : Promise<boolean> => {
-    try {
-      const response = await axios.get('http://localhost:3000/auth', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('userToken')}` }
-      });
-      console.log('/check-auth response: ', response.data);
-      return response.data.authenticated;
-
-    } catch (err) {
-      return false;
-    }
+  interface User {
+    email: string;
+    //...
+  }
+  interface AuthStatusResponse {
+    authenticated: boolean;
+    user: User;
   }
 
+  //how do i get auth token from cookies?
+  async function getAuthStatus() {
+    try {
+
+      //check wether user is logged in
+      const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth');
+      setIsAuthenticated(response.data.authenticated);
+      setUserEmail(response.data.user.email);
+    } catch (err) {
+      console.error('error checking user auth: ', err);
+      try {
+        //make new access token and call to get auth status again
+        console.log('refreshing access token');
+        await api.get('/refresh-token');
+        getAuthStatus();
+      } catch (err) {
+        console.error('error generating new access token: ', err);
+      }
+    }
+  }
+ 
   return (
     <>
       <a
@@ -69,8 +85,7 @@ function App() {
         className="absolute top-3 right-3">
         <Logo isWhite={false}/>
       </a>
-      <FeedList email={userEmail}/>
-
+      <FeedList email={userEmail} isAuthenticated={isAuthenticated}/>
       {(isAuthenticated && (
         <div>signed in as: {userEmail}</div>
       ))}

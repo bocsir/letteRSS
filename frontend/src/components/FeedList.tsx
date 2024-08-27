@@ -3,11 +3,14 @@ import { ArticleItem, Articles } from "../interfaces";
 import axios from "axios";
 import Feed from "../components/Feed";
 import Menu from "./Menu";
+import api from '../api';
+
 
 interface FeedListProps {
   email: string;
+  isAuthenticated: boolean;
 }
-export const FeedList: React.FC<FeedListProps> = ({email}) => {
+export const FeedList: React.FC<FeedListProps> = ({email, isAuthenticated}) => {
   //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState<Articles>({});
   const [feedVisibility, setFeedVisibility] = useState<{
@@ -21,7 +24,7 @@ export const FeedList: React.FC<FeedListProps> = ({email}) => {
       if (email !== "") {
         //get users followed feeds by email
       }
-      const res = await axios.get("http://localhost:3000/");
+      const res = await api.get('/');
       console.log("fetched articles: ", res.data);
       setArticles(res.data);
     } catch (error) {
@@ -49,7 +52,7 @@ export const FeedList: React.FC<FeedListProps> = ({email}) => {
       >
         <div className="flex justify-between items-center">
           <h2 className="text-base font-bold ml-3 text-gray-400">Feeds:</h2>
-          <Menu callGetArticles={getArticles}/>
+          <Menu callGetArticles={getArticles} isAuthenticated={isAuthenticated}/>
         </div>
 
         {Object.entries(articles).map(

@@ -1,13 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
 import grid2 from "../../assets/images/grid-bg_4x.webp";
 import { FormEvent, useState } from "react";
 import {Link} from 'react-router-dom';
 import { Logo } from "../Logo";
-import { Navigate } from "react-router-dom";
+import api from '../../api';
 
-const Login = () => {
+const Login: React.FC = () => {
+
   const [eyeIcon, setEyeIcon] = useState(faEye);
   const [passVis, setPassVis] = useState<string>("password");
 
@@ -28,27 +28,24 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:3000/login", {
-        email,
-        password,
-      })
-      .then((res) => {
-        console.log("password valid: ", res.data.valid , ", query failed: ", res.data.queryFailed, ", response: ", res);
-        setPasswordValid(res.data.valid);
-        setQueryFailed(res.data.queryFailed);
+    try {
+      const response = await api.post('/login', { email: email, password: password });
+        console.log("password valid: ", response.data.valid , ", query failed: ", response.data.queryFailed, ", response: ", response);
+        setPasswordValid(response.data.valid);
+        setQueryFailed(response.data.queryFailed);
+        console.log(response.data.accessToken);
         //successful login
         if(passwordValid && !queryFailed) {
-          localStorage.setItem('userToken', res.data.token);
-          localStorage.setItem('userEmail', email);
-
-          window.location.href="/dashboard";
+          window.location.href="/";
         }
-      })
-      .catch((err) => console.log(err));
-  };
+        
+      
+    } catch (err) {
+      console.error('login failed: ', err);
+    }
+  }
 
   return (
     <>
