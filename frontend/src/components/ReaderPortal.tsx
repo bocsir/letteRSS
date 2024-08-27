@@ -11,10 +11,7 @@ interface ReaderPortalProps {
   setIsPortalVisible: any;
 }
 
-const ReaderPortal: React.FC<ReaderPortalProps> = ({
-  item,
-  setIsPortalVisible,
-}) => {
+const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const sanitizedContent = useMemo(() => {
@@ -24,7 +21,6 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
   }, [item]);
 
   const minimalLink = item.link.split("/")[2];
-
   const changePortalState = () => {
     setIsPortalVisible(false);
   };
@@ -36,12 +32,11 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex items-center justify-between w-3/6 text-sm relative z-50"
+        className="flex items-center justify-between text-sm relative z-50 w-5/6 max-w-[800px]"
       >
-        <a href={item.link} className="hover:text-amber-300">
+        <a href={item.link} className="hover:text-amber-300 text-sm font-medium">
           {minimalLink}
         </a>
-        <p>Uploaded: {item.pubDate}</p>
         <div className="flex relative z-60">
           <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked} />
           <button
@@ -53,11 +48,10 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
           <br />
         </div>
       </div>
-      {/* TODO: make this variable width like a window, add iframe option to site */}
 
       <div
-        className={`h-5/6 w-3/6 bg-black content overflow-auto border border-white rounded-lg text-white ${
-          isChecked ? "p-0" : "p-4"
+        className={`h-min max-h-[80vh] md:w-5/6 ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
+          isChecked ? "p-0 h-[80vh] w-5/6" : "p-4 pt-2"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -71,8 +65,11 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
           ></iframe>
         ) : sanitizedContent ? (
           <>
+            <a href={item.link} className="text-xl underline">
+              {item.title}
+            </a>
             <div
-              className="text-base leading-5"
+              className="text-base leading-5 mt-3 flex flex-col space-y-3"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           </>

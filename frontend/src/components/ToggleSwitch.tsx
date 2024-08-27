@@ -13,7 +13,7 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isChecked, setIsChec
 
   return (
     <>
-      <label className='relative mr-4 mb-1 flex cursor-pointer select-none items-center'>
+      <label className='relative mr-4 flex cursor-pointer select-none items-center'>
         <span className='label flex items-center text-sm font-medium'>
           View: <span className='pl-1'> {isChecked ? 'Site' : 'Simple'} </span>
         </span>

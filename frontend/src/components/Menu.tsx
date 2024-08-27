@@ -48,7 +48,7 @@ const Nav: React.FC<NavProps> = ({ callGetArticles, isAuthenticated }) => {
         <button onClick={toggleMenuVis}>
           <FontAwesomeIcon
             icon={faEllipsis}
-            className="text-2xl text-gray-400 pointer z-20 relative mr-2.5"
+            className="text-2xl text-gray-400 pointer relative mr-2.5"
           />
         </button>
 

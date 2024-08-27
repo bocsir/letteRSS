@@ -80,10 +80,11 @@ const App: React.FC = () => {
         className="absolute top-3 right-3">
         <Logo isWhite={false}/>
       </a>
-      <FeedList email={userEmail} isAuthenticated={isAuthenticated}/>
       {(isAuthenticated && (
-        <div>signed in as: {userEmail}</div>
+        <div className="ml-3">signed in as: {userEmail}</div>
       ))}
+
+      <FeedList email={userEmail} isAuthenticated={isAuthenticated}/>
     </>
   );
 }
