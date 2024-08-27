@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { ArticleItem, Articles } from "../interfaces";
-import axios from "axios";
 import Feed from "../components/Feed";
 import Menu from "./Menu";
 import api from '../api';
-
 
 interface FeedListProps {
   email: string;

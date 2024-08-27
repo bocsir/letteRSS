@@ -1,10 +1,6 @@
 /*
 *TODO:  
   *auth:
-    *refresh toekn that persists for 30 days
-    *what should TOKEN_SECRET look like?
-    *store tokens in httponly cookies
-    *use access token for api requests, when request fails, use refresh token to get new one at /refresh-token
     *if refresh token fails, logout user
 
   *feed database:
@@ -35,9 +31,8 @@
 import React, { useEffect, useState } from "react";
 import { FeedList } from "./components/FeedList";
 import { Logo } from "./components/Logo";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import api from './api';
-import Login from "./components/pages/Login";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
