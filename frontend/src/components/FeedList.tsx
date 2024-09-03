@@ -11,9 +11,7 @@ interface FeedListProps {
 export const FeedList: React.FC<FeedListProps> = ({email, isAuthenticated}) => {
   //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState<Articles>({});
-  const [feedVisibility, setFeedVisibility] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const [feedVisibility, setFeedVisibility] = useState<{ [key: string]: boolean }>({});
 
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
@@ -30,10 +28,12 @@ export const FeedList: React.FC<FeedListProps> = ({email, isAuthenticated}) => {
     }
   };
 
-  //get articles on mount (first render)
+  //get articles on mount and when isAuthenticated refreshes
   useEffect(() => {
-    getArticles();
-  }, []);
+    if (isAuthenticated) {
+      getArticles();
+    }
+  }, [isAuthenticated]);
 
   const toggleFeedVisibility = (feedIndex: string) => {
     setFeedVisibility((prev: { [key: string]: boolean }) => ({

@@ -32,7 +32,9 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex items-center justify-between text-sm relative z-50 w-5/6 max-w-[800px]"
+        className={`flex items-center justify-between text-sm relative z-50 w-5/6
+          ${isChecked ? "max-w-5/6" : "max-w-[800px]"}
+          `}
       >
         <a href={item.link} className="hover:text-amber-300 text-sm font-medium">
           {minimalLink}
@@ -50,12 +52,12 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }
       </div>
 
       <div
-        className={`h-min max-h-[80vh] md:w-5/6 ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
-          isChecked ? "p-0 h-[80vh] w-5/6" : "p-4 pt-2"
+        className={`w-full max-h-[80vh] md:w-5/6 md: ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
+          isChecked ? "p-0 w-5/6 max-w-none min-h-[80vh] h-[80vh]" : "h-min p-4 pt-2"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative w-full"></div>
+        {/* <div className="relative w-full"></div> */}
 
         {isChecked ? (
           <iframe
@@ -64,7 +66,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }
             title={item.link}
           ></iframe>
         ) : sanitizedContent ? (
-          <>
+          <div className="text-orange-100">
             <a href={item.link} className="text-xl underline">
               {item.title}
             </a>
@@ -72,7 +74,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }
               className="text-base leading-5 mt-3 flex flex-col space-y-3"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
-          </>
+          </div>
         ) : (
           <p>No content to display</p>
         )}

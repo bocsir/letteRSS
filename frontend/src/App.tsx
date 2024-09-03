@@ -1,7 +1,8 @@
 /*
 *TODO:  
   *auth:
-    *if refresh token fails, logout user
+    *if refresh token fails, send user to login page
+    *fix the way uauth is checked
 
   *feed database:
     *URLs table:
@@ -32,17 +33,21 @@ import React, { useEffect, useState } from "react";
 import { FeedList } from "./components/FeedList";
 import { Logo } from "./components/Logo";
 import { AxiosResponse } from "axios";
-import api from './api';
+import api, { interceptors } from './api';
+import { useNavigate } from "react-router-dom";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userEmail, setUserEmail] = useState<string>("");
- 
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     getAuthStatus();
   }, []);
 
+  useEffect(() => {
+    interceptors(navigate);
+  }, [navigate]);
   interface User {
     email: string;
     //...
@@ -52,7 +57,6 @@ const App: React.FC = () => {
     user: User;
   }
 
-  //how do i get auth token from cookies?
   async function getAuthStatus() {
     try {
 
@@ -66,13 +70,13 @@ const App: React.FC = () => {
         //make new access token and call to get auth status again
         console.log('refreshing access token');
         await api.get('/refresh-token');
-        getAuthStatus();
+        // getAuthStatus();
       } catch (err) {
         console.error('error generating new access token: ', err);
       }
     }
   }
- 
+
   return (
     <>
       <a

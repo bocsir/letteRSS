@@ -15,7 +15,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
-const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET!;
 
 //db
 let connection: Connection | null = null;
@@ -54,53 +53,63 @@ async function getHashedPw(password: string, saltRounds: number): Promise<string
 
 const saltRounds: number = 10;
 
-//signup form submit endpoint
-app.post("/signup", async (req: Request) => {
+//'/signup' endpont. puts user email and hashed password into the database
+app.post("/signup", async (req: Request, res: Response) => {
+    console.log('signing up user');
     let signupValues: [any, string];
     let body: any = req.body!;
 
     if (connection) {
-        let hashedPw = await getHashedPw(body.password, saltRounds);
-        signupValues = [body.email, hashedPw];
-
-        //send signupValues to db
-        const query = "INSERT INTO user (email, password) VALUES (?, ?)";
-
-        const queryRes = connection.query(query, signupValues);
+        try {
+            let hashedPw = await getHashedPw(body.password, saltRounds);
+            signupValues = [body.email, hashedPw];
+    
+            //send signupValues to db
+            const query = "INSERT INTO user (email, password) VALUES (?, ?)";
+    
+            const queryRes = await connection.query(query, signupValues);
+            res.status(201).json({ message: 'User created successfully'});
+    
+        } catch (err) {
+            console.error('Signup erorr: ', err);
+            res.status(500).json({error: ''})
+        }
     }
 });
 
 function generateRefreshToken(userId: string): string {
     return jwt.sign(
         { userId },
-        REFRESH_TOKEN_SECRET,
+        JWT_SECRET,
         { expiresIn: '30d' }
     );
 }
 
 //login form submit endpoint
-//check that password is good
 app.post('/login', async (req, res) => {
     //get hashed password from db
-    const query = 'SELECT * FROM user WHERE email = (?)';
     if (connection) {
+        const query = 'SELECT * FROM user WHERE email = (?)';
         try {
+            //check that password mathches that of the same email in db
             const queryRes = await connection.query(query, req.body.email)
             const hashedPw = queryRes[0].password;
-                
-            let accessToken: string;
-            //check password
             bcrypt.compare(req.body.password, hashedPw, async (err, passwordRes) => {
+                //if password matches, make new access and refresh tokens
                 if (passwordRes) {
                     const userId = queryRes[0].id;
-                    accessToken = jwt.sign(
+
+                    const accessToken: string = jwt.sign(
                         { userId: userId, email: queryRes[0].email },
                         JWT_SECRET,
                         { expiresIn: '1h' }
                     );
-                    const refreshToken = generateRefreshToken(userId);
+                    //make new refresh token and update database with it
+                    const refreshToken: string = generateRefreshToken(userId);
                     await connection?.query('UPDATE user SET refresh_token = ? WHERE id = ?', [refreshToken, userId]);
                     
+                    //store both tokens in cookies
+
                     res.cookie('accessToken', accessToken, {
                         httpOnly: false, //accessible by js
                         secure: false, //set to true when https is set up
@@ -118,9 +127,9 @@ app.post('/login', async (req, res) => {
                     res.json({valid: passwordRes, queryFailed: false, accessToken: accessToken });
 
                 } else if (err) {
-                    console.error("Error validating password: ", err);
+                    console.error("Error validating password or creating/storing tokens ", err);
                 }
-            })
+            });
 
         } catch (err) {
             console.error(err);
@@ -142,17 +151,15 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
     const cookie = req.headers.cookie || null;
     if (cookie) {
         const accessToken = cookie.split('=')[2] || null;
-        console.log('accessToken::::: ', accessToken);
         if (accessToken == null) return res.sendStatus(401);
   
         jwt.verify(accessToken, JWT_SECRET, (err, user) => {
+            console.log(user, err);
           if (err) return res.sendStatus(403);
           req.user = user as UserPayload;
           next();
         });
-    
     }
-  
 }
   
 app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
@@ -191,7 +198,7 @@ app.get('/refresh-token', async(req, res) => {
 
 //rss feed handling*********************************************************************
 //fill with feeds from db in future 
-let feedURLs: string[] = ["https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
+let feedURLs: string[] = ["http://fetchrss.com/rss/66d63ac29c1d413f08062ef366d63a7c89c1a56ea20b5e23.xml", "https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
