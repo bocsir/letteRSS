@@ -11,10 +11,9 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 interface NavProps {
   callGetArticles: any;
-  isAuthenticated: boolean;
 }
 //somehow Nav needs to tell FeedList to call getArticles again
-const Nav: React.FC<NavProps> = ({ callGetArticles, isAuthenticated }) => {
+const Nav: React.FC<NavProps> = ({ callGetArticles }) => {
     const [menuVisible, setMenuVis] = useState<boolean>(false);
     const toggleMenuVis = () => {
       setMenuVis(!menuVisible);
@@ -87,17 +86,6 @@ const Nav: React.FC<NavProps> = ({ callGetArticles, isAuthenticated }) => {
                 </button>
               </div>
             </form>
-
-            {(!isAuthenticated) && (
-            <div className="flex flex-col">
-              <p className="text-base">Save feeds to your account:</p>
-              <div className="flex items-center gap-2 mt-1">
-                <Link className="bg-amber-300 p-2 pt-1 pb-1 rounded-md text-black text-base font-semibold" to="/login" >Login</Link>
-                <p className="text-base">or</p>
-                <Link className="bg-amber-300 p-2 pt-1 pb-1 rounded-md text-black text-base font-semibold" to="/singup">Sign Up</Link>
-              </div>
-            </div>
-            )}
           </div>
         </div>
         )}
@@ -106,4 +94,4 @@ const Nav: React.FC<NavProps> = ({ callGetArticles, isAuthenticated }) => {
   );
 };
 
-export default Nav
+export default Nav;

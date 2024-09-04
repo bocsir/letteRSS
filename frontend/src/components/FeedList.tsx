@@ -43,14 +43,14 @@ export const FeedList: React.FC<FeedListProps> = ({email, isAuthenticated}) => {
     console.log(feedVisibility);
   };
   return (
-    <div className="pt-1 h-[95vh]">
+    <div className="h-[95vh]">
       <div
         id="feed-list"
-        className="bg-[#000000] max-w-96 h-[100%] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-3 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)]"
+        className="max-w-96 h-[100%] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-3 p-3 border-2 border-gray-400 bg-neutral-900"
       >
         <div className="flex justify-between items-center">
           <h2 className="text-base font-bold ml-3 text-gray-400">Feeds:</h2>
-          <Menu callGetArticles={getArticles} isAuthenticated={isAuthenticated}/>
+          <Menu callGetArticles={getArticles}/>
         </div>
 
         {Object.entries(articles).map(

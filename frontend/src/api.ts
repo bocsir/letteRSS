@@ -13,7 +13,8 @@ export const interceptors = (navigate: any) => {
 
         (response) => response, 
         (err) => {
-            if (err.response && err.response.status === 401) {
+            if (err.response && err.response.status === 403) {
+                console.log('navigating to /login');
                 navigate("/login");
             }
             return Promise.reject(err);

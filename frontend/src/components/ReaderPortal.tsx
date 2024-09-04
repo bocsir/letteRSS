@@ -11,7 +11,7 @@ interface ReaderPortalProps {
   setIsPortalVisible: any;
 }
 
-const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }) => {
+const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const sanitizedContent = useMemo(() => {
@@ -66,7 +66,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, }
             title={item.link}
           ></iframe>
         ) : sanitizedContent ? (
-          <div className="text-orange-100">
+          <div className="text-gray-300">
             <a href={item.link} className="text-xl underline">
               {item.title}
             </a>

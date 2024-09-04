@@ -77,9 +77,9 @@ app.post("/signup", async (req: Request, res: Response) => {
     }
 });
 
-function generateRefreshToken(userId: string): string {
+function generateRefreshToken(email: string): string {
     return jwt.sign(
-        { userId },
+        { email },
         JWT_SECRET,
         { expiresIn: '30d' }
     );
@@ -97,15 +97,17 @@ app.post('/login', async (req, res) => {
             bcrypt.compare(req.body.password, hashedPw, async (err, passwordRes) => {
                 //if password matches, make new access and refresh tokens
                 if (passwordRes) {
+                    console.log(';lasdkfj;adslkjfd');
                     const userId = queryRes[0].id;
+                    const email = queryRes[0].email;
 
                     const accessToken: string = jwt.sign(
-                        { userId: userId, email: queryRes[0].email },
+                        { userId: userId, email: email },
                         JWT_SECRET,
                         { expiresIn: '1h' }
                     );
                     //make new refresh token and update database with it
-                    const refreshToken: string = generateRefreshToken(userId);
+                    const refreshToken: string = generateRefreshToken(email);
                     await connection?.query('UPDATE user SET refresh_token = ? WHERE id = ?', [refreshToken, userId]);
                     
                     //store both tokens in cookies
@@ -126,8 +128,10 @@ app.post('/login', async (req, res) => {
 
                     res.json({valid: passwordRes, queryFailed: false, accessToken: accessToken });
 
-                } else if (err) {
-                    console.error("Error validating password or creating/storing tokens ", err);
+                } else {
+                    console.log('kkkkkkkk');
+                    console.error("error logging in");
+                    res.json({valid: false, queryFailed: false});
                 }
             });
 
@@ -153,6 +157,7 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
         const accessToken = cookie.split('=')[2] || null;
         if (accessToken == null) return res.sendStatus(401);
   
+        //check access token validity
         jwt.verify(accessToken, JWT_SECRET, (err, user) => {
             console.log(user, err);
           if (err) return res.sendStatus(403);
@@ -163,13 +168,22 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
 }
   
 app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+    console.log()
     res.json({ authenticated: true, user: req.user });
 });
 
+app.post('/logout', (res: any) => {
+    console.log('response obj methods: ', Object.keys(res.res));
+    const actualRes = res.res;
+    actualRes.setHeader('Set-Cookie', 'accessToken=; HttpOnly=false; Secure=false; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+    actualRes.setHeader('Set-Cookie', 'refreshToken=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+    actualRes.status(200).json({ message: 'logged out successfuly'});
+});
+
 //generate a new accessToken using the safe refresh token
-app.get('/refresh-token', async(req, res) => {
+app.post('/refresh-token', async(req, res) => {
     const refreshToken = req.headers.cookie?.split('=')[1];
-    console.log('refresh token::::::: ', refreshToken);
+    //send error to send user to /login
     if (!refreshToken) return res.sendStatus(401);
 
     try {
@@ -182,12 +196,16 @@ app.get('/refresh-token', async(req, res) => {
             JWT_SECRET,
             { expiresIn: '1h' }
         );
-
+/*                        httpOnly: false, //accessible by js
+                        secure: false, //set to true when https is set up
+                        sameSite: 'strict',
+                        maxAge: 15 * 60 * 1000 // 15 minutes
+ */
         res.cookie('accessToken', newAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            httpOnly: false, //accessible by js
+            secure: false, //set to true when https is set up
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000 // 15 minutes
+            maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
         res.json({ message: 'Token refreshed' });

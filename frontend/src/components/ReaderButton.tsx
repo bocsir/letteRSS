@@ -25,7 +25,9 @@ const ReaderButton: React.FC<ReaderButtonProps> = ({ item, isHovered, setIsHover
       >
         <FontAwesomeIcon icon={faAnglesRight} />
       </button>
-      {(isPortalVisible) && <ReaderPortal item={item} setIsPortalVisible={setIsPortalVisible}/>}
+      {(isPortalVisible) && 
+        <ReaderPortal item={item} setIsPortalVisible={setIsPortalVisible}/>
+      }
     </>
   );
 };
