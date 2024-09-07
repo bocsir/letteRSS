@@ -16,7 +16,9 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mariadb": "^3.3.1",
+    "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.4",
+    "opml": "^0.5.5",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
@@ -25,9 +27,11 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.12",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "jsonwebtoken": "^9.0.2",
+    "opmlparser": "^0.8.0",
     "typescript": "^5.5.4"
   }
 }

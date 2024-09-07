@@ -5,6 +5,8 @@ import mariadb, { Connection, Pool } from 'mariadb';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
+import fs from 'fs';
+const opml = require("opml");
 
 let app: Express = express();
 app.use(cors({
@@ -97,7 +99,6 @@ app.post('/login', async (req, res) => {
             bcrypt.compare(req.body.password, hashedPw, async (err, passwordRes) => {
                 //if password matches, make new access and refresh tokens
                 if (passwordRes) {
-                    console.log(';lasdkfj;adslkjfd');
                     const userId = queryRes[0].id;
                     const email = queryRes[0].email;
 
@@ -129,7 +130,6 @@ app.post('/login', async (req, res) => {
                     res.json({valid: passwordRes, queryFailed: false, accessToken: accessToken });
 
                 } else {
-                    console.log('kkkkkkkk');
                     console.error("error logging in");
                     res.json({valid: false, queryFailed: false});
                 }
@@ -159,7 +159,6 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
   
         //check access token validity
         jwt.verify(accessToken, JWT_SECRET, (err, user) => {
-            console.log(user, err);
           if (err) return res.sendStatus(403);
           req.user = user as UserPayload;
           next();
@@ -168,7 +167,6 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
 }
   
 app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
-    console.log()
     res.json({ authenticated: true, user: req.user });
 });
 
@@ -216,7 +214,7 @@ app.post('/refresh-token', async(req, res) => {
 
 //rss feed handling*********************************************************************
 //fill with feeds from db in future 
-let feedURLs: string[] = ["http://fetchrss.com/rss/66d63ac29c1d413f08062ef366d63a7c89c1a56ea20b5e23.xml", "https://psychcool.org/index.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
+let feedURLs: string[] = ["http://fetchrss.com/rss/66d63ac29c1d413f08062ef366d63a7c89c1a56ea20b5e23.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
@@ -251,6 +249,60 @@ app.post('/newFeed', async (req, res) => {
     res.json({message: 'Data recieved successfully'});
 });
 
+import multer, { FileFilterCallback } from 'multer';
+import path from 'path';
+
+//set up multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error| null, destination: string) => void) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+//file filter
+const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+    if (file.mimetype === 'text/x-opml' || file.originalname.toLocaleLowerCase().endsWith('.opml')) {
+        cb(null, true);
+    } else { //add condition for .xml files here
+        cb(new Error('Only .opml files allowed'));
+    }
+}
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 1024 * 1024 * 5} //5mb
+});
+
+app.post('/fileImport', upload.single('file'), async (req: Request, res: Response) => {
+    if(req.file) {
+        console.log(req.file);
+        res.status(200).json({
+            message: 'File uploaded successfully',
+            filename: req.file.filename
+        });
+    } else {
+        return res.status(400).json({ message: 'File upload failed' });
+    }
+
+});
+
+// Error handling middleware
+app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File size is too large. Max limit is 5MB' });
+      }
+    }
+    if (err.message === 'Only .opml files are allowed!') {
+      return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: 'Internal server error' });
+});
 
 //express server*************************
 const server = app.listen("3000", () => {

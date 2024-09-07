@@ -1,13 +1,12 @@
 /*
 *TODO:
-  *logout button
-    *clears cookies?
 
-  *feed list
+*****  *feed list
     *import from .opml inside menu component
 
   *auto-discovery
     *enter site url, automatically find feed
+      *or maybe use a library to make one???? (fetchRSS)
 
   *feed database:
     *URLs table:
@@ -33,6 +32,8 @@
   *save read / unread posts
   *red dot for new posts
   *loading animation for feeds on render
+  *set profile picture
+  *reddit feed from subreddit url
 */
 import React, { useEffect, useState } from "react";
 import { FeedList } from "./components/FeedList";

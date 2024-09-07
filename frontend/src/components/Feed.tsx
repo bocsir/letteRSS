@@ -40,7 +40,6 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         isHovered={isHovered} 
         setIsHovered={setIsHovered} 
       />
-
     </>
   );
 };
