@@ -5,14 +5,17 @@ import mariadb, { Connection, Pool } from 'mariadb';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
-import fs from 'fs';
-const opml = require("opml");
+import multer, { FileFilterCallback } from 'multer';
+import path from 'path';
+const fs = require('fs');
+const opml = require('opml');
 
 let app: Express = express();
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -214,7 +217,7 @@ app.post('/refresh-token', async(req, res) => {
 
 //rss feed handling*********************************************************************
 //fill with feeds from db in future 
-let feedURLs: string[] = ["http://fetchrss.com/rss/66d63ac29c1d413f08062ef366d63a7c89c1a56ea20b5e23.xml", "https://netflixtechblog.com/feed", "https://www.nasa.gov/feeds/iotd-feed/"];
+let feedURLs: string[] = ["https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
@@ -249,8 +252,25 @@ app.post('/newFeed', async (req, res) => {
     res.json({message: 'Data recieved successfully'});
 });
 
-import multer, { FileFilterCallback } from 'multer';
-import path from 'path';
+const parseFeed = (name: string) => {
+    console.log(name);
+     fs.readFile(name, function (err: Error, opmltext: any) {
+        if (!err) {
+            opml.parse (opmltext, function (err: Error, theOutline: any) {
+                if (!err) {
+                    console.log(JSON.stringify(theOutline, undefined, 4));
+
+                    console.log(theOutline.opml.body.subs);
+                    const feeds = theOutline.opml.body.subs;
+                    const newURLs = feeds.map(getUrl);
+                    function getUrl(item: any) {return item.xmlUrl}
+                    feedURLs = [...feedURLs, ...newURLs];
+                    renderFeed();
+                }
+            })
+        }
+    })
+}
 
 //set up multer for file uploads
 const storage = multer.diskStorage({
@@ -259,28 +279,20 @@ const storage = multer.diskStorage({
     },
     filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error| null, destination: string) => void) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        const name = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname); 
+        cb(null, name);
     }
 });
 
-//file filter
-const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-    if (file.mimetype === 'text/x-opml' || file.originalname.toLocaleLowerCase().endsWith('.opml')) {
-        cb(null, true);
-    } else { //add condition for .xml files here
-        cb(new Error('Only .opml files allowed'));
-    }
-}
-
 const upload = multer({
     storage: storage,
-    fileFilter: fileFilter,
     limits: { fileSize: 1024 * 1024 * 5} //5mb
 });
 
 app.post('/fileImport', upload.single('file'), async (req: Request, res: Response) => {
     if(req.file) {
         console.log(req.file);
+        parseFeed(req.file.path);
         res.status(200).json({
             message: 'File uploaded successfully',
             filename: req.file.filename
@@ -288,7 +300,6 @@ app.post('/fileImport', upload.single('file'), async (req: Request, res: Respons
     } else {
         return res.status(400).json({ message: 'File upload failed' });
     }
-
 });
 
 // Error handling middleware
