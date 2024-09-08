@@ -38,7 +38,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
     try {
       const formData = new FormData();
       formData.append('file', file[0]);
-
       const res = await axios.post(
         "http://localhost:3000/fileImport",
         formData,
@@ -58,6 +57,10 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
 
   const sendURL = async (e: FormEvent) => {
     e.preventDefault();
+    if (!newFeedUrl.startsWith('http')) {
+      alert('Input must be a URL');
+      return;
+    }
     try {
       //send new url to server
       const res = await axios.post(
@@ -71,7 +74,8 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
       callGetArticles();
       setMenuVis(false);
     } catch (error) {
-      console.log(error);
+      alert('Error adding URL');
+      console.error(error);
     }
 
     setNewFeedUrl(""); //clear input filed

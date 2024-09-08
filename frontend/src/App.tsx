@@ -2,7 +2,8 @@
 *TODO:
 
 *****  *feed list
-    *import from .opml inside menu component
+    *import from .xml inside menu component
+    *url import error handling
 
   *auto-discovery
     *enter site url, automatically find feed

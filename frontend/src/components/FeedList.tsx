@@ -79,12 +79,15 @@ export const FeedList: React.FC<FeedListProps> = ({
                 onClick={() => toggleFeedVisibility(feedIndex)}
               >
                 <h3
-                  className={`cursor-pointer text-base select-none whitespace-nowrap text-clip pr-3
+                  className={`overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip pr-3
                   ${
                     feedVisibility[feedIndex] ? "text-amber-300" : "text-white"
                   }`}
                 >
-                  {feedIndex}
+                  {feedIndex.length > 27 ? (
+                    <span>{feedIndex.substring(0,27).concat('...')}</span>
+                  ): 
+                (feedIndex)}
                 </h3>
                 <button
                   className={`text-2xl pl-2 font-semibold relative z-1 ${

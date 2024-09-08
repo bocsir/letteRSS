@@ -197,11 +197,6 @@ app.post('/refresh-token', async(req, res) => {
             JWT_SECRET,
             { expiresIn: '1h' }
         );
-/*                        httpOnly: false, //accessible by js
-                        secure: false, //set to true when https is set up
-                        sameSite: 'strict',
-                        maxAge: 15 * 60 * 1000 // 15 minutes
- */
         res.cookie('accessToken', newAccessToken, {
             httpOnly: false, //accessible by js
             secure: false, //set to true when https is set up
@@ -221,7 +216,6 @@ let feedURLs: string[] = ["https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
-
 
 //get all Items from feed url and store in allItems{}
 const parse = async (url: string) => {
@@ -245,16 +239,37 @@ app.get('/',authenticateToken, async (req, res) => {
 
 //endpoint to get new article
 app.post('/newFeed', async (req, res) => {
-    const { feedUrl } = req.body;
-    feedURLs.push(feedUrl);
-    await renderFeed();
-    //send successful response to frontend
-    res.json({message: 'Data recieved successfully'});
-});
+    try {
+        const { feedUrl } = req.body;
+        console.log(feedURLs);
+        
+        if (!feedUrl || typeof feedUrl !== 'string') {
+            return res.status(400).json({ message: 'Invalid feedUrl provided' });
+        }
+        
+        feedURLs.push(feedUrl);
+        await renderFeed();
+        
+        res.status(200).json({ message: 'Data received successfully' });    
+    } catch (err) {
+        console.error('Error processing new feed:', err);
+        
+        res.status(500).json({
+            message: 'An error occurred while processing the request',
+            error: err instanceof Error ? err.message : 'Unknown error'
+        });
+    }});
 
 const parseFeed = (name: string) => {
     console.log(name);
-     fs.readFile(name, function (err: Error, opmltext: any) {
+    const extension = name.split('.')[1];
+
+    if (extension !== 'opml') {
+
+        return;
+    }
+
+    fs.readFile(name, function (err: Error, opmltext: any) {
         if (!err) {
             opml.parse (opmltext, function (err: Error, theOutline: any) {
                 if (!err) {
@@ -284,14 +299,30 @@ const storage = multer.diskStorage({
     }
 });
 
+const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+    if (file.mimetype === 'text/x-opml' || file.originalname.toLowerCase().endsWith('.opml')) {
+        cb(null, true);
+    } else if (file.mimetype==='text/xml'|| file.originalname.toLowerCase().endsWith('.xml')) {
+        console.log('xml file lksdajf;lakjf;adlskj: ', file.filename);
+        // const name = file
+        cb(null, true);
+    } else {
+        cb(new Error('Only .opml files are allowed!'));
+    }
+};
+
 const upload = multer({
     storage: storage,
+    fileFilter: fileFilter,
     limits: { fileSize: 1024 * 1024 * 5} //5mb
 });
 
-app.post('/fileImport', upload.single('file'), async (req: Request, res: Response) => {
+app.post('/fileImport', upload.single('file'), (req: Request, res: Response) => {
     if(req.file) {
         console.log(req.file);
+        if (req.file.filename.endsWith('.xml')) {
+            
+        }
         parseFeed(req.file.path);
         res.status(200).json({
             message: 'File uploaded successfully',
@@ -319,6 +350,12 @@ app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
 const server = app.listen("3000", () => {
     console.log("app listening at http://localhost:3000");
 });
+
+process.on('SIGTERM', () => {
+    server.close(() => {
+        console.log('server terminated');
+    })
+})
 
 interface AuthValues {
     email: string,
