@@ -2,7 +2,7 @@
   "name": "letterss",
   "version": "1.0.0",
   "description": "A simle RSS reader",
-  "main": "main.jsx",
+  "main": "main.tsx",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

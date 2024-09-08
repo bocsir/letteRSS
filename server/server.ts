@@ -319,15 +319,23 @@ const upload = multer({
 
 app.post('/fileImport', upload.single('file'), (req: Request, res: Response) => {
     if(req.file) {
-        console.log(req.file);
         if (req.file.filename.endsWith('.xml')) {
             
         }
+        //parse file for urls and add them to feedUrls array
         parseFeed(req.file.path);
+        //try to delete file
+        try {
+            fs.unlinkSync(req.file.path);
+            console.log('deleted file at ', req.file.path);
+        } catch (err) {
+            console.error('error deleting file');
+        }
         res.status(200).json({
             message: 'File uploaded successfully',
             filename: req.file.filename
         });
+
     } else {
         return res.status(400).json({ message: 'File upload failed' });
     }

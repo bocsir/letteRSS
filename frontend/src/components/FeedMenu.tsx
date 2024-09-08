@@ -4,15 +4,15 @@
 import axios from "axios";
 import fs from 'fs';
 // import opml from 'opml';
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
   faEllipsis,
   faFileArrowUp,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface FeedMenuProps {
   callGetArticles: any;
@@ -23,6 +23,15 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
   const [importHover, setImportHover] = useState<boolean>(false);
   const [file, setfile] = useState<File[]>();
   const [newFeedUrl, setNewFeedUrl] = useState<string>("");
+  const [showUrlError, setShowUrlError] = useState<boolean>(false);
+  const [urlNotFound, seturlNotFound] = useState<boolean>(false);
+
+  const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+    setNewFeedUrl(e.target.value);
+    setShowUrlError(false);
+    seturlNotFound(false);
+  }
 
   const toggleMenuVis = () => {
     setMenuVis(!menuVisible);
@@ -50,6 +59,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
 
       callGetArticles();
       setMenuVis(false);
+      setfile([]);
     } catch(err) {
       console.error("error sending files", err);
     }
@@ -58,7 +68,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
   const sendURL = async (e: FormEvent) => {
     e.preventDefault();
     if (!newFeedUrl.startsWith('http')) {
-      alert('Input must be a URL');
+      setShowUrlError(true);
       return;
     }
     try {
@@ -74,7 +84,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
       callGetArticles();
       setMenuVis(false);
     } catch (error) {
-      alert('Error adding URL');
+      seturlNotFound(true);
       console.error(error);
     }
 
@@ -114,13 +124,19 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
                 <label htmlFor="feed-url" className="text-base">
                   Enter a URL:
                 </label>
+                {showUrlError && (
+                  <p className="text-red-500 text-sm mb-1">Invalid URL</p>
+                )}
+                {urlNotFound && (
+                  <p className="text-red-500 text-sm mb-1">URL not found</p>
+                )}
                 <div className="flex items-center relative">
                   <input
                     type="text"
                     id="feed-url"
                     name="feed-url"
                     value={newFeedUrl}
-                    onChange={(e) => setNewFeedUrl(e.target.value)}
+                    onChange={(e) => updateFeedUrl(e)}
                     className="text-white bg-black text-base pl-1 pr-1 rounded-sm w-full h-8 mr-10"
                     placeholder="https://example.com/feed"
                   ></input>
@@ -135,7 +151,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
               </form>
               <p className="text-lg text-gray-400 -mb-1">or</p>
               <form onSubmit={sendFile} className="flex flex-col">
-                <p>Import a file (.opml or .xml):</p>
+                <p>Import a file (.opml):</p>
                 <div className="relative flex gap-3 w-full items-center">
                   <label
                     onMouseOver={() => setImportHover(true)}
@@ -153,7 +169,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
                     </div>
 
                     <div>
-                      {file ? (
+                      {(file && file.length > 0) ? (
                         <p className="p-1 text-sm text-white bg-neutral-900 rounded pl-2">
                           {file.map((file) => file.name)}
                         </p>
@@ -172,7 +188,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
                     }}
                     id="file-upload"
                     type="file"
-                    accept=".opml, .xml"
+                    accept=".opml"
                     className="hidden"
                   ></input>
                   <button
