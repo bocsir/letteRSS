@@ -1,10 +1,6 @@
 /*
 *TODO:
 
-*****  *feed list
-    *import from .xml inside menu component
-    *url import error handling
-
   *auto-discovery
     *enter site url, automatically find feed
       *or maybe use a library to make one???? (fetchRSS)
@@ -26,8 +22,8 @@
 *MORE THINGS:
   *READER VIEW
     *drag to resize reader view
-      *save in localstorage
-    *next, prev buttons for feed  
+      *save size in localstorage
+    *next, prev buttons for feed 
   *keybinds for each click. 
     *alt text describing bind
   *save read / unread posts
@@ -82,7 +78,6 @@ const App: React.FC = () => {
     try {
       const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth');
       setIsAuthenticated(response.data.authenticated);
-      console.log('user email: ', userEmail)
       setUserEmail(response.data.user.email);
     } catch (err) {
       //if access token invalid/ expired

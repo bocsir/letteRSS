@@ -36,7 +36,13 @@ const pool: Pool = mariadb.createPool({
     try {
         connection = await pool.getConnection();
         //log users to prove connection
+
+        //need to get user id of signed in user from database
+        // const query = "INSERT INTO url ("
         const rows = await connection.query('SELECT * FROM user');
+
+        // const feedRows = await connection.query('SELET * FROM feed');
+        // console.log(feedRows);
         // console.log(rows); // [ { val: 1 } ]
     } catch (err) {
         console.error('Error connecting to the database:', err);
@@ -130,6 +136,18 @@ app.post('/login', async (req, res) => {
                         maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
                     });
 
+                    const user = {
+                        id: userId,
+                        email: email
+                    }
+
+                    res.cookie('user', JSON.stringify(user), {
+                        httpOnly: true,
+                        secure: false,
+                        sameSite: 'strict',
+                        maxAge: 15 * 60 * 1000,
+                    });
+                        
                     res.json({valid: passwordRes, queryFailed: false, accessToken: accessToken });
 
                 } else {
@@ -145,25 +163,32 @@ app.post('/login', async (req, res) => {
     }
 });
 
-interface UserPayload {
+interface UserInfo {
     userId: string;
     email: string;
 }
 
+
 interface AuthenticatedRequest extends Request {
-    user?: UserPayload;
+    user?: UserInfo;
+}
+
+function getCookieValue(name: string, req: any): string {
+    const cookie = req.headers.cookie;
+    const value = cookie.split(`${name}=`)[1].split(';')[0];
+    return value;
 }
 
 function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const cookie = req.headers.cookie || null;
     if (cookie) {
-        const accessToken = cookie.split('=')[2] || null;
+        const accessToken = getCookieValue('accessToken', req);
         if (accessToken == null) return res.sendStatus(401);
   
         //check access token validity
         jwt.verify(accessToken, JWT_SECRET, (err, user) => {
           if (err) return res.sendStatus(403);
-          req.user = user as UserPayload;
+          req.user = user as UserInfo;
           next();
         });
     }
@@ -176,14 +201,16 @@ app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) =
 app.post('/logout', (res: any) => {
     console.log('response obj methods: ', Object.keys(res.res));
     const actualRes = res.res;
+    // clear cookies
     actualRes.setHeader('Set-Cookie', 'accessToken=; HttpOnly=false; Secure=false; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
     actualRes.setHeader('Set-Cookie', 'refreshToken=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT');
+    actualRes.setHeader('Set-Cookie', 'user=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1960 00:00:00 GMT');
     actualRes.status(200).json({ message: 'logged out successfuly'});
 });
 
 //generate a new accessToken using the safe refresh token
 app.post('/refresh-token', async(req, res) => {
-    const refreshToken = req.headers.cookie?.split('=')[1];
+    const refreshToken = getCookieValue('refreshToken', req);
     //send error to send user to /login
     if (!refreshToken) return res.sendStatus(401);
 
@@ -193,7 +220,7 @@ app.post('/refresh-token', async(req, res) => {
         if (!row) return res.sendStatus(403);
         //create new access token
         const newAccessToken = jwt.sign(
-            { userId: row[0].userId, email: row[0].email },
+            { userId: row[0].id, email: row[0].email },
             JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -204,6 +231,18 @@ app.post('/refresh-token', async(req, res) => {
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
+        const user = {
+            id: row[0].id,
+            email: row[0].email
+        }
+
+        res.cookie('user', JSON.stringify(user), {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000,
+        });
+
         res.json({ message: 'Token refreshed' });
     } catch(err) {
         return res.sendStatus(403);
@@ -211,7 +250,7 @@ app.post('/refresh-token', async(req, res) => {
 });
 
 //rss feed handling*********************************************************************
-//fill with feeds from db in future 
+            //fill with feeds from db in future *********
 let feedURLs: string[] = ["https://www.nasa.gov/feeds/iotd-feed/"];
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
@@ -231,8 +270,29 @@ async function renderFeed() {
 }
 renderFeed();
 
+async function getUrlsFromDb(req: any) {
+    //get id from user cookie
+    const value = getCookieValue('user', req);
+    const decodedValue = decodeURIComponent(value);
+    const parsedValue = JSON.parse(decodedValue);
+
+    const userId = parsedValue.id;
+
+    if (connection) {
+        const query = 'SELECT url FROM url WHERE user_id = ?';
+
+        const data = await connection.execute(query, userId);
+
+        const urls = data.map((item: { url: string; }) => item.url);
+        console.log(urls);
+        feedURLs = [...feedURLs, ...urls];
+    }
+}
+
 //endpoint to send Items, make this secure
-app.get('/',authenticateToken, async (req, res) => {
+app.get('/', authenticateToken, async (req, res) => {
+    //call function to get feeds here if not already called (if dbfeed = empty)
+    await getUrlsFromDb(req);
     await renderFeed();
     res.send(allItems);
 })
@@ -264,10 +324,7 @@ const parseFeed = (name: string) => {
     console.log(name);
     const extension = name.split('.')[1];
 
-    if (extension !== 'opml') {
-
-        return;
-    }
+    if (extension !== 'opml') return;
 
     fs.readFile(name, function (err: Error, opmltext: any) {
         if (!err) {
@@ -348,7 +405,7 @@ app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
         return res.status(400).json({ message: 'File size is too large. Max limit is 5MB' });
       }
     }
-    if (err.message === 'Only .opml files are allowed!') {
+    if (err.message === 'Only .opml files are allowed') {
       return res.status(400).json({ message: err.message });
     }
     res.status(500).json({ message: 'Internal server error' });
@@ -364,11 +421,5 @@ process.on('SIGTERM', () => {
         console.log('server terminated');
     })
 })
-
-interface AuthValues {
-    email: string,
-    password: string
-}
-
 
 export default server;

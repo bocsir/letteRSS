@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ToggleSwitch } from "./ToggleSwitch";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FeedItem } from "../interfaces";
 import DOMPurify from "dompurify";
 
@@ -16,9 +16,9 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
 
   const sanitizedContent = useMemo(() => {
     let content = DOMPurify.sanitize(item.content!);
-
     return content ? content : DOMPurify.sanitize(item["content:encoded"]!);
   }, [item]);
+
 
   const minimalLink = item.link.split("/")[2];
   const changePortalState = () => {
@@ -28,7 +28,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
   return createPortal(
     <div
       onClick={changePortalState}
-      className="w-screen h-screen fixed inset-0 flex flex-col justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm"
+      className="w-screen h-screen fixed inset-0 flex flex-col justify-top items-center bg-black bg-opacity-50 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -40,7 +40,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
           {minimalLink}
         </a>
         <div className="flex relative z-60">
-          <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked} />
+          <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked}/>
           <button
             onClick={changePortalState}
             className="relative text-xl hover:text-amber-300"

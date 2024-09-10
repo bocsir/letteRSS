@@ -8,11 +8,11 @@ const api: AxiosInstance = axios.create({
 
 export const interceptors = (navigate: any) => {
 
-    //if 401, send user to login
     api.interceptors.response.use(
 
         (response) => response, 
         (err) => {
+            //if 401, send user to login
             if (err.response && err.response.status === 403) {
                 console.log('navigating to /login');
                 navigate("/login");
