@@ -57,7 +57,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
 
       console.log("file sent to server", res.data);
 
-      callGetArticles();
+      callGetArticles()
       setMenuVis(false);
       setfile([]);
     } catch(err) {
@@ -76,7 +76,10 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
       const res = await axios.post(
         "http://localhost:3000/newFeed",
         { feedUrl: newFeedUrl },
-        { headers: { "Content-Type": "application/json" } }
+        { 
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true
+        }
       );
       console.log("feed added: ", res.data);
 

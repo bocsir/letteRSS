@@ -28,7 +28,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
   return createPortal(
     <div
       onClick={changePortalState}
-      className="w-screen h-screen fixed inset-0 flex flex-col justify-top items-center bg-black bg-opacity-50 backdrop-blur-sm"
+      className="w-screen pt-[5vh] fixed inset-0 flex flex-col justify-top items-center bg-black bg-opacity-50 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}

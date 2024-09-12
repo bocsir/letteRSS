@@ -168,30 +168,29 @@ interface UserInfo {
     email: string;
 }
 
-
 interface AuthenticatedRequest extends Request {
     user?: UserInfo;
 }
 
 function getCookieValue(name: string, req: any): string {
     const cookie = req.headers.cookie;
-    const value = cookie.split(`${name}=`)[1].split(';')[0];
-    return value;
+    console.log(cookie);
+    const cookieValue = cookie.split(`${name}=`)[1].split(';')[0];
+    return cookieValue;
 }
 
 function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    const cookie = req.headers.cookie || null;
-    if (cookie) {
-        const accessToken = getCookieValue('accessToken', req);
-        if (accessToken == null) return res.sendStatus(401);
-  
-        //check access token validity
-        jwt.verify(accessToken, JWT_SECRET, (err, user) => {
-          if (err) return res.sendStatus(403);
-          req.user = user as UserInfo;
-          next();
-        });
-    }
+    //check if access token expired
+    const accessToken = getCookieValue('accessToken', req);
+    if (accessToken == null) return res.sendStatus(401);
+
+    //ensure access token validity if not expired
+    jwt.verify(accessToken, JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user as UserInfo;
+        next();
+    });
+    
 }
   
 app.get('/auth', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
@@ -210,8 +209,8 @@ app.post('/logout', (res: any) => {
 
 //generate a new accessToken using the safe refresh token
 app.post('/refresh-token', async(req, res) => {
+    //send error to send user to /login if refresh token expired
     const refreshToken = getCookieValue('refreshToken', req);
-    //send error to send user to /login
     if (!refreshToken) return res.sendStatus(401);
 
     try {
@@ -251,7 +250,36 @@ app.post('/refresh-token', async(req, res) => {
 
 //rss feed handling*********************************************************************
             //fill with feeds from db in future *********
+            //(do so on '/' call i think)
 let feedURLs: string[] = ["https://www.nasa.gov/feeds/iotd-feed/"];
+
+async function updateFeedDB (newURLs: string[], userID: number) {
+
+    //array of items in newURLs not in feedURLs
+    const uniqueURLs = newURLs.filter(url => !feedURLs.includes(url));
+
+    //update feedURLs, removing duplicates with Set
+    feedURLs = [...new Set([...feedURLs, ...newURLs])];
+
+    //update database with each url in feedURls
+        //insert all values from uniqueURLs into the database
+        //need userID from wherever thsi function needs to be called
+            //(every time feedURLs is updated, call this instead)
+
+        const query = "INSERT INTO url (user_id, url) values (?, ?)";
+
+        //send each url from uniqeURLs to the database
+        uniqueURLs.map(async url => {
+            const queryValues = [userID, url];
+            if (connection) {
+                const data = await connection.execute(query, queryValues);
+            }
+    
+        })
+
+    
+}
+
 //items are individual articles/ blog posts
 let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
@@ -272,12 +300,9 @@ renderFeed();
 
 async function getUrlsFromDb(req: any) {
     //get id from user cookie
-    const value = getCookieValue('user', req);
-    const decodedValue = decodeURIComponent(value);
-    const parsedValue = JSON.parse(decodedValue);
-
-    const userId = parsedValue.id;
-
+    const userId = getUserId(req);
+    console.log(userId);
+    
     if (connection) {
         const query = 'SELECT url FROM url WHERE user_id = ?';
 
@@ -285,6 +310,7 @@ async function getUrlsFromDb(req: any) {
 
         const urls = data.map((item: { url: string; }) => item.url);
         console.log(urls);
+
         feedURLs = [...feedURLs, ...urls];
     }
 }
@@ -301,13 +327,15 @@ app.get('/', authenticateToken, async (req, res) => {
 app.post('/newFeed', async (req, res) => {
     try {
         const { feedUrl } = req.body;
-        console.log(feedURLs);
         
         if (!feedUrl || typeof feedUrl !== 'string') {
             return res.status(400).json({ message: 'Invalid feedUrl provided' });
         }
         
-        feedURLs.push(feedUrl);
+        console.log(req.headers.cookie);
+        const userId = getUserId(req);
+            //update feed url and database
+        await updateFeedDB([feedUrl], userId);
         await renderFeed();
         
         res.status(200).json({ message: 'Data received successfully' });    
@@ -320,8 +348,8 @@ app.post('/newFeed', async (req, res) => {
         });
     }});
 
-const parseFeed = (name: string) => {
-    console.log(name);
+//parse added file, add it to feedURLs
+const parseFeed = (name: string, req: any) => {
     const extension = name.split('.')[1];
 
     if (extension !== 'opml') return;
@@ -336,13 +364,26 @@ const parseFeed = (name: string) => {
                     const feeds = theOutline.opml.body.subs;
                     const newURLs = feeds.map(getUrl);
                     function getUrl(item: any) {return item.xmlUrl}
-                    feedURLs = [...feedURLs, ...newURLs];
+                    // feedURLs = [...feedURLs, ...newURLs];
+
+                    //get id from cookie
+                    const userId = getUserId(req);
+                    console.log(userId);
+                    updateFeedDB(newURLs, userId)
+
                     renderFeed();
                 }
             })
         }
     })
 }
+
+function getUserId(req: any): number {
+    const value = getCookieValue('user', req);
+    const decodedValue = decodeURIComponent(value);
+    const parsedValue = JSON.parse(decodedValue);
+    return parsedValue.id;
+} 
 
 //set up multer for file uploads
 const storage = multer.diskStorage({
@@ -360,7 +401,6 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: FileFil
     if (file.mimetype === 'text/x-opml' || file.originalname.toLowerCase().endsWith('.opml')) {
         cb(null, true);
     } else if (file.mimetype==='text/xml'|| file.originalname.toLowerCase().endsWith('.xml')) {
-        console.log('xml file lksdajf;lakjf;adlskj: ', file.filename);
         // const name = file
         cb(null, true);
     } else {
@@ -380,7 +420,7 @@ app.post('/fileImport', upload.single('file'), (req: Request, res: Response) => 
             
         }
         //parse file for urls and add them to feedUrls array
-        parseFeed(req.file.path);
+        parseFeed(req.file.path, req);
         //try to delete file
         try {
             fs.unlinkSync(req.file.path);
