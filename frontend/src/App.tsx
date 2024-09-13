@@ -1,5 +1,6 @@
 /*
 *TODO:
+  *need to be able to get url list on post request to server, not by keeping list there
 
   *auto-discovery
     *enter site url, automatically find feed
@@ -18,6 +19,8 @@
   *AWS hosting
   
   *serch function for finding new feeds
+
+  *change theme like how https://tty1.blog/
 
 *MORE THINGS:
   *READER VIEW

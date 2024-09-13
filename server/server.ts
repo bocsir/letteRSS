@@ -249,39 +249,28 @@ app.post('/refresh-token', async(req, res) => {
 });
 
 //rss feed handling*********************************************************************
-            //fill with feeds from db in future *********
-            //(do so on '/' call i think)
-let feedURLs: string[] = ["https://www.nasa.gov/feeds/iotd-feed/"];
-
 async function updateFeedDB (newURLs: string[], userID: number) {
-
+    let feedURLs: string[] = await getUrlsFromDb(userID);
     //array of items in newURLs not in feedURLs
     const uniqueURLs = newURLs.filter(url => !feedURLs.includes(url));
 
     //update feedURLs, removing duplicates with Set
     feedURLs = [...new Set([...feedURLs, ...newURLs])];
 
-    //update database with each url in feedURls
-        //insert all values from uniqueURLs into the database
-        //need userID from wherever thsi function needs to be called
-            //(every time feedURLs is updated, call this instead)
+    const query = "INSERT INTO url (user_id, url) values (?, ?)";
 
-        const query = "INSERT INTO url (user_id, url) values (?, ?)";
+    //send each url from uniqeURLs to the database
+    uniqueURLs.map(async url => {
+        const queryValues = [userID, url];
+        if (connection) {
+            const data = await connection.execute(query, queryValues);
+        }
+    });
 
-        //send each url from uniqeURLs to the database
-        uniqueURLs.map(async url => {
-            const queryValues = [userID, url];
-            if (connection) {
-                const data = await connection.execute(query, queryValues);
-            }
-    
-        })
-
-    
+    renderFeed(feedURLs)
 }
 
 //items are individual articles/ blog posts
-let allItems: { [feedTitle: string]: any[] } = {};
 const parser = new RSSParser();
 
 //get all Items from feed url and store in allItems{}
@@ -289,54 +278,71 @@ const parse = async (url: string) => {
     //parse out each <item> in feed items. <item> represents an article
     const feed = await parser.parseURL(url);
     const fTitle = feed.title || '';
+    let allItems: { [feedTitle: string]: any[] } = {};
     allItems[fTitle] = feed.items.map(item => ({ item }));
+    return allItems;
 }
 
-async function renderFeed() {
-    const parsePromises = feedURLs.map((url) => parse(url));
+//returns all items for all rss feeds in feedURLs
+async function renderFeed(feedURLs: string[]) {
+    let parsedItems: any[] = [];
+    const parsePromises = feedURLs.map(async (url) => {
+         parsedItems.push(await(parse(url)))
+         
+    });
+
     await Promise.all(parsePromises);
+    console.log(parsedItems);
+    return parsedItems;
 }
-renderFeed();
 
-async function getUrlsFromDb(req: any) {
-    //get id from user cookie
-    const userId = getUserId(req);
-    console.log(userId);
-    
+//returns all urls stored in db where user id matches
+async function getUrlsFromDb(req?: any, id?: number): Promise<string[]> {
+    //get id from user cookie or func input
+    const userId = (id) ? id : getUserId(req);
     if (connection) {
         const query = 'SELECT url FROM url WHERE user_id = ?';
-
         const data = await connection.execute(query, userId);
-
         const urls = data.map((item: { url: string; }) => item.url);
-        console.log(urls);
 
-        feedURLs = [...feedURLs, ...urls];
+        return urls;
     }
+    return ['https://', ''];
 }
 
 //endpoint to send Items, make this secure
 app.get('/', authenticateToken, async (req, res) => {
     //call function to get feeds here if not already called (if dbfeed = empty)
-    await getUrlsFromDb(req);
-    await renderFeed();
-    res.send(allItems);
+    const urlList = await getUrlsFromDb(req);
+    const allItems = await renderFeed(urlList);
+
+    interface FormattedItems {
+        [key: string]: any
+    }
+    let formattedItems: FormattedItems = {};
+
+        allItems.map(feed => {
+            const key = Object.keys(feed)[0];
+            const value = Object.values(feed)[0];
+            formattedItems[key] = value;
+        })
+
+    res.send(formattedItems);
 })
 
 //endpoint to get new article
 app.post('/newFeed', async (req, res) => {
     try {
-        const { feedUrl } = req.body;
+        const { feedURL } = req.body;
         
-        if (!feedUrl || typeof feedUrl !== 'string') {
-            return res.status(400).json({ message: 'Invalid feedUrl provided' });
+        if (!feedURL || typeof feedURL !== 'string') {
+            return res.status(400).json({ message: 'Invalid feedURL provided' });
         }
         
         console.log(req.headers.cookie);
         const userId = getUserId(req);
             //update feed url and database
-        await updateFeedDB([feedUrl], userId);
-        await renderFeed();
+        await updateFeedDB([feedURL], userId);
         
         res.status(200).json({ message: 'Data received successfully' });    
     } catch (err) {
@@ -351,9 +357,7 @@ app.post('/newFeed', async (req, res) => {
 //parse added file, add it to feedURLs
 const parseFeed = (name: string, req: any) => {
     const extension = name.split('.')[1];
-
     if (extension !== 'opml') return;
-
     fs.readFile(name, function (err: Error, opmltext: any) {
         if (!err) {
             opml.parse (opmltext, function (err: Error, theOutline: any) {
@@ -364,14 +368,11 @@ const parseFeed = (name: string, req: any) => {
                     const feeds = theOutline.opml.body.subs;
                     const newURLs = feeds.map(getUrl);
                     function getUrl(item: any) {return item.xmlUrl}
-                    // feedURLs = [...feedURLs, ...newURLs];
 
                     //get id from cookie
                     const userId = getUserId(req);
                     console.log(userId);
                     updateFeedDB(newURLs, userId)
-
-                    renderFeed();
                 }
             })
         }
@@ -415,12 +416,14 @@ const upload = multer({
 });
 
 app.post('/fileImport', upload.single('file'), (req: Request, res: Response) => {
+    console.log(req.body);
+
     if(req.file) {
-        if (req.file.filename.endsWith('.xml')) {
-            
-        }
-        //parse file for urls and add them to feedUrls array
+        console.log(';lskfdj;alsdkfj;alskdfj;alskjf')
+        //parse file for urls and add them to feedURLs array
         parseFeed(req.file.path, req);
+
+
         //try to delete file
         try {
             fs.unlinkSync(req.file.path);

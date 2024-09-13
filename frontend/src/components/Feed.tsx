@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReaderButton from './ReaderButton';
 import { FeedItem } from "../interfaces";
 
 interface FeedProps {
-  item: FeedItem
+  item: any
 }
 
 const Feed: React.FC<FeedProps> = ({ item }) => {
@@ -16,6 +16,10 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
     month: "long", 
     year: "numeric" 
   }; 
+
+  useEffect(() => {
+    console.log(item);
+  }, [item]);
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
 

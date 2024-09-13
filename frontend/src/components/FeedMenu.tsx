@@ -5,7 +5,6 @@ import axios from "axios";
 import fs from 'fs';
 // import opml from 'opml';
 import { ChangeEvent, FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -13,12 +12,14 @@ import {
   faFileArrowUp,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { Articles } from "../interfaces";
 
 interface FeedMenuProps {
   callGetArticles: any;
+  articles: Articles;
 }
 //somehow FeedMenu needs to tell FeedList to call getArticles again
-const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
+const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
   const [menuVisible, setMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
   const [file, setfile] = useState<File[]>();
@@ -31,7 +32,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
     setNewFeedUrl(e.target.value);
     setShowUrlError(false);
     seturlNotFound(false);
-  }
+  };
 
   const toggleMenuVis = () => {
     setMenuVis(!menuVisible);
@@ -47,11 +48,17 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles }) => {
     try {
       const formData = new FormData();
       formData.append('file', file[0]);
+
+      const articlesJson = JSON.stringify(articles);
+      // const urls = 
+      formData.append('articles', articlesJson);
+
       const res = await axios.post(
         "http://localhost:3000/fileImport",
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data"}
+          headers: { "Content-Type": "multipart/form-data"},
+          withCredentials: true
         }
       );
 

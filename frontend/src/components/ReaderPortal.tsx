@@ -11,14 +11,16 @@ interface ReaderPortalProps {
   setIsPortalVisible: any;
 }
 
-const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible }) => {
+const ReaderPortal: React.FC<ReaderPortalProps> = ({
+  item,
+  setIsPortalVisible,
+}) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const sanitizedContent = useMemo(() => {
     let content = DOMPurify.sanitize(item.content!);
     return content ? content : DOMPurify.sanitize(item["content:encoded"]!);
   }, [item]);
-
 
   const minimalLink = item.link.split("/")[2];
   const changePortalState = () => {
@@ -36,11 +38,15 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
           ${isChecked ? "max-w-5/6" : "max-w-[800px]"}
           `}
       >
-        <a href={item.link} className="hover:text-amber-300 text-sm font-medium">
+        <a
+          href={item.link}
+          target="_blank"
+          className="hover:text-amber-300 text-sm font-medium"
+        >
           {minimalLink}
         </a>
         <div className="flex relative z-60">
-          <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked}/>
+          <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked} />
           <button
             onClick={changePortalState}
             className="relative text-xl hover:text-amber-300"
@@ -53,7 +59,9 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
 
       <div
         className={`w-full max-h-[80vh] md:w-5/6 md: ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
-          isChecked ? "p-0 w-5/6 max-w-none min-h-[80vh] h-[80vh]" : "h-min p-4 pt-2"
+          isChecked
+            ? "p-0 w-5/6 max-w-none min-h-[80vh] h-[80vh]"
+            : "h-min p-4 pt-2"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -67,7 +75,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible })
           ></iframe>
         ) : sanitizedContent ? (
           <div className="text-gray-300">
-            <a href={item.link} className="text-xl underline">
+            <a href={item.link} target="_blank" className="text-xl underline">
               {item.title}
             </a>
             <div

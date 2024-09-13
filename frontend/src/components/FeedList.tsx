@@ -48,6 +48,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       [feedIndex]: !prev[feedIndex],
     }));
   };
+
   return (
     <div className="h-[95vh]">
       <div
@@ -61,7 +62,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             </span>
             Feeds
           </h2>
-          <Menu callGetArticles={getArticles} />
+          <Menu callGetArticles={getArticles} articles={articles} />
         </div>
 
         {Object.entries(articles).map(
@@ -85,9 +86,11 @@ export const FeedList: React.FC<FeedListProps> = ({
                   }`}
                 >
                   {feedIndex.length > 27 ? (
-                    <span>{feedIndex.substring(0,27).concat('...')}</span>
-                  ): 
-                (feedIndex)}
+                    <span>{feedIndex.substring(0, 27).concat("...")}</span>
+                  ) : (
+                    feedIndex
+                    
+                  )}
                 </h3>
                 <button
                   className={`text-2xl pl-2 font-semibold relative z-1 ${
@@ -100,7 +103,7 @@ export const FeedList: React.FC<FeedListProps> = ({
               {feedVisibility[feedIndex] && (
                 <div className="font-semibold flex flex-col ml-3">
                   {feedArray.map((item: ArticleItem) => (
-                    <Feed key={item.item.title} item={item.item} />
+                    <Feed item={item.item} />
                   ))}
                 </div>
               )}
