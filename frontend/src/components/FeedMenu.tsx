@@ -28,7 +28,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
   const [urlNotFound, seturlNotFound] = useState<boolean>(false);
 
   const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setNewFeedUrl(e.target.value);
     setShowUrlError(false);
     seturlNotFound(false);
@@ -62,7 +61,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
         }
       );
 
-      console.log("file sent to server", res.data);
 
       callGetArticles()
       setMenuVis(false);
@@ -80,6 +78,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
     }
     try {
       //send new url to server
+      console.log(newFeedUrl);
       const res = await axios.post(
         "http://localhost:3000/newFeed",
         { feedUrl: newFeedUrl },
@@ -88,7 +87,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
           withCredentials: true
         }
       );
-      console.log("feed added: ", res.data);
 
       //call async getArticles in parent to update frontend after new url addition
       callGetArticles();

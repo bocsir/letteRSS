@@ -17,9 +17,6 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
     year: "numeric" 
   }; 
 
-  useEffect(() => {
-    console.log(item);
-  }, [item]);
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
 

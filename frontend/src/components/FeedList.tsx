@@ -22,13 +22,11 @@ export const FeedList: React.FC<FeedListProps> = ({
 
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
-    console.log("gettingarticles");
     try {
       if (email !== "") {
         //get users followed feeds by email
       }
       const res = await api.get("/");
-      console.log("fetched articles: ", res.data);
       setArticles(res.data);
     } catch (error) {
       console.error(error);

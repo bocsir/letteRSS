@@ -1,18 +1,11 @@
 /*
 *TODO:
-  *need to be able to get url list on post request to server, not by keeping list there
-
   *auto-discovery
     *enter site url, automatically find feed
       *or maybe use a library to make one???? (fetchRSS)
 
   *feed database:
-    *URLs table:
-      * id (Primary Key) //user id
-      * url
-      * title (optional) //if user sets title
-    *add to db from server array
-    *ability to remove feeds (delete row with matching url from URLs table)
+  *ability to remove feeds (delete row with matching url from URLs table)
   
   *responsive for mobile
 
@@ -58,7 +51,6 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    console.log('getting auth');
     getAuthStatus();
   }, []);
 

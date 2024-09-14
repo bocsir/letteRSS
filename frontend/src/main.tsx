@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import Login from './components/pages/Login'
 import SignUp from './components/pages/SignUp'
-import Home from './components/pages/Home'
 import './index.css'
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -29,6 +28,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {/* set entry point of app as router */}
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
   </StrictMode>,
-)
+);
