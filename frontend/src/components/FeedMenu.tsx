@@ -18,13 +18,15 @@ interface FeedMenuProps {
   callGetArticles: any;
   closeAllFeeds: any;
   articles: Articles;
+  setIsEditable: any;
 }
 //somehow FeedMenu needs to tell FeedList to call getArticles again
 const FeedMenu: React.FC<FeedMenuProps> = ({
   callGetArticles,
   closeAllFeeds,
   articles,
-}) => {
+  setIsEditable  
+  }) => {
   const [newFeedMenuVis, setNewFeedMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
   const [file, setfile] = useState<File[]>();
@@ -108,7 +110,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
 
   const toggleEditFeedVis = () => {
     setMenuVis(false);
-    setEditFeedVis(!editFeedVis);
+    setIsEditable(true);
   };
 
   return (

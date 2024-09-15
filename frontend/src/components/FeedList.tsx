@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { ArticleItem, Articles } from "../interfaces";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareRss } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSquareRss,
+  faPlus,
+  faMinus,
+} from "@fortawesome/free-solid-svg-icons";
 import Feed from "../components/Feed";
-import Menu from "./FeedMenu";
+import FeedMenu from "./FeedMenu";
 import api from "../api";
 
 interface FeedListProps {
@@ -19,14 +23,32 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [feedVisibility, setFeedVisibility] = useState<{
     [key: string]: boolean;
   }>({});
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [newFeedName, setNewFeedName] = useState<{[key: string]: string}>({});
 
+  useEffect(() => {
+    let feedNames: {[key: string]: string} = {};
+    Object.keys(articles).map(name => {
+      feedNames[name] = name.length > 27 ? name.substring(0,27).concat('...') : name;
+    });
+    setNewFeedName(feedNames);
+  }, [articles])
+
+  const updateFeedName = (e: React.ChangeEvent<HTMLInputElement>, feedIndex: string) => {
+    const updatedFeedName: {[key: string]: string} = {
+      ...newFeedName,
+      [feedIndex]: e.target.value,
+    };
+    setNewFeedName(updatedFeedName);
+  }
+  
   const closeAllFeeds = () => {
     const closedFeeds = Object.keys(feedVisibility).reduce((acc, key) => {
       acc[key] = false;
       return acc;
     }, {} as { [key: string]: boolean });
     setFeedVisibility(closedFeeds);
-  }
+  };
 
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
@@ -65,48 +87,58 @@ export const FeedList: React.FC<FeedListProps> = ({
             </span>
             Feeds
           </h2>
-          <Menu callGetArticles={getArticles} closeAllFeeds={closeAllFeeds} articles={articles} />
+          <FeedMenu
+            callGetArticles={getArticles}
+            closeAllFeeds={closeAllFeeds}
+            articles={articles}
+            setIsEditable={setIsEditable}
+          />
         </div>
 
         {Object.entries(articles).map(
           ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
             <div
               key={feedIndex}
-              className={`max-w-96 rounded pl-3 pr-3 ${
+              className={`max-w-96 rounded pl-3 pr-3 border-2
+              ${
                 feedVisibility[feedIndex]
-                  ? "border bg-black"
-                  : "border border-transparent"
+                  ? "border-gray-400 bg-black"
+                  : "border-transparent"
               }`}
             >
               <div
-                className="h-7 flex justify-between items-center relative"
+                className="h-6 flex justify-between items-center relative cursor-pointer"
                 onClick={() => toggleFeedVisibility(feedIndex)}
               >
-                <h3
-                  className={`overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip pr-3
+                <input
+                  type="text"
+                  className={`focus:outline-none bg-transparent overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
                   ${
                     feedVisibility[feedIndex] ? "text-amber-300" : "text-white"
                   }`}
-                >
-                  {feedIndex.length > 27 ? (
-                    <span>{feedIndex.substring(0, 27).concat("...")}</span>
-                  ) : (
-                    feedIndex
-                    
-                  )}
-                </h3>
+                  
+                  value={newFeedName[feedIndex]}
+                  
+                  onChange={(e) => updateFeedName(e, feedIndex)}
+                  readOnly={!isEditable}
+                  >                  
+                </input>
                 <button
-                  className={`text-2xl pl-2 font-semibold relative z-1 ${
+                  className={`text-sm pl-2 font-bold relative z-1 ${
                     feedVisibility[feedIndex] ? "text-amber-300" : "text-white"
                   }`}
                 >
-                  {feedVisibility[feedIndex] ? "-" : "+"}
+                  {feedVisibility[feedIndex] ? (
+                    <FontAwesomeIcon icon={faMinus}/>
+                  ) : (
+                    <FontAwesomeIcon icon={faPlus}/>
+                  )}
                 </button>
               </div>
               {feedVisibility[feedIndex] && (
                 <div className="font-semibold flex flex-col ml-3">
                   {feedArray.map((item: ArticleItem) => (
-                    <Feed item={item.item} />
+                    <Feed item={item.item}/>
                   ))}
                 </div>
               )}

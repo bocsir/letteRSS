@@ -5,7 +5,6 @@ const api: AxiosInstance = axios.create({
     withCredentials: true
 });
 
-
 export const interceptors = (navigate: any) => {
 
     api.interceptors.response.use(

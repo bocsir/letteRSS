@@ -9,7 +9,7 @@ interface FeedProps {
 }
 
 const Feed: React.FC<FeedProps> = ({ item }) => {
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isYellow, setisYellow] = useState<boolean>(false);
   
   const dateFormat: Intl.DateTimeFormatOptions = { 
     day: "numeric", 
@@ -20,15 +20,19 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
 
+  const setActive = () => {
+    setisYellow(true);
+  }
+
   return (
     <>
       <a
         href={item.link}
         target="_blank"
         rel="noopener noreferrer"
-        className={`mt-2 relative ${isHovered ? 'text-amber-300' : ''}`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className={`mt-2 relative ${isYellow ? 'text-amber-300' : ''}`}
+        onMouseEnter={() => setisYellow(true)}
+        onMouseLeave={() => setisYellow(false)}
       >
         <h3 className="text-base font-normal leading-4">
           {item.title}
@@ -38,8 +42,9 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
       </a>
       <ReaderButton 
         item={articleContent} 
-        isHovered={isHovered} 
-        setIsHovered={setIsHovered} 
+        isYellow={isYellow} 
+        setIsYellow={setisYellow} 
+
       />
     </>
   );

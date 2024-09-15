@@ -9,11 +9,13 @@ import DOMPurify from "dompurify";
 interface ReaderPortalProps {
   item: FeedItem;
   setIsPortalVisible: any;
+  setIsYellow: any;
 }
 
 const ReaderPortal: React.FC<ReaderPortalProps> = ({
   item,
   setIsPortalVisible,
+  setIsYellow
 }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
@@ -25,7 +27,10 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
   const minimalLink = item.link.split("/")[2];
   const changePortalState = () => {
     setIsPortalVisible(false);
+    setIsYellow(false);
   };
+
+  
 
   return createPortal(
     <div

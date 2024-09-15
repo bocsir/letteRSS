@@ -7,26 +7,30 @@ import { FeedItem } from "../interfaces";
 
 interface ReaderButtonProps {
   item: FeedItem;
-  isHovered: boolean;
-  setIsHovered: any;
+  isYellow: boolean;
+  setIsYellow: any;
 }
 
-const ReaderButton: React.FC<ReaderButtonProps> = ({ item, isHovered, setIsHovered }) => {
+const ReaderButton: React.FC<ReaderButtonProps> = ({ item, isYellow, setIsYellow }) => {
   const [isPortalVisible, setIsPortalVisible] = useState<boolean>(false);
+
+  if (isPortalVisible) {
+    setIsYellow(true);
+  }
 
   return (
     <>
       <button
         onClick={() => setIsPortalVisible(true)}
-        className={`mb-2 flex items-center text-sm h-5 hover:bg-neutral-900 rounded relative z-2 ${isHovered ? 'text-amber-300' : ''}`}
+        className={`mb-2 flex items-center text-sm h-5 hover:bg-neutral-900 rounded relative z-2 ${isYellow ? 'text-amber-300' : ''}`}
         data-title="open here"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => setIsYellow(true)}
+        onMouseLeave={() => setIsYellow(false)}
       >
         <FontAwesomeIcon icon={faAnglesRight} />
       </button>
       {(isPortalVisible) && 
-        <ReaderPortal item={item} setIsPortalVisible={setIsPortalVisible}/>
+        <ReaderPortal item={item} setIsPortalVisible={setIsPortalVisible} setIsYellow={setIsYellow}/>
       }
     </>
   );
