@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReaderButton from './ReaderButton';
 import { FeedItem } from "../interfaces";
 

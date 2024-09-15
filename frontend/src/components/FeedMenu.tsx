@@ -2,7 +2,6 @@
 //calling feedComponent logic could be a separate component
 
 import axios from "axios";
-import fs from 'fs';
 // import opml from 'opml';
 import { ChangeEvent, FormEvent, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,19 +12,27 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Articles } from "../interfaces";
+import api from "../api";
 
 interface FeedMenuProps {
   callGetArticles: any;
+  closeAllFeeds: any;
   articles: Articles;
 }
 //somehow FeedMenu needs to tell FeedList to call getArticles again
-const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
-  const [menuVisible, setMenuVis] = useState<boolean>(false);
+const FeedMenu: React.FC<FeedMenuProps> = ({
+  callGetArticles,
+  closeAllFeeds,
+  articles,
+}) => {
+  const [newFeedMenuVis, setNewFeedMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
   const [file, setfile] = useState<File[]>();
   const [newFeedUrl, setNewFeedUrl] = useState<string>("");
   const [showUrlError, setShowUrlError] = useState<boolean>(false);
   const [urlNotFound, seturlNotFound] = useState<boolean>(false);
+  const [menuVis, setMenuVis] = useState<boolean>(false);
+  const [editFeedVis, setEditFeedVis] = useState<boolean>(false);
 
   const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
     setNewFeedUrl(e.target.value);
@@ -33,46 +40,37 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
     seturlNotFound(false);
   };
 
-  const toggleMenuVis = () => {
-    setMenuVis(!menuVisible);
-  };
-
   const sendFile = async (e: FormEvent) => {
     e.preventDefault();
     if (!file || file.length === 0) {
-      alert('please select a file');
+      alert("please select a file");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append('file', file[0]);
+      formData.append("file", file[0]);
 
       const articlesJson = JSON.stringify(articles);
-      // const urls = 
-      formData.append('articles', articlesJson);
+      // const urls =
+      formData.append("articles", articlesJson);
 
-      const res = await axios.post(
-        "http://localhost:3000/fileImport",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data"},
-          withCredentials: true
-        }
-      );
+      const res = await api.post("/fileImport", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
 
-
-      callGetArticles()
+      callGetArticles();
       setMenuVis(false);
       setfile([]);
-    } catch(err) {
+    } catch (err) {
       console.error("error sending files", err);
     }
-  }
+  };
 
   const sendURL = async (e: FormEvent) => {
     e.preventDefault();
-    if (!newFeedUrl.startsWith('http')) {
+    if (!newFeedUrl.startsWith("http")) {
       setShowUrlError(true);
       return;
     }
@@ -82,9 +80,9 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
       const res = await axios.post(
         "http://localhost:3000/newFeed",
         { feedUrl: newFeedUrl },
-        { 
+        {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true
+          withCredentials: true,
         }
       );
 
@@ -99,24 +97,74 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
     setNewFeedUrl(""); //clear input filed
   };
 
+  const toggleNewFeedMenuVis = () => {
+    setMenuVis(false);
+    setNewFeedMenuVis(!newFeedMenuVis);
+  };
+
+  const toggleMenuVis = () => {
+    setMenuVis(!menuVis);
+  };
+
+  const toggleEditFeedVis = () => {
+    setMenuVis(false);
+    setEditFeedVis(!editFeedVis);
+  };
+
   return (
     <>
       <div className="">
         <button onClick={toggleMenuVis}>
           <FontAwesomeIcon
             icon={faEllipsis}
-            className="text-2xl text-gray-400 pointer relative mr-2.5"
+            className={`text-2xl text-gray-400 pointer relative ${
+              newFeedMenuVis ? "z-10" : "z-20"
+            } mr-2.5`}
           />
         </button>
 
-        {menuVisible && (
+        {menuVis && (
           <div
+            className="absolute left-0 top-0 z-10 w-full h-full backdrop-blur-[2px]"
             onClick={toggleMenuVis}
+          >
+            <div
+              className="flex flex-col items-center absoute justify-around absolute top-24 left-64 z-20 bg-neutral-900 border-2 border-gray-400 rounded-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => closeAllFeeds()}
+                className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
+              >
+                close all
+              </button>
+
+              <hr className="color-gray-500 border-inset border-1 w-full" />
+              <button
+                onClick={toggleEditFeedVis}
+                className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
+              >
+                edit feed
+              </button>
+              <hr className="color-gray-500 border-inset border-1 w-full" />
+              <button
+                className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
+                onClick={toggleNewFeedMenuVis}
+              >
+                new feed
+              </button>
+            </div>
+          </div>
+        )}
+
+        {newFeedMenuVis && (
+          <div
+            onClick={toggleNewFeedMenuVis}
             className="w-screen h-screen backdrop-blur-[2px] absolute top-0 left-0 z-10 flex flex-col items-center"
           >
             <div className="w-96 flex justify-end mt-64">
               <button
-                onClick={toggleMenuVis}
+                onClick={toggleNewFeedMenuVis}
                 className="text-xl hover:text-amber-300"
               >
                 <FontAwesomeIcon className="text-2xl" icon={faXmark} />
@@ -177,7 +225,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({ callGetArticles, articles }) => {
                     </div>
 
                     <div>
-                      {(file && file.length > 0) ? (
+                      {file && file.length > 0 ? (
                         <p className="p-1 text-sm text-white bg-neutral-900 rounded pl-2">
                           {file.map((file) => file.name)}
                         </p>

@@ -20,12 +20,17 @@ export const FeedList: React.FC<FeedListProps> = ({
     [key: string]: boolean;
   }>({});
 
+  const closeAllFeeds = () => {
+    const closedFeeds = Object.keys(feedVisibility).reduce((acc, key) => {
+      acc[key] = false;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    setFeedVisibility(closedFeeds);
+  }
+
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
     try {
-      if (email !== "") {
-        //get users followed feeds by email
-      }
       const res = await api.get("/");
       setArticles(res.data);
     } catch (error) {
@@ -60,7 +65,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             </span>
             Feeds
           </h2>
-          <Menu callGetArticles={getArticles} articles={articles} />
+          <Menu callGetArticles={getArticles} closeAllFeeds={closeAllFeeds} articles={articles} />
         </div>
 
         {Object.entries(articles).map(
