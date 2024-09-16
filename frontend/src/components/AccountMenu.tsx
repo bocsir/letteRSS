@@ -21,9 +21,14 @@ const logoutUser = async() => {
   return (
     <div
       onClick={toggleAccountMenu}
-      className="w-screen h-screen backdrop-blur-[2px] absolute top-0 left-0 z-10 flex flex-col items-center"
+      className="w-screen h-full backdrop-blur-[2px] absolute top-0 left-0 z-20 flex flex-col items-center justify-center"
     >
-      <div className="w-96 flex justify-end mt-64">
+
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex flex-col gap-3 p-4 h-min relative border-gray-400 border-2 bg-black rounded-md z-10"
+      >
+      <div className="w-full flex justify-end absolute -top-7 right-0">
         <button
           onClick={toggleAccountMenu}
           className="text-xl hover:text-amber-300"
@@ -32,17 +37,16 @@ const logoutUser = async() => {
         </button>
       </div>
 
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-3 p-4 w-96 h-max shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black rounded-md z-10 inset-x-2/4 inset-y-1/4"
-      >
-        <p>now signed in as: {userEmail}</p>
+        <p>Signed in as: {userEmail}</p>
+        <div className="w-full flex justify-center">
         <button
           className="bg-amber-300 w-min p-3 mt-3 mb-2 rounded-lg leading-3 cursor-pointer text-stone-800 font-bold transition-shadow duration-200 ease-in-out hover:shadow-[0px_0px_10px_4px_rgb(147,91,9)] hover:text-amber-800"
           onClick={logoutUser}
         >
           logout
         </button>
+
+        </div>
       </div>
     </div>
   );

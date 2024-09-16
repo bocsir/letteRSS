@@ -20,8 +20,6 @@ now:::*be able to change individual feed names
     *hide iframe option if unavailable 
       *tried but failed to get it to work by creating an example iframe and checking for errors
 
-    *responsive for mobile
-
     *AWS hosting
     
     *serch function for finding new feeds
@@ -103,17 +101,17 @@ now:::*be able to change individual feed names
       <>
         <a
           href="/"
-          className="absolute top-2 right-3">
+          className="absolute top-2 left-3">
           <Logo isWhite={false}/>
         </a>
 
-        <div className="flex items-center hover:text-yellow-500 w-min pr-2 ml-1">
+        <div className="flex items-center hover:text-yellow-500 w-full justify-end pr-2 ml-1">
+          <p className="text-gray-100 hidden sm:block">{userEmail}</p>
           <button 
             onClick={() => setAccountMenuVisible(true)}
             className="cursor-pointer p-2 m-2 rounded-full border-2 border-gray-400 w-min flex items-center justify-center">
             <FontAwesomeIcon className="aspect-square scale-75 text-gray-100" icon={faUser}/>
           </button>
-          <p className="text-gray-100">{userEmail}</p>
         </div>
 
         <FeedList email={userEmail} isAuthenticated={isAuthenticated}/>

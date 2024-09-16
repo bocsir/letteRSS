@@ -19,14 +19,16 @@ interface FeedMenuProps {
   closeAllFeeds: any;
   articles: Articles;
   setIsEditable: any;
+  isEditable: any;
 }
 //somehow FeedMenu needs to tell FeedList to call getArticles again
 const FeedMenu: React.FC<FeedMenuProps> = ({
   callGetArticles,
   closeAllFeeds,
   articles,
-  setIsEditable  
-  }) => {
+  setIsEditable,
+  isEditable,
+}) => {
   const [newFeedMenuVis, setNewFeedMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
   const [file, setfile] = useState<File[]>();
@@ -110,13 +112,19 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
 
   const toggleEditFeedVis = () => {
     setMenuVis(false);
-    setIsEditable(true);
+    setIsEditable(!isEditable);
   };
 
+  const collapseFeeds = () => {
+    closeAllFeeds();
+    setMenuVis(false);
+  }
+
   return (
-    <>
-      <div className="">
-        <button onClick={toggleMenuVis}>
+    <div className="relative">
+        <button 
+        className=""
+        onClick={toggleMenuVis}>
           <FontAwesomeIcon
             icon={faEllipsis}
             className={`text-2xl text-gray-400 pointer relative ${
@@ -126,19 +134,16 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
         </button>
 
         {menuVis && (
-          <div
-            className="absolute left-0 top-0 z-10 w-full h-full backdrop-blur-[2px]"
-            onClick={toggleMenuVis}
-          >
+          <>
             <div
-              className="flex flex-col items-center absoute justify-around absolute top-24 left-64 z-20 bg-neutral-900 border-2 border-gray-400 rounded-md"
+              className="flex flex-col items-center justify-around absolute right-0 z-20 bg-neutral-900 border-2 border-gray-400 rounded-md"
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                onClick={() => closeAllFeeds()}
+                onClick={() => collapseFeeds()}
                 className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
               >
-                close all
+                collapse
               </button>
 
               <hr className="color-gray-500 border-inset border-1 w-full" />
@@ -146,7 +151,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                 onClick={toggleEditFeedVis}
                 className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
               >
-                edit feed
+                edit
               </button>
               <hr className="color-gray-500 border-inset border-1 w-full" />
               <button
@@ -156,15 +161,16 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                 new feed
               </button>
             </div>
-          </div>
+
+          </>
         )}
 
         {newFeedMenuVis && (
           <div
             onClick={toggleNewFeedMenuVis}
-            className="w-screen h-screen backdrop-blur-[2px] absolute top-0 left-0 z-10 flex flex-col items-center"
+            className="w-screen h-screen backdrop-blur-[2px] fixed top-0 left-0 z-10 flex flex-col items-center justify-center"
           >
-            <div className="w-96 flex justify-end mt-64">
+            <div className="w-96 flex justify-end">
               <button
                 onClick={toggleNewFeedMenuVis}
                 className="text-xl hover:text-amber-300"
@@ -260,8 +266,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
             </div>
           </div>
         )}
-      </div>
-    </>
+    </div>
   );
 };
 

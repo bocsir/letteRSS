@@ -30,12 +30,11 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
     setIsYellow(false);
   };
 
-  
 
   return createPortal(
     <div
       onClick={changePortalState}
-      className="w-screen pt-[5vh] fixed inset-0 z-30 flex flex-col justify-top items-center bg-black bg-opacity-50 backdrop-blur-sm"
+      className="w-screen pt-[10vh] fixed inset-0 z-30 flex flex-col justify-top items-center bg-black bg-opacity-50 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}

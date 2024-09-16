@@ -5,6 +5,7 @@ import {
   faSquareRss,
   faPlus,
   faMinus,
+  faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import Feed from "../components/Feed";
 import FeedMenu from "./FeedMenu";
@@ -24,24 +25,28 @@ export const FeedList: React.FC<FeedListProps> = ({
     [key: string]: boolean;
   }>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
-  const [newFeedName, setNewFeedName] = useState<{[key: string]: string}>({});
+  const [newFeedName, setNewFeedName] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    let feedNames: {[key: string]: string} = {};
-    Object.keys(articles).map(name => {
-      feedNames[name] = name.length > 27 ? name.substring(0,27).concat('...') : name;
+    let feedNames: { [key: string]: string } = {};
+    Object.keys(articles).map((name) => {
+      feedNames[name] =
+        name.length > 27 ? name.substring(0, 27).concat("...") : name;
     });
     setNewFeedName(feedNames);
-  }, [articles])
+  }, [articles]);
 
-  const updateFeedName = (e: React.ChangeEvent<HTMLInputElement>, feedIndex: string) => {
-    const updatedFeedName: {[key: string]: string} = {
+  const updateFeedName = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    feedIndex: string
+  ) => {
+    const updatedFeedName: { [key: string]: string } = {
       ...newFeedName,
       [feedIndex]: e.target.value,
     };
     setNewFeedName(updatedFeedName);
-  }
-  
+  };
+
   const closeAllFeeds = () => {
     const closedFeeds = Object.keys(feedVisibility).reduce((acc, key) => {
       acc[key] = false;
@@ -74,11 +79,19 @@ export const FeedList: React.FC<FeedListProps> = ({
     }));
   };
 
+  const preventFeedOpenOnEdit = (
+    e: React.MouseEvent<HTMLInputElement, MouseEvent>
+  ) => {
+    if (isEditable) {
+      e.stopPropagation();
+    }
+  };
+
   return (
-    <div className="h-[95vh]">
+    <>
       <div
         id="feed-list"
-        className="max-w-96 h-[100%] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-3 p-3 border-2 border-gray-400 bg-neutral-900"
+        className="max-w-96 h-[90vh] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-2 mr-2 sm:ml-3 p-3 border-2 border-gray-400 bg-neutral-900"
       >
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-bold ml-3 text-gray-400">
@@ -92,6 +105,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             closeAllFeeds={closeAllFeeds}
             articles={articles}
             setIsEditable={setIsEditable}
+            isEditable={isEditable}
           />
         </div>
 
@@ -110,35 +124,54 @@ export const FeedList: React.FC<FeedListProps> = ({
                 className="h-6 flex justify-between items-center relative cursor-pointer"
                 onClick={() => toggleFeedVisibility(feedIndex)}
               >
+                {isEditable && (
+                  <input 
+                    type="checkbox"
+                    onClick={(e) => e.stopPropagation()}
+                    className="mr-2 accent-yellow-400 focus:ring-yellow-400 focus:ring-1"  
+                  />
+
+                )}
                 <input
                   type="text"
-                  className={`focus:outline-none bg-transparent overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
-                  ${
-                    feedVisibility[feedIndex] ? "text-amber-300" : "text-white"
-                  }`}
-                  
+                  className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
+                    ${
+                      feedVisibility[feedIndex]
+                        ? "text-amber-300"
+                        : "text-white"
+                    }
+                    ${
+                      isEditable
+                        ? " pl-1 rounded bg-black cursor-text"
+                        : "bg-transparent "
+                    }`}
                   value={newFeedName[feedIndex]}
-                  
+                  onClick={preventFeedOpenOnEdit}
                   onChange={(e) => updateFeedName(e, feedIndex)}
                   readOnly={!isEditable}
-                  >                  
-                </input>
-                <button
-                  className={`text-sm pl-2 font-bold relative z-1 ${
-                    feedVisibility[feedIndex] ? "text-amber-300" : "text-white"
-                  }`}
-                >
-                  {feedVisibility[feedIndex] ? (
-                    <FontAwesomeIcon icon={faMinus}/>
-                  ) : (
-                    <FontAwesomeIcon icon={faPlus}/>
-                  )}
-                </button>
+                ></input>
+                {/* <FontAwesomeIcon className="absolute text-xs right-8" icon={faPen}/> */}
+
+                {!isEditable && (
+                  <button
+                    className={`text-sm pl-2 font-bold relative z-1 ${
+                      feedVisibility[feedIndex]
+                        ? "text-amber-300"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {feedVisibility[feedIndex] ? (
+                      <FontAwesomeIcon icon={faMinus} />
+                    ) : (
+                      <FontAwesomeIcon icon={faPlus} />
+                    )}
+                  </button>
+                )}
               </div>
               {feedVisibility[feedIndex] && (
                 <div className="font-semibold flex flex-col ml-3">
                   {feedArray.map((item: ArticleItem) => (
-                    <Feed item={item.item}/>
+                    <Feed item={item.item} />
                   ))}
                 </div>
               )}
@@ -146,6 +179,6 @@ export const FeedList: React.FC<FeedListProps> = ({
           )
         )}
       </div>
-    </div>
+    </>
   );
 };
