@@ -168,12 +168,17 @@ interface AuthenticatedRequest extends Request {
 }
 
 function getCookieValue(name: string, req: any): string {
-  if (req && req.headers.cookie) {
-    const cookie = req.headers.cookie;
-    const cookieValue = cookie.split(`${name}=`)[1].split(";")[0];
-    return cookieValue;
+  let cookieValue;
+  try {
+    if (req && req.headers.cookie) {
+      const cookie = req.headers.cookie;
+      cookieValue = cookie.split(`${name}=`)[1].split(";")[0];
+    }  
+  } catch {
+    console.error('cookie not found');
   }
-  return "";
+
+  return cookieValue;
 }
 
 function authenticateToken(
@@ -183,7 +188,9 @@ function authenticateToken(
 ) {
   //check if access token expired
   const accessToken = getCookieValue("accessToken", req);
-  if (accessToken == null) return res.sendStatus(401);
+  if (!accessToken) {
+    return res.sendStatus(401);
+  }
 
   //ensure access token validity if not expired
   jwt.verify(accessToken, JWT_SECRET, (err, user) => {
@@ -264,80 +271,135 @@ app.post("/refresh-token", async (req, res) => {
 });
 
 //rss feed handling*********************************************************************
-async function updateFeedDB(newURLs: string[], userID: number) {
-  let feedURLs: string[] = await getUrlsFromDb(null, userID);
 
+const getDefaultFeedName = async(url: string): Promise<string> => {
+  const feed = await parser.parseURL(url);
+  const defaultName = feed.title || "";
+  return defaultName
+}
+
+async function updateFeedDB(newURLs: string[], userID: number) {
+  const data = await getFeedData(null, userID);
+  let feedURLs: string[] = [];
+  let names: string[] = [];
+
+  if (data) {
+    feedURLs = data[0];
+    names = data[1];
+  }
+
+  names = await Promise.all(
+    names.map(async (name: string, index: number) => 
+      (name === null) ? name : await getDefaultFeedName(feedURLs[index])
+    )
+  );
+  
   //array of items in newURLs not in feedURLs
   const uniqueURLs = newURLs.filter((url) => !feedURLs.includes(url));
 
   //update feedURLs, removing duplicates with Set
   feedURLs = [...new Set([...feedURLs, ...newURLs])];
 
-  const query = "INSERT INTO url (user_id, url) values (?, ?)";
+  const query = "INSERT INTO url (user_id, url, name) values (?, ?, ?)";
 
+  
   //send each url from uniqeURLs to the database
   uniqueURLs.map(async (url) => {
-    const queryValues = [userID, url];
+    const feedName = await getDefaultFeedName(url);
+    const queryValues = [userID, url, feedName];
     if (connection) {
       const data = await connection.execute(query, queryValues);
     }
   });
 
-  renderFeed(feedURLs);
+  renderFeed(names, feedURLs);
 }
+
+app.post("/changeFeedName", authenticateToken, async (req, res) => {
+  console.log(req.body.newName);
+  const query = "UPDATE url SET name = ? WHERE name = ?";
+  const values = [req.body.newName, req.body.oldName];
+
+  try {
+    await connection?.execute(query, values);
+  } catch(err) {
+    console.error(err);
+    res.status(401)
+  }
+
+  res.status(200).json({ message: "DB updated successfully" });
+});
+
 
 //items are individual articles/ blog posts
 const parser = new RSSParser();
 
-//get all Items from feed url and store in allItems{}
-const parse = async (url: string) => {
+//get all Items from feed url and store in renderedFeeds{}
+const parse = async ( url: string, name: string) => {
   //parse out each <item> in feed items. <item> represents an article
   const feed = await parser.parseURL(url);
-  const fTitle = feed.title || "";
-  let allItems: { [feedTitle: string]: any[] } = {};
-  allItems[fTitle] = feed.items.map((item) => ({ item }));
-  return allItems;
+  //use provided name if there is one, else use feeds default, else use ""
+  let fTitle = (name) ? name : feed.title;
+  fTitle = (fTitle) ? fTitle : "";
+
+  //fill renderedFeeds object with name: content for each feed
+  let renderedFeeds: { [feedTitle: string]: any[] } = {};
+  renderedFeeds[fTitle] = feed.items.map((item) => ({ item }));
+  return renderedFeeds;
 };
 
 //returns all items for all rss feeds in feedURLs
-async function renderFeed(feedURLs: string[]) {
+async function renderFeed(names: string[], feedURLs: string[]) {
   let parsedItems: any[] = [];
-  const parsePromises = feedURLs.map(async (url) => {
-    parsedItems.push(await parse(url));
-  });
-  await Promise.all(parsePromises);
+
+  for (let i = 0; i < names.length; i++) {
+    parsedItems.push(await parse(feedURLs[i], names[i]));
+  } 
+  
   return parsedItems;
 }
 
 //returns all urls stored in db where user id matches
-async function getUrlsFromDb(req: any, id?: number): Promise<string[]> {
-  //get id from user cookie or func input
-
+async function getFeedData(req: any, id?: number): Promise<string[][]> {
   //if req null, userId has been passed, else get userId
   const userId = req ? getUserId(req) : id;
 
-  if (connection) {
-    const query = "SELECT url FROM url WHERE user_id = ?";
-    const data = await connection.execute(query, userId);
-    const urls = data.map((item: { url: string }) => item.url);
+  let urls: string[] = [];
+  let names: string[] = [];
 
-    return urls;
+  if (connection) {
+    try {
+      const query = "SELECT url, name FROM url WHERE user_id = ?";
+      const rows = await connection.execute(query, userId);
+  
+      const data = rows.map((item: {url: string, name: string}) => {
+        urls.push(item.url);
+        names.push(item.name);
+      });
+  
+    } catch (err) {
+      console.error(err);
+    }
+
   }
-  return [];
+  return [urls, names];
 }
 
 //endpoint to send Items, make this secure
 app.get("/", authenticateToken, async (req, res) => {
   //call function to get feeds here if not already called (if dbfeed = empty)
-  const urlList = await getUrlsFromDb(req);
-  const allItems = await renderFeed(urlList);
+  const data = await getFeedData(req);
+  console.log(data);
+  const urlList = data[0]
+  const names = data[1]
 
+  const renderedFeeds = await renderFeed(names, urlList);
   interface FormattedItems {
     [key: string]: any;
   }
   let formattedItems: FormattedItems = {};
 
-  allItems.map((feed) => {
+  renderedFeeds.map((feed) => {
     const key = Object.keys(feed)[0];
     const value = Object.values(feed)[0];
     formattedItems[key] = value;
@@ -347,7 +409,7 @@ app.get("/", authenticateToken, async (req, res) => {
 });
 
 //endpoint to add new article url
-app.post("/newFeed", async (req, res) => {
+app.post("/newFeed", authenticateToken, async (req, res) => {
   try {
     const feedUrl = req.body.feedUrl;
     if (!feedUrl) {
@@ -445,10 +507,7 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 5 }, //5mb
 });
 
-app.post(
-  "/fileImport",
-  upload.single("file"),
-  (req: Request, res: Response) => {
+app.post("/fileImport", upload.single("file"), (req: Request, res: Response) => {
     if (req.file) {
       //parse file for urls and add them to feedURLs array
       parseFeed(req.file.path, req);

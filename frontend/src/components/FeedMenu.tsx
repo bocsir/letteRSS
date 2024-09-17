@@ -36,7 +36,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   const [showUrlError, setShowUrlError] = useState<boolean>(false);
   const [urlNotFound, seturlNotFound] = useState<boolean>(false);
   const [menuVis, setMenuVis] = useState<boolean>(false);
-  const [editFeedVis, setEditFeedVis] = useState<boolean>(false);
 
   const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
     setNewFeedUrl(e.target.value);

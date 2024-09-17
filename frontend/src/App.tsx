@@ -1,7 +1,10 @@
   /*
   *TODO:
     *EDIT FEEDS:
-now:::*be able to change individual feed names
+
+****next:
+    *feed not updating after being added
+
 
       *be able to select feeds with checkbox
         *to add to folder
@@ -114,7 +117,7 @@ now:::*be able to change individual feed names
           </button>
         </div>
 
-        <FeedList email={userEmail} isAuthenticated={isAuthenticated}/>
+        <FeedList isAuthenticated={isAuthenticated}/>
 
         {accountMenuVisible && (
           <AccountMenu toggleAccountMenu={toggleMenuVis} userEmail={userEmail} navigate={navigate}/>
