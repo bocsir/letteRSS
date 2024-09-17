@@ -31,7 +31,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-        const response = await api.post('/login', { email: email, password: password });
+        const response = await api.post('/auth/login', { email: email, password: password });
         console.log("password valid: ", response.data.valid , ", query failed: ", response.data.queryFailed, ", response: ", response);
         setPasswordValid(response.data.valid);
         setQueryFailed(response.data.queryFailed);

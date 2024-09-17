@@ -4,8 +4,9 @@
 
 ****next:
     *feed not updating after being added
-
-
+    *401 response after adding feed isnt working
+    *are receptors improperly configured in feedlist?
+    
       *be able to select feeds with checkbox
         *to add to folder
           *create new folder
@@ -83,7 +84,7 @@
     //check for access and refresh token status
     async function getAuthStatus() {
       try {
-        const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth');
+        const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth/auth');
         setIsAuthenticated(response.data.authenticated);
         setUserEmail(response.data.user.email);
       } catch (err) {
@@ -92,7 +93,7 @@
         try {
           //make new access token using refresh token, call to get auth status again
           console.log('refreshing access token');
-          await api.post('/refresh-token');
+          await api.post('/auth/refresh-token');
           getAuthStatus();
         } catch (err) {
           console.error('error generating new access token: ', err);

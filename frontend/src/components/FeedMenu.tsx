@@ -58,7 +58,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       // const urls =
       formData.append("articles", articlesJson);
 
-      const res = await api.post("/fileImport", formData, {
+      const res = await api.post("feed/fileImport", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -81,13 +81,15 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       //send new url to server
       console.log(newFeedUrl);
       const res = await axios.post(
-        "http://localhost:3000/newFeed",
+        "http://localhost:3000/feed/newFeed",
         { feedUrl: newFeedUrl },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
+
+      console.log(res);
 
       //call async getArticles in parent to update frontend after new url addition
       callGetArticles();

@@ -13,7 +13,7 @@ const AccountMenu = ({ toggleAccountMenu, userEmail, navigate }: AccountMenuProp
 
 //call server endpoint to clear the refresh token at '/logout'
 const logoutUser = async() => {
-    const response = await api.post('/logout');
+    const response = await api.post('/auth/logout');
     console.log(response);
     navigate('/login');
 }

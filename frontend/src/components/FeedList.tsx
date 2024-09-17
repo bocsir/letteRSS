@@ -75,7 +75,8 @@ export const FeedList: React.FC<FeedListProps> = ({
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
     try {
-      const res = await api.get("/");
+      const res = await api.get("/feed/");
+      console.log('/feed/ response: ', res);
       setArticles(res.data);
     } catch (error) {
       console.error(error);
@@ -114,7 +115,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     setShowSaveBtn(updatedSaveBtnStatus);
 
     const res = await axios.post(
-      "http://localhost:3000/changeFeedName",
+      "http://localhost:3000/feed/changeFeedName",
       { 
         newName: feedNames[name],
         oldName: name
@@ -123,6 +124,7 @@ export const FeedList: React.FC<FeedListProps> = ({
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
+    console.log(res);
 }
 
   return (
@@ -183,7 +185,7 @@ export const FeedList: React.FC<FeedListProps> = ({
                           ? " pl-1 rounded bg-black cursor-text"
                           : "bg-transparent "
                       }`}
-                  value={feedNames[feedIndex]}
+                  value={feedNames[feedIndex] || ''}
                   onClick={preventFeedOpenOnEdit}
                   onChange={(e) => updateFeedName(e, feedIndex)}
                   readOnly={!isEditable}

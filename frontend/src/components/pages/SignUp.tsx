@@ -52,7 +52,7 @@ const SignUp = () => {
     if (goodPw && goodEmail) {
       try {
         //call /signup endpoint to put email and hashed password into database
-        await axios.post("http://localhost:3001/signup", {
+        await axios.post("http://localhost:3001/auth/signup", {
           email,
           password,
         });
@@ -61,7 +61,7 @@ const SignUp = () => {
         console.log('loggin user in automatically');
         try {
           //generate access token and refresh token
-          const response = await api.post("/login", {
+          const response = await api.post("/auth/login", {
             email: email,
             password: password,
           });
