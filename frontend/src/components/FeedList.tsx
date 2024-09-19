@@ -26,7 +26,7 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
   const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean}>({});
-  const [selectedArticles, setSelectedItems] = useState<{ [key: string]: boolean}>({});
+  const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   
   useEffect(() => {
     let feedNames: { [key: string]: string } = {};
@@ -41,17 +41,28 @@ export const FeedList: React.FC<FeedListProps> = ({
   }, [articles]);
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
-    const newFeedsObj = {
-      ...selectedArticles,
-      [feedIndex]: e.target.checked
-    }
+    let newFeeds;
 
-    setSelectedItems(newFeedsObj);
+    //delete if unckecked, add if checked
+    if (e.target.checked) {
+      newFeeds = [
+        ...selectedArticles,
+        feedIndex
+      ]
+    } else {
+      newFeeds = selectedArticles.filter(item => item !== feedIndex);
+    }
+    setSelectedArticles(newFeeds);
   }
 
   //delete selectedArticles from database using their key if key: true
-  const removeSelectedItems = async() => {
+  const deleteSelected = async() => {
+    if (selectedArticles.length === 0) {
+      return;
+    }
 
+    const res = await api.post('/feed/deleteArticles', selectedArticles);
+    console.log(res);
   }
 
   const updateFeedName = (
@@ -131,7 +142,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       [name]: false
     }
     setShowSaveBtn(updatedSaveBtnStatus);
-    
+
     const res = await api.post(
       "/feed/changeFeedName",
       { 
@@ -161,6 +172,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             articles={articles}
             setIsEditable={setIsEditable}
             isEditable={isEditable}
+            deleteSelected={deleteSelected}
           />
         </div>
 

@@ -22,6 +22,7 @@ interface FeedMenuProps {
   articles: Articles;
   setIsEditable: any;
   isEditable: any;
+  deleteSelected: any;
 }
 //somehow FeedMenu needs to tell FeedList to call getArticles again
 const FeedMenu: React.FC<FeedMenuProps> = ({
@@ -30,6 +31,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   articles,
   setIsEditable,
   isEditable,
+  deleteSelected
 }) => {
   const [newFeedMenuVis, setNewFeedMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
@@ -144,10 +146,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setDoneBtnVis(false);
   };
 
-  const deleteSelected = async() => {
-
-  }
-
   return (
     <div className="relative">
       {doneBtnVis ? (
@@ -169,12 +167,12 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
             className="relative hover:text-gray-400"
             onMouseEnter={() => updateMenuBtnHover(0, true)}
             onMouseLeave={() => updateMenuBtnHover(0, false)}
+            onClick={deleteSelected}
           >
             <FontAwesomeIcon icon={faTrashCan} />
           </button>
           {menuBtnHover[0] && (
             <div 
-              onClick={deleteSelected}
               className="bg-amber-300 z-30 absolute top-7 pl-2 pr-2 -left-8 w-max h-min cursor-none">
               <p className="text-sm text-black">remove selected</p>
             </div>

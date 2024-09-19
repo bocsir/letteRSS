@@ -182,6 +182,24 @@ router.post("/fileImport", authenticateToken, upload.single("file"), async (req,
   }
 });
 
+router.post('/deleteArticles', authenticateToken, async(req, res) => {
+  const names = req.body;
+  const formattedValues: string = names.map((name: string) => `'${name.replace(/'/g, "''")}'`).join(', ');
+  const query = `DELETE FROM url WHERE name IN (${formattedValues})`;
+
+  console.log('formatted vals: ', formattedValues);
+  
+  const connection = await getConnection();
+  try {
+    await connection.execute(query, formattedValues);
+    res.status(200).json({ message: "RSS feed successfully removed" });
+  } catch (err) {
+    console.error(err);
+    res.status(500)
+  }
+
+});
+
 // Error handling middleware
 router.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err instanceof multer.MulterError) {

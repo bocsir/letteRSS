@@ -3,16 +3,12 @@
     *EDIT FEEDS:
 
 ****next:
-  show loading symbols when feeds are added / loading
-*401 response after adding feed isnt working
-    *are receptors improperly configured in feedlist?
-    
-      *be able to select feeds with checkbox
+  
+-      *be able to select feeds with checkbox
         *to add to folder
           *create new folder
           *store folders in database
             *new optional column in url table: folder varchar(30)
-        *to delete from db
 
     *search feeds
       *ctrl+k brings up search box to look through all feeds by name with suggestions
