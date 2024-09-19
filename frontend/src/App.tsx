@@ -3,8 +3,8 @@
     *EDIT FEEDS:
 
 ****next:
-    *feed not updating after being added
-    *401 response after adding feed isnt working
+  show loading symbols when feeds are added / loading
+*401 response after adding feed isnt working
     *are receptors improperly configured in feedlist?
     
       *be able to select feeds with checkbox
@@ -88,16 +88,7 @@
         setIsAuthenticated(response.data.authenticated);
         setUserEmail(response.data.user.email);
       } catch (err) {
-        //if access token invalid/ expired
-        console.error('error checking user auth: ', err);
-        try {
-          //make new access token using refresh token, call to get auth status again
-          console.log('refreshing access token');
-          await api.post('/auth/refresh-token');
-          getAuthStatus();
-        } catch (err) {
-          console.error('error generating new access token: ', err);
-        }
+        getAuthStatus();      
       }
     }
 

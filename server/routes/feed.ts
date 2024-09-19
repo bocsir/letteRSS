@@ -101,10 +101,13 @@ router.post("/newFeed", authenticateToken, async (req, res) => {
   }
 });
 
-router.post("/changeFeedName", authenticateToken, async (req, res) => {
+router.post("/changeFeedName", authenticateToken, async(req, res) => {
   const connection = await getConnection();
   const query = "UPDATE url SET name = ? WHERE name = ?";
   const values = [req.body.newName, req.body.oldName];
+
+  console.log(req);
+  console.log(values);
 
   try {
     await connection.execute(query, values);

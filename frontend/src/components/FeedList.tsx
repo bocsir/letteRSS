@@ -26,7 +26,8 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
   const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean}>({});
-
+  const [selectedArticles, setSelectedItems] = useState<{ [key: string]: boolean}>({});
+  
   useEffect(() => {
     let feedNames: { [key: string]: string } = {};
     Object.keys(articles).map((name) => {
@@ -38,6 +39,20 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     removeAllSaveButtons();
   }, [articles]);
+
+  const updateSelectedItems = (e: any, feedIndex: string) => {
+    const newFeedsObj = {
+      ...selectedArticles,
+      [feedIndex]: e.target.checked
+    }
+
+    setSelectedItems(newFeedsObj);
+  }
+
+  //delete selectedArticles from database using their key if key: true
+  const removeSelectedItems = async() => {
+
+  }
 
   const updateFeedName = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -91,10 +106,12 @@ export const FeedList: React.FC<FeedListProps> = ({
   }, [isAuthenticated]);
 
   const toggleFeedVisibility = (feedIndex: string) => {
-    setFeedVisibility((prev: { [key: string]: boolean }) => ({
-      ...prev,
-      [feedIndex]: !prev[feedIndex],
-    }));
+    if (!isEditable) {
+      setFeedVisibility((prev: { [key: string]: boolean }) => ({
+        ...prev,
+        [feedIndex]: !prev[feedIndex],
+      }));  
+    }
   };
 
   const preventFeedOpenOnEdit = (
@@ -107,23 +124,21 @@ export const FeedList: React.FC<FeedListProps> = ({
 
   const sendFeedNames = async(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
     e.stopPropagation();
+
+    //hide save button
     const updatedSaveBtnStatus = {
       ...showSaveBtn,
       [name]: false
     }
-
     setShowSaveBtn(updatedSaveBtnStatus);
-
-    const res = await axios.post(
-      "http://localhost:3000/feed/changeFeedName",
+    
+    const res = await api.post(
+      "/feed/changeFeedName",
       { 
         newName: feedNames[name],
         oldName: name
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      }
+      );
     console.log(res);
 }
 
@@ -161,14 +176,14 @@ export const FeedList: React.FC<FeedListProps> = ({
               }`}
             >
               <div
-                className="h-6 flex justify-between items-center relative cursor-pointer"
+                className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""}`}
                 onClick={() => toggleFeedVisibility(feedIndex)}
               >
                 {isEditable && (
                   <input
                     type="checkbox"
-                    onClick={(e) => e.stopPropagation()}
-                    className="mr-2 accent-yellow-400 focus:ring-yellow-400 focus:ring-1"
+                    onClick={(e) => updateSelectedItems(e, feedIndex)}
+                    className="mr-2 accent-yellow-400 focus:ring-yellow-400 focus:ring-1 cursor-pointer"
                   />
                 )}
                 <input

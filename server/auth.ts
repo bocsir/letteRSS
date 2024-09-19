@@ -25,6 +25,12 @@ export function authenticateToken(
   res: Response,
   next: NextFunction
 ) {
+  const refreshToken = getCookieValue('refreshToken', req);
+  if (!refreshToken) {
+    console.log('no refresh token')
+    return res.sendStatus(403);
+  }
+
   const accessToken = getCookieValue("accessToken", req);
   if (!accessToken) {
     console.log('no access token');
