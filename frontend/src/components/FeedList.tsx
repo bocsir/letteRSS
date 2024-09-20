@@ -63,6 +63,13 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     const res = await api.post('/feed/deleteArticles', selectedArticles);
     console.log(res);
+    if (res.status === 200) {
+        selectedArticles.map(item => {
+        delete articles[item]
+        setSelectedArticles([]);
+        setIsEditable(false);
+      });
+    }
   }
 
   const updateFeedName = (
