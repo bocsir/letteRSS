@@ -1,11 +1,5 @@
   /*
   *TODO:
-  *first just send each name, fill with that.
-
-
-
-  *when feed name clicked, render feed, show loading animation.
-  
   *folder stuff
     *to add to folder
       *create new folder

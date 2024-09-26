@@ -65,33 +65,15 @@ async function getFeedData(req: any, id?: number): Promise<string[][]> {
 }
 
 router.get("/getFeedNames", authenticateToken, async (req, res) => {
-  //object with urls and names in separate arrays at matching indices
   const data = await getFeedData(req);
   res.send(data);
 });
 
-//give this name and url
+//endpoint to parse feeds individually
 router.post("/getRenderedFeedData", authenticateToken, async (req, res) => {
-  const data = req.body;//find data in req
-
+  const data = req.body;
   const renderedFeed = await parse(data.url, data.name);
-  console.log(renderedFeed);
   res.send(renderedFeed);
-
-//old------
-  // const urlList: string[] = data[0];
-  // const names: string[] = data[1];
-
-  // const renderedFeeds = await renderFeed(names, urlList);
-  // let formattedItems: { [key: string]: any } = {};
-
-  // renderedFeeds.forEach((feed) => {
-  //   const key = Object.keys(feed)[0];
-  //   const value = Object.values(feed)[0];
-  //   formattedItems[key] = value;
-  // });
-
-  // res.send(formattedItems);
 });
 
 router.post("/newFeed", authenticateToken, async (req, res) => {
