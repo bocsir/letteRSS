@@ -3,8 +3,12 @@
     *EDIT FEEDS:
 
 ****next:
+
+  *first just send each name, fill with that.
+  *when feed name clicked, render feed, show loading animation.
   
--      *be able to select feeds with checkbox
+
+    *be able to select feeds with checkbox
         *to add to folder
           *create new folder
           *store folders in database
@@ -33,7 +37,6 @@
       *alt text describing bind
     *save read / unread posts
     *red dot for new posts
-    *loading animation for feeds on render
     *set profile picture
     *reddit feed from subreddit url
   */

@@ -10,6 +10,7 @@ import Feed from "../components/Feed";
 import FeedMenu from "./FeedMenu";
 import api from "../api";
 import axios from "axios";
+import LoadingAnimation from "./LoadingAnimation";
 
 interface FeedListProps {
   isAuthenticated: boolean;
@@ -20,14 +21,16 @@ export const FeedList: React.FC<FeedListProps> = ({
 }) => {
   //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState<Articles>({});
+  const [prevArticles, setPrevArticles] = useState<Articles>({});
   const [feedVisibility, setFeedVisibility] = useState<{
     [key: string]: boolean;
   }>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
-  const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean}>({});
+  const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   useEffect(() => {
     let feedNames: { [key: string]: string } = {};
     Object.keys(articles).map((name) => {
@@ -56,7 +59,7 @@ export const FeedList: React.FC<FeedListProps> = ({
   }
 
   //delete selectedArticles from database using their key if key: true
-  const deleteSelected = async() => {
+  const deleteSelected = async () => {
     if (selectedArticles.length === 0) {
       return;
     }
@@ -64,7 +67,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     const res = await api.post('/feed/deleteArticles', selectedArticles);
     console.log(res);
     if (res.status === 200) {
-        selectedArticles.map(item => {
+      selectedArticles.map(item => {
         delete articles[item]
         setSelectedArticles([]);
         setIsEditable(false);
@@ -89,7 +92,7 @@ export const FeedList: React.FC<FeedListProps> = ({
   };
 
   const removeAllSaveButtons = () => {
-    let showSaveDefault: { [key: string]: boolean} = {};
+    let showSaveDefault: { [key: string]: boolean } = {};
     Object.keys(articles).map((name) => {
 
       showSaveDefault[name] = false;
@@ -107,13 +110,16 @@ export const FeedList: React.FC<FeedListProps> = ({
 
   //request to allAritcles endpoint for articles
   const getArticles = async () => {
+    setIsLoading(true);
     try {
       const res = await api.get("/feed/");
       console.log('/feed/ response: ', res);
       setArticles(res.data);
     } catch (error) {
       console.error(error);
+      // setShowNoArticlesFound()
     }
+    setIsLoading(false);
   };
 
   //get articles on mount and when isAuthenticated refreshes
@@ -128,7 +134,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       setFeedVisibility((prev: { [key: string]: boolean }) => ({
         ...prev,
         [feedIndex]: !prev[feedIndex],
-      }));  
+      }));
     }
   };
 
@@ -140,7 +146,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     }
   };
 
-  const sendFeedNames = async(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
+  const sendFeedNames = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
     e.stopPropagation();
 
     //hide save button
@@ -152,22 +158,22 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     const res = await api.post(
       "/feed/changeFeedName",
-      { 
+      {
         newName: feedNames[name],
         oldName: name
       }
-      );
+    );
     console.log(res);
-}
+  }
 
   return (
     <>
       <div
         id="feed-list"
-        className="max-w-96 h-[90vh] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-2 mr-2 sm:ml-3 p-3 border-2 border-gray-400 bg-neutral-900"
+        className="max-w-96 h-[90vh] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-2 mr-2 sm:ml-3 p-3 border-2 border-neutral-500 bg-neutral-900"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold ml-3 text-gray-400">
+          <h2 className="text-lg font-bold ml-3 text-neutral-500">
             <span>
               <FontAwesomeIcon className="text-lg mr-1" icon={faSquareRss} />
             </span>
@@ -183,16 +189,17 @@ export const FeedList: React.FC<FeedListProps> = ({
           />
         </div>
 
+        <LoadingAnimation isLoading={isLoading}/>
+
         {Object.entries(articles).map(
           ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
             <div
               key={feedIndex}
               className={`max-w-96 rounded pl-3 pr-3 border-2
-              ${
-                feedVisibility[feedIndex]
-                  ? "border-gray-400 bg-black"
+              ${feedVisibility[feedIndex]
+                  ? "border-neutral-500 bg-black"
                   : "border-transparent"
-              }`}
+                }`}
             >
               <div
                 className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""}`}
@@ -209,16 +216,14 @@ export const FeedList: React.FC<FeedListProps> = ({
                   type="text"
                   maxLength={50}
                   className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
-                      ${
-                        feedVisibility[feedIndex]
-                          ? "text-amber-300"
-                          : "text-white"
-                      }
-                      ${
-                        isEditable
-                          ? " pl-1 rounded bg-black cursor-text"
-                          : "bg-transparent "
-                      }`}
+                      ${feedVisibility[feedIndex]
+                      ? "text-amber-300"
+                      : "text-white"
+                    }
+                      ${isEditable
+                      ? " pl-1 rounded bg-neutral-500 cursor-text"
+                      : "bg-transparent "
+                    }`}
                   value={feedNames[feedIndex] || ''}
                   onClick={preventFeedOpenOnEdit}
                   onChange={(e) => updateFeedName(e, feedIndex)}
@@ -226,8 +231,8 @@ export const FeedList: React.FC<FeedListProps> = ({
                 ></input>
                 {showSaveBtn[feedIndex] && (
                   <button
-                  onClick={(e) => {sendFeedNames(e, feedIndex)}}
-                  type="submit"
+                    onClick={(e) => { sendFeedNames(e, feedIndex) }}
+                    type="submit"
                     className="flex items-center text-white h-min leading-3 p-1 rounded bg-neutral-900 hover:text-amber-300 transition-color duration-150 ease-in-out text-base flex items-center absolute right-2"
                   >
                     <p>save</p>
@@ -237,11 +242,10 @@ export const FeedList: React.FC<FeedListProps> = ({
 
                 {!isEditable && (
                   <button
-                    className={`text-sm pl-2 font-bold relative z-1 ${
-                      feedVisibility[feedIndex]
+                    className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
                         ? "text-amber-300"
-                        : "text-gray-400"
-                    }`}
+                        : "text-neutral-500"
+                      }`}
                   >
                     {feedVisibility[feedIndex] ? (
                       <FontAwesomeIcon icon={faMinus} />

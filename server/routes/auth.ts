@@ -138,7 +138,8 @@ router.post("/refresh-token", async (req, res) => {
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
-
+    
+    console.log('access token refreshed :)');
     res.json({ message: "Token refreshed" });
   } catch (err) {
     return res.sendStatus(403);
