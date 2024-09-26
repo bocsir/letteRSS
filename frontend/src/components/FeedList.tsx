@@ -5,6 +5,9 @@ import {
   faSquareRss,
   faPlus,
   faMinus,
+  faSort,
+  faArrowDownZA,
+  faArrowDownAZ,
 } from "@fortawesome/free-solid-svg-icons";
 import Feed from "../components/Feed";
 import FeedMenu from "./FeedMenu";
@@ -21,7 +24,6 @@ export const FeedList: React.FC<FeedListProps> = ({
 }) => {
   //useState is useful because calling its update function will trigger re-render
   const [articles, setArticles] = useState<Articles>({});
-  const [prevArticles, setPrevArticles] = useState<Articles>({});
   const [feedVisibility, setFeedVisibility] = useState<{
     [key: string]: boolean;
   }>({});
@@ -30,8 +32,10 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [sortMenu, setSortMenu] = useState<boolean>(false);
 
   useEffect(() => {
+    //update FeedNames when articles changes
     let feedNames: { [key: string]: string } = {};
     Object.keys(articles).map((name) => {
       feedNames[name] =
@@ -42,6 +46,34 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     removeAllSaveButtons();
   }, [articles]);
+
+  const sortArticles = (isAlphabetical: boolean) => {
+    const currentArticles: string[] = [];
+    
+    Object.keys(articles).map((name) => {
+      currentArticles.push(feedNames[name]);
+    });
+
+    const sortedArticles = (isAlphabetical) 
+    ? currentArticles.sort((a,b) => a.localeCompare(b))
+    : currentArticles.sort((a,b) => b.localeCompare(a));
+
+    const sortedObj = createObjTemplate(sortedArticles);
+
+    const newArticlesObj = Object.assign(sortedObj, articles);
+    
+    setArticles(newArticlesObj);
+    console.log(currentArticles);
+
+  }
+
+  const createObjTemplate = (arr: string[]): Record<string, null> => {
+    const obj: Record<string, null> = {};
+    arr.forEach(item => {
+      obj[item] = null;
+    });
+    return obj;  
+  }
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
     let newFeeds;
@@ -173,12 +205,41 @@ export const FeedList: React.FC<FeedListProps> = ({
         className="max-w-96 h-[90vh] h-max-[100%] overflow-scroll overflow-x-hidden rounded ml-2 mr-2 sm:ml-3 p-3 border-2 border-neutral-500 bg-neutral-900"
       >
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold ml-3 text-neutral-500">
-            <span>
-              <FontAwesomeIcon className="text-lg mr-1" icon={faSquareRss} />
-            </span>
-            Feeds
-          </h2>
+          <div className="flex gap-2 items-center">
+            <h2 className="text-lg font-bold ml-3 text-neutral-500">
+              <span>
+                <FontAwesomeIcon className="text-lg mr-1" icon={faSquareRss} />
+              </span>
+              Feeds
+            </h2>
+            <div className="relative">
+              <FontAwesomeIcon
+                onClick={() => setSortMenu(!sortMenu)}
+                className="text-lg text-neutral-500 hover:text-yellow-500" icon={faSort} />
+              {sortMenu && (
+                <div
+                  className="flex flex-col font-bold items-center justify-around absolute left-4 top-0 z-20 bg-neutral-900 border-2 border-neutral-500 rounded-md w-max"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={(e) => sortArticles(true)}
+                    className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
+                  >
+                    <FontAwesomeIcon icon={faArrowDownAZ} />
+                  </button>
+                  <hr className="border-neutral-500 border-inset border-1 w-full" />
+                  <button
+                    onClick={(e) => sortArticles(false)}
+                    className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
+                  >
+                     <FontAwesomeIcon icon={faArrowDownZA} />
+                  </button>
+
+                </div>
+              )}
+
+            </div>
+          </div>
           <FeedMenu
             callGetArticles={getArticles}
             closeAllFeeds={closeAllFeeds}
@@ -189,7 +250,7 @@ export const FeedList: React.FC<FeedListProps> = ({
           />
         </div>
 
-        <LoadingAnimation isLoading={isLoading}/>
+        <LoadingAnimation isLoading={isLoading} />
 
         {Object.entries(articles).map(
           ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
@@ -243,8 +304,8 @@ export const FeedList: React.FC<FeedListProps> = ({
                 {!isEditable && (
                   <button
                     className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
-                        ? "text-amber-300"
-                        : "text-neutral-500"
+                      ? "text-amber-300"
+                      : "text-neutral-500"
                       }`}
                   >
                     {feedVisibility[feedIndex] ? (

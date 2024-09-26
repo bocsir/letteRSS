@@ -215,7 +215,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                 onClick={() => collapseFeeds()}
                 className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
               >
-                collapse
+                close all
               </button>
               <hr className="border-neutral-500 border-inset border-1 w-full" />
               <button

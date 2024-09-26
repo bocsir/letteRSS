@@ -1,18 +1,13 @@
   /*
   *TODO:
-    *EDIT FEEDS:
-
-****next:
-
   *first just send each name, fill with that.
   *when feed name clicked, render feed, show loading animation.
   
-
-    *be able to select feeds with checkbox
-        *to add to folder
-          *create new folder
-          *store folders in database
-            *new optional column in url table: folder varchar(30)
+  *folder stuff
+    *to add to folder
+      *create new folder
+      *store folders in database
+        *new optional column in url table: folder varchar(30)
 
     *search feeds
       *ctrl+k brings up search box to look through all feeds by name with suggestions
@@ -28,7 +23,7 @@
     
     *serch function for finding new feeds
 
-    *change theme like how https://tty1.blog/
+    *change theme like https://tty1.blog/
 
   *MORE THINGS:
     *READER VIEW
