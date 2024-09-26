@@ -11,6 +11,6 @@ export interface ArticleItem {
 }
 
 export interface Articles {
-  [feedIndex: string]: ArticleItem[];
+  [feedIndex: string]: ArticleItem[] | [];
 }
   

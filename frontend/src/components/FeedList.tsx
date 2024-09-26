@@ -33,6 +33,7 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortMenu, setSortMenu] = useState<boolean>(false);
+  const [urls, setUrls] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     //update FeedNames when articles changes
@@ -49,22 +50,18 @@ export const FeedList: React.FC<FeedListProps> = ({
 
   const sortArticles = (isAlphabetical: boolean) => {
     const currentArticles: string[] = [];
-    
+
     Object.keys(articles).map((name) => {
       currentArticles.push(feedNames[name]);
     });
 
-    const sortedArticles = (isAlphabetical) 
-    ? currentArticles.sort((a,b) => a.localeCompare(b))
-    : currentArticles.sort((a,b) => b.localeCompare(a));
+    const sortedArticles = (isAlphabetical)
+      ? currentArticles.sort((a, b) => a.localeCompare(b))
+      : currentArticles.sort((a, b) => b.localeCompare(a));
 
     const sortedObj = createObjTemplate(sortedArticles);
-
     const newArticlesObj = Object.assign(sortedObj, articles);
-    
     setArticles(newArticlesObj);
-    console.log(currentArticles);
-
   }
 
   const createObjTemplate = (arr: string[]): Record<string, null> => {
@@ -72,7 +69,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     arr.forEach(item => {
       obj[item] = null;
     });
-    return obj;  
+    return obj;
   }
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
@@ -141,27 +138,66 @@ export const FeedList: React.FC<FeedListProps> = ({
   };
 
   //request to allAritcles endpoint for articles
-  const getArticles = async () => {
+  const getFeedNames = async () => {
     setIsLoading(true);
+
     try {
-      const res = await api.get("/feed/");
-      console.log('/feed/ response: ', res);
-      setArticles(res.data);
-    } catch (error) {
-      console.error(error);
-      // setShowNoArticlesFound()
+      const res = await api.get('/feed/getFeedNames');
+      console.log('/feed/getFeedNames response: ', res);
+
+      const articlesObj: Record<string, []> = {}
+      res.data[1].forEach((name: string) => {
+        articlesObj[name] = [];
+      })
+      const urls: {[key: string]: string} = {};
+      let index = 0;
+      res.data[0].forEach((url: string) => {
+        urls[Object.keys(articlesObj)[index]] = url;
+        index++;
+      });
+      setUrls(urls);
+      console.log(urls);
+      setArticles(articlesObj);
+    } catch (err) {
+      console.error('error getting feed names or setting feed names to article', err);
     }
+
     setIsLoading(false);
   };
+
 
   //get articles on mount and when isAuthenticated refreshes
   useEffect(() => {
     if (isAuthenticated) {
-      getArticles();
+      getFeedNames();
     }
   }, [isAuthenticated]);
 
-  const toggleFeedVisibility = (feedIndex: string) => {
+  const toggleFeedVisibility = async (feedIndex: string) => {
+    //parse articles at that index
+    //**need to make sure when names are edited the changes are reflected in urls
+    if (articles[feedIndex].length === 0) {
+      const name = feedIndex;
+      const url = urls[feedIndex];
+
+      try {
+        const res = await api.post('/feed/getRenderedFeedData',
+          {
+            name: name,
+            url: url,
+          }
+        )
+        const data = Object.entries(res.data)[0][1] as ArticleItem[];
+        const newArticlesObj: Articles = {
+          ...articles,
+          [feedIndex]: data
+        }
+        setArticles(newArticlesObj);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     if (!isEditable) {
       setFeedVisibility((prev: { [key: string]: boolean }) => ({
         ...prev,
@@ -215,7 +251,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             <div className="relative">
               <FontAwesomeIcon
                 onClick={() => setSortMenu(!sortMenu)}
-                className="text-lg text-neutral-500 hover:text-yellow-500" icon={faSort} />
+                className="text-base text-neutral-500 cursor-pointer active:text-yellow-500" icon={faSort} />
               {sortMenu && (
                 <div
                   className="flex flex-col font-bold items-center justify-around absolute left-4 top-0 z-20 bg-neutral-900 border-2 border-neutral-500 rounded-md w-max"
@@ -232,7 +268,7 @@ export const FeedList: React.FC<FeedListProps> = ({
                     onClick={(e) => sortArticles(false)}
                     className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
                   >
-                     <FontAwesomeIcon icon={faArrowDownZA} />
+                    <FontAwesomeIcon icon={faArrowDownZA} />
                   </button>
 
                 </div>
@@ -241,7 +277,7 @@ export const FeedList: React.FC<FeedListProps> = ({
             </div>
           </div>
           <FeedMenu
-            callGetArticles={getArticles}
+            callGetArticles={getFeedNames}
             closeAllFeeds={closeAllFeeds}
             articles={articles}
             setIsEditable={setIsEditable}
@@ -254,79 +290,79 @@ export const FeedList: React.FC<FeedListProps> = ({
 
         {Object.entries(articles).map(
           ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
-            <div
-              key={feedIndex}
-              className={`max-w-96 rounded pl-3 pr-3 border-2
+            < div
+              key = { feedIndex }
+              className = {`max-w-96 rounded pl-3 pr-3 border-2
               ${feedVisibility[feedIndex]
-                  ? "border-neutral-500 bg-black"
-                  : "border-transparent"
+              ? "border-neutral-500 bg-black"
+              : "border-transparent"
+            }`}
+            >
+        <div
+          className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""}`}
+          onClick={() => toggleFeedVisibility(feedIndex)}
+        >
+          {isEditable && (
+            <input
+              type="checkbox"
+              onClick={(e) => updateSelectedItems(e, feedIndex)}
+              className="mr-2 accent-yellow-400 focus:ring-yellow-400 focus:ring-1 cursor-pointer"
+            />
+          )}
+          <input
+            type="text"
+            maxLength={50}
+            className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
+                      ${feedVisibility[feedIndex]
+                ? "text-amber-300"
+                : "text-white"
+              }
+                      ${isEditable
+                ? " pl-1 rounded bg-neutral-500 cursor-text"
+                : "bg-transparent "
+              }`}
+            value={feedNames[feedIndex] || ''}
+            onClick={preventFeedOpenOnEdit}
+            onChange={(e) => updateFeedName(e, feedIndex)}
+            readOnly={!isEditable}
+          ></input>
+          {showSaveBtn[feedIndex] && (
+            <button
+              onClick={(e) => { sendFeedNames(e, feedIndex) }}
+              type="submit"
+              className="flex items-center text-white h-min leading-3 p-1 rounded bg-neutral-900 hover:text-amber-300 transition-color duration-150 ease-in-out text-base flex items-center absolute right-2"
+            >
+              save
+            </button>
+          )}
+          {/* <FontAwesomeIcon className="absolute text-xs right-8" icon={faPen}/> */}
+
+          {!isEditable && (
+            <button
+              className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
+                ? "text-yellow-500"
+                : "text-neutral-500"
                 }`}
             >
-              <div
-                className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""}`}
-                onClick={() => toggleFeedVisibility(feedIndex)}
-              >
-                {isEditable && (
-                  <input
-                    type="checkbox"
-                    onClick={(e) => updateSelectedItems(e, feedIndex)}
-                    className="mr-2 accent-yellow-400 focus:ring-yellow-400 focus:ring-1 cursor-pointer"
-                  />
-                )}
-                <input
-                  type="text"
-                  maxLength={50}
-                  className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
-                      ${feedVisibility[feedIndex]
-                      ? "text-amber-300"
-                      : "text-white"
-                    }
-                      ${isEditable
-                      ? " pl-1 rounded bg-neutral-500 cursor-text"
-                      : "bg-transparent "
-                    }`}
-                  value={feedNames[feedIndex] || ''}
-                  onClick={preventFeedOpenOnEdit}
-                  onChange={(e) => updateFeedName(e, feedIndex)}
-                  readOnly={!isEditable}
-                ></input>
-                {showSaveBtn[feedIndex] && (
-                  <button
-                    onClick={(e) => { sendFeedNames(e, feedIndex) }}
-                    type="submit"
-                    className="flex items-center text-white h-min leading-3 p-1 rounded bg-neutral-900 hover:text-amber-300 transition-color duration-150 ease-in-out text-base flex items-center absolute right-2"
-                  >
-                    <p>save</p>
-                  </button>
-                )}
-                {/* <FontAwesomeIcon className="absolute text-xs right-8" icon={faPen}/> */}
-
-                {!isEditable && (
-                  <button
-                    className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
-                      ? "text-amber-300"
-                      : "text-neutral-500"
-                      }`}
-                  >
-                    {feedVisibility[feedIndex] ? (
-                      <FontAwesomeIcon icon={faMinus} />
-                    ) : (
-                      <FontAwesomeIcon icon={faPlus} />
-                    )}
-                  </button>
-                )}
-              </div>
-              {feedVisibility[feedIndex] && (
-                <div className="font-semibold flex flex-col ml-3">
-                  {feedArray.map((item: ArticleItem) => (
-                    <Feed item={item.item} />
-                  ))}
-                </div>
+              {feedVisibility[feedIndex] ? (
+                <FontAwesomeIcon icon={faMinus} />
+              ) : (
+                <FontAwesomeIcon icon={faPlus} />
               )}
-            </div>
-          )
+            </button>
+          )}
+        </div>
+        {feedVisibility[feedIndex] && (
+          <div className="font-semibold flex flex-col ml-3">
+            {feedArray.map((item: ArticleItem) => (
+              <Feed item={item.item} />
+            ))}
+          </div>
         )}
       </div>
+      )
+        )}
+    </div >
     </>
   );
 };

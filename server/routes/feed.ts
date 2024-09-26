@@ -5,7 +5,7 @@ import fs from "fs";
 const opml = require('opml');
 import { getConnection } from "../database";
 import { authenticateToken } from "../auth";
-import { getDefaultFeedName, renderFeed } from '../rss';
+import { getDefaultFeedName, renderFeed, parse } from '../rss';
 import { getUserId } from '../utils';
 
 const router = express.Router();
@@ -40,6 +40,7 @@ async function updateFeedDB(newURLs: string[], userID: number) {
   return renderFeed(names, feedURLs);
 }
 
+//get names and urls from db
 async function getFeedData(req: any, id?: number): Promise<string[][]> {
   const connection = await getConnection();
   const userId = req ? getUserId(req) : id;
@@ -63,21 +64,34 @@ async function getFeedData(req: any, id?: number): Promise<string[][]> {
   return [urls, names];
 }
 
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/getFeedNames", authenticateToken, async (req, res) => {
+  //object with urls and names in separate arrays at matching indices
   const data = await getFeedData(req);
-  const urlList: string[] = data[0];
-  const names: string[] = data[1];
+  res.send(data);
+});
 
-  const renderedFeeds = await renderFeed(names, urlList);
-  let formattedItems: { [key: string]: any } = {};
+//give this name and url
+router.post("/getRenderedFeedData", authenticateToken, async (req, res) => {
+  const data = req.body;//find data in req
 
-  renderedFeeds.forEach((feed) => {
-    const key = Object.keys(feed)[0];
-    const value = Object.values(feed)[0];
-    formattedItems[key] = value;
-  });
+  const renderedFeed = await parse(data.url, data.name);
+  console.log(renderedFeed);
+  res.send(renderedFeed);
 
-  res.send(formattedItems);
+//old------
+  // const urlList: string[] = data[0];
+  // const names: string[] = data[1];
+
+  // const renderedFeeds = await renderFeed(names, urlList);
+  // let formattedItems: { [key: string]: any } = {};
+
+  // renderedFeeds.forEach((feed) => {
+  //   const key = Object.keys(feed)[0];
+  //   const value = Object.values(feed)[0];
+  //   formattedItems[key] = value;
+  // });
+
+  // res.send(formattedItems);
 });
 
 router.post("/newFeed", authenticateToken, async (req, res) => {

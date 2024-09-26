@@ -197,7 +197,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
           <button className="" onClick={toggleMenuVis}>
             <FontAwesomeIcon
               icon={faEllipsis}
-              className={`text-2xl text-neutral-500 pointer relative ${newFeedMenuVis ? "z-10" : "z-20"
+              className={`text-2xl text-neutral-500 pointer relative active:text-yellow-500 ${newFeedMenuVis ? "z-10" : "z-20"
                 } mr-2.5`}
             />
           </button>
