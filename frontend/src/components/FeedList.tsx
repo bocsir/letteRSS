@@ -34,7 +34,7 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortMenu, setSortMenu] = useState<boolean>(false);
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
-  const [isParsing, setIsParsing] = useState<boolean>(false);
+  const [isParsing, setIsParsing] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     //update FeedNames when articles changes
@@ -162,7 +162,6 @@ export const FeedList: React.FC<FeedListProps> = ({
     } catch (err) {
       console.error('error getting feed names or setting feed names to article', err);
     }
-
     setIsLoading(false);
   };
 
@@ -174,6 +173,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     }
   }, [isAuthenticated]);
 
+  //gets parsed feed or just toggles if already parsed
   const toggleFeedVisibility = async (feedIndex: string) => {
     //parse articles at that index
     //**need to make sure when names are edited the changes are reflected in urls
@@ -188,7 +188,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       const name = feedIndex;
       const url = urls[feedIndex];
 
-      setIsParsing(true);
+      setIsParsing({...isParsing, [name]: true});
       try {
         const res = await api.post('/feed/getRenderedFeedData',
           {
@@ -205,7 +205,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       } catch (err) {
         console.error(err);
       }
-      setIsParsing(false);
+      setIsParsing({...isParsing, [name]: false});
     }
 
   };
@@ -289,7 +289,6 @@ export const FeedList: React.FC<FeedListProps> = ({
             deleteSelected={deleteSelected}
           />
         </div>
-
         <LoadingAnimation isLoading={isLoading} />
 
         {Object.entries(articles).map(
@@ -358,8 +357,8 @@ export const FeedList: React.FC<FeedListProps> = ({
               </div>
               {feedVisibility[feedIndex] && (
                 <>
-                  {isParsing && (
-                    <div className="flex justify-center items-center z-50 w-full h-full mb-3" >
+                  {isParsing[feedIndex] && (
+                    <div className="flex justify-center items-center z-50 w-full h-full mb-3 mt-3" >
                       <div className="flex flex-row gap-2">
                         <div className="w-1 h-1 rounded-full bg-yellow-500 animate-bounce"></div>
                         <div className="w-1 h-1 rounded-full bg-yellow-500 animate-bounce [animation-delay:-.3s]"></div>
@@ -370,7 +369,7 @@ export const FeedList: React.FC<FeedListProps> = ({
                   )}
                   <div className="font-semibold flex flex-col ml-3">
                     {feedArray.map((item: ArticleItem) => (
-                      <Feed item={item.item} />
+                      <Feed key={item.item.link} item={item.item} />
                     ))}
                   </div>
                 </>

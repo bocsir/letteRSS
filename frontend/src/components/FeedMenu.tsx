@@ -112,7 +112,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
           withCredentials: true,
         }
       );
-
+      console.log('sendurl resonse: ');
       console.log(res);
 
       //call async getArticles in parent to update frontend after new url addition
@@ -122,8 +122,8 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       seturlNotFound(true);
       console.error(error);
     }
-    setIsLoading(false);
     setNewFeedUrl(""); //clear input filed
+    setIsLoading(false);
   };
 
   const toggleNewFeedMenuVis = () => {

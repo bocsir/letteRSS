@@ -15,6 +15,7 @@ export const interceptors = (navigate: any) => {
                 console.log('navigating to /login');
                 navigate("/login");
             } else if (err.response.status === 401) {
+                //refresh token then re call the function that triggered the error
                 await api.post('/auth/refresh-token');
                 const ogEndpoint = err.config.url;
                 const ogData = JSON.parse(err.config.data);

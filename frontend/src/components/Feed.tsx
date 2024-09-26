@@ -10,12 +10,12 @@ interface FeedProps {
 
 const Feed: React.FC<FeedProps> = ({ item }) => {
   const [isYellow, setisYellow] = useState<boolean>(false);
-  
-  const dateFormat: Intl.DateTimeFormatOptions = { 
-    day: "numeric", 
-    month: "long", 
-    year: "numeric" 
-  }; 
+
+  const dateFormat: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  };
 
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
@@ -34,16 +34,17 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         onMouseEnter={() => setisYellow(true)}
         onMouseLeave={() => setisYellow(false)}
       >
-        <h3 className="text-base font-normal leading-4">
+        <span className="text-base font-normal leading-4">
           {item.title}
-          <FontAwesomeIcon icon={faLink} className="text-xs ml-1"/>
-        </h3>
-        <p className="font-light text-sm">{articleDate}</p>
+          <FontAwesomeIcon icon={faLink} className="text-xs ml-1" />
+        </span>
+        <br />
+        <span className="font-light text-sm">{articleDate}</span>
       </a>
-      <ReaderButton 
-        item={articleContent} 
-        isYellow={isYellow} 
-        setIsYellow={setisYellow} 
+      <ReaderButton
+        item={articleContent}
+        isYellow={isYellow}
+        setIsYellow={setisYellow}
 
       />
     </>
