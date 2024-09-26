@@ -1,22 +1,21 @@
 # LetteRSS - RSS Reader
-Minimal RSS reader.
+Minimal RSS reader
 
 ## Description
 The goal of this project is to create an RSS reader that doesn't feel as busy as other readers.
-This reader has no social media-like reccommendations or tab to look through curated feeds to add to your list. It is just an RSS reader.
+This reader has no social media-like reccommendations or tab to look through curated feeds to add to your list. It is just an RSS reader that you can add your RSS feeds to.
 
 ### Curent Features
   <ul>
     <li>Auth uses JWT for access and refresh tokens</li>
     <li>Users can add feeds by individual site link or with an .opml file</li>
-    <li>Names of feeds can be edited</li>
+    <li>Feeds can be deleted and their names can be edited</li>
     <li>Feeds can be read in-site or with an iframe to the original page</li>
   </ul>
   
 ### Future Features
   <ul>
     <li>Folders for feeds</li>
-    <li>Deleting feeds</li>
     <li>Feed search</li>
     <li>Change theme / font</li>
     <li>Feed export</li>
