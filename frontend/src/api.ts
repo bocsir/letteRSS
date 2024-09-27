@@ -16,17 +16,20 @@ export const interceptors = (navigate: any) => {
                 navigate("/login");
             } else if (err.response.status === 401) {
                 //refresh token then re call the function that triggered the error
-                await api.post('/auth/refresh-token');
-                const ogEndpoint = err.config.url;
-                const ogData = JSON.parse(err.config.data);
-                await api.post(
-                    ogEndpoint,
-                    ogData
-                );
+                try {
+                    const res = await api.post('/auth/refresh-token');
+                    console.log(res);
+                } catch(err){
+                    console.error(err);
+                    navigate("/login");
+                }
+                const ogRequest = err.config
+                return await api.request(ogRequest);
             }
             return Promise.reject(err);
         }
     );
 }
+
 
 export default api;

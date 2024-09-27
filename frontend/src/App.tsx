@@ -1,5 +1,10 @@
   /*
   *TODO:
+  *re calling endoint in api.ts not working after auth erorr 401
+
+  *mark read/ unread
+  *red dot for unseen
+
   *folder stuff
     *to add to folder
       *create new folder

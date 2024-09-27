@@ -103,7 +103,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     }
     try {
       //send new url to server
-      console.log(newFeedUrl);
       const res = await axios.post(
         "http://localhost:3000/feed/newFeed",
         { feedUrl: newFeedUrl },
@@ -112,8 +111,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
           withCredentials: true,
         }
       );
-      console.log('sendurl resonse: ');
-      console.log(res);
 
       //call async getArticles in parent to update frontend after new url addition
       callGetArticles();

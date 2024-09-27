@@ -109,7 +109,7 @@ router.post("/logout", (req, res) => {
   res.status(200).json({ message: "logged out successfully" });
 });
 
-router.post("/refresh-token", async (req, res) => {
+router.post("/refresh-token", async(req, res) => {
   const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) return res.sendStatus(401);
 

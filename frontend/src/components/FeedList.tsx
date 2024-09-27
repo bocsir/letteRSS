@@ -12,7 +12,6 @@ import {
 import Feed from "../components/Feed";
 import FeedMenu from "./FeedMenu";
 import api from "../api";
-import axios from "axios";
 import LoadingAnimation from "./LoadingAnimation";
 
 interface FeedListProps {
@@ -28,11 +27,12 @@ export const FeedList: React.FC<FeedListProps> = ({
     [key: string]: boolean;
   }>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
-  const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
-  const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortMenu, setSortMenu] = useState<boolean>(false);
+//these should all be one object i think:
+  const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
+  const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
   const [isParsing, setIsParsing] = useState<{[key: string]: boolean}>({});
 
@@ -47,6 +47,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     setFeedNames(feedNames);
 
     removeAllSaveButtons();
+    console.log('articles: ', articles);
   }, [articles]);
 
   const sortArticles = (isAlphabetical: boolean) => {
@@ -109,14 +110,16 @@ export const FeedList: React.FC<FeedListProps> = ({
     e: React.ChangeEvent<HTMLInputElement>,
     feedIndex: string
   ) => {
+    const newName = e.target.value;
     const updatedFeedName: { [key: string]: string } = {
       ...feedNames,
-      [feedIndex]: e.target.value,
+      [feedIndex]: newName,
     };
     const updatedSaveBtnStatus = {
       ...showSaveBtn,
       [feedIndex]: true
     }
+
     setShowSaveBtn(updatedSaveBtnStatus);
     setFeedNames(updatedFeedName);
   };
@@ -144,12 +147,11 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     try {
       const res = await api.get('/feed/getFeedNames');
-      console.log('/feed/getFeedNames response: ', res);
 
-      const articlesObj: Record<string, []> = {}
+      const articlesObj: Record<string, []> = {};
       res.data[1].forEach((name: string) => {
         articlesObj[name] = [];
-      })
+      });
       const urls: { [key: string]: string } = {};
       let index = 0;
       res.data[0].forEach((url: string) => {
@@ -157,14 +159,12 @@ export const FeedList: React.FC<FeedListProps> = ({
         index++;
       });
       setUrls(urls);
-      console.log(urls);
       setArticles(articlesObj);
     } catch (err) {
       console.error('error getting feed names or setting feed names to article', err);
     }
     setIsLoading(false);
   };
-
 
   //get articles on mount and when isAuthenticated refreshes
   useEffect(() => {
@@ -227,6 +227,17 @@ export const FeedList: React.FC<FeedListProps> = ({
       [name]: false
     }
     setShowSaveBtn(updatedSaveBtnStatus);
+
+    //change the key for articles
+    let newArticles: Articles = {...articles, [feedNames[name]]:articles[name]};
+    delete newArticles[name];
+    setArticles(newArticles);
+
+    //change the key for urls
+    let newUrls: {[key: string]: string} = {...urls, [feedNames[name]]:urls[name]};
+    delete newUrls[name];
+
+    setUrls(newUrls);
 
     const res = await api.post(
       "/feed/changeFeedName",
