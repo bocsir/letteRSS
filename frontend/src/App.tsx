@@ -1,15 +1,15 @@
   /*
   *TODO:
-  *re calling endoint in api.ts not working after auth erorr 401
 
-  *mark read/ unread
-  *red dot for unseen
+  
+    *folder stuff 
+      *add to folder
+        *create new folder
+        *store folders in database
+          *new optional column in url table: folder varchar(30)
 
-  *folder stuff
-    *to add to folder
-      *create new folder
-      *store folders in database
-        *new optional column in url table: folder varchar(30)
+    *mark read/ unread
+    *dot for unread?
 
     *search feeds
       *ctrl+k brings up search box to look through all feeds by name with suggestions

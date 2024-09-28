@@ -23,13 +23,12 @@ export const interceptors = (navigate: any) => {
                     console.error(err);
                     navigate("/login");
                 }
-                const ogRequest = err.config
+                const ogRequest = err.config;
                 return await api.request(ogRequest);
             }
             return Promise.reject(err);
         }
     );
 }
-
 
 export default api;

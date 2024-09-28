@@ -20,10 +20,6 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
   const articleContent: FeedItem = item;
 
-  const setActive = () => {
-    setisYellow(true);
-  }
-
   return (
     <>
       <a

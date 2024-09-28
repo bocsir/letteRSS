@@ -16,6 +16,7 @@ import {
 import { Articles } from "../interfaces";
 import api from "../api";
 import LoadingAnimation from "./LoadingAnimation";
+import FolderMenu from "./FolderMenu";
 
 interface FeedMenuProps {
   callGetArticles: any;
@@ -156,13 +157,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       <div className="relative">
         {doneBtnVis ? (
           <div className="flex gap-3 items-center h-max">
-            <button
-              className="relative hover:text-neutral-500"
-              onMouseEnter={() => updateMenuBtnHover(1, true)}
-              onMouseLeave={() => updateMenuBtnHover(1, false)}
-            >
-              <FontAwesomeIcon icon={faFolderOpen} />
-            </button>
+              <FolderMenu updateMenuBtnHover={updateMenuBtnHover}/>
             {menuBtnHover[1] && (
               <div className="bg-amber-300 z-30 absolute -left-16 top-7 pl-2 pr-2 w-max h-min cursor-none">
                 <p className="text-sm text-black">organize selected</p>
@@ -290,7 +285,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                     className="w-full mr-8 p-3 pt-2 pb-2 bg-black rounded-md border border-dashed border-neutral-500 cursor-pointer text-neutral-500 flex items-center gap-3"
                     htmlFor="file-upload"
                   >
-                    <div className="">
+                    <div>
                       <FontAwesomeIcon
                         className={`text-2xl ${importHover ? "text-gray-200" : ""
                           }`}
@@ -304,7 +299,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                           {file.map((file) => file.name)}
                         </p>
                       ) : (
-                        <p>click to browse files</p>
+                        <p className={`${importHover ? "text-gray-200" : ""}`}>click to browse files</p>
                       )}
                     </div>
                   </label>

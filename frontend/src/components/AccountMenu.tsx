@@ -38,12 +38,18 @@ const AccountMenu = ({ toggleAccountMenu, userEmail, navigate }: AccountMenuProp
         </div>
 
         <p>Signed in as: {userEmail}</p>
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-stretch w-full gap-3">
           <button
-            className="bg-amber-300 w-min p-3 mt-3 mb-2 rounded-lg leading-3 cursor-pointer text-stone-800 font-bold transition-shadow duration-200 ease-in-out hover:shadow-[0px_0px_10px_4px_rgb(147,91,9)] hover:text-amber-800"
+            className="bg-amber-300 w-min p-3 mt-3 mb-2 h-min rounded-lg leading-3 cursor-pointer text-stone-800 font-bold transition-shadow duration-200 ease-in-out hover:shadow-[0px_0px_10px_4px_rgb(147,91,9)] hover:text-amber-800"
             onClick={logoutUser}
           >
             logout
+          </button>
+          <button
+            className="bg-amber-300 p-3 mt-3 mb-2 leading-3 w-max rounded-lg cursor-pointer text-stone-800 font-bold transition-shadow duration-200 ease-in-out hover:shadow-[0px_0px_10px_4px_rgb(147,91,9)] hover:text-amber-800"
+            onClick={logoutUser}
+          >
+            logout all devices
           </button>
 
         </div>

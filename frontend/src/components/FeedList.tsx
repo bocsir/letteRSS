@@ -30,11 +30,18 @@ export const FeedList: React.FC<FeedListProps> = ({
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortMenu, setSortMenu] = useState<boolean>(false);
-//these should all be one object i think:
+
   const [feedNames, setFeedNames] = useState<{ [key: string]: string }>({});
   const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
   const [isParsing, setIsParsing] = useState<{[key: string]: boolean}>({});
+
+  //get articles on mount and when isAuthenticated refreshes
+  useEffect(() => {
+    if (isAuthenticated) {
+      getFeedNames();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     //update FeedNames when articles changes
@@ -50,6 +57,7 @@ export const FeedList: React.FC<FeedListProps> = ({
     console.log('articles: ', articles);
   }, [articles]);
 
+  //feed editing ---
   const sortArticles = (isAlphabetical: boolean) => {
     const currentArticles: string[] = [];
 
@@ -61,17 +69,14 @@ export const FeedList: React.FC<FeedListProps> = ({
       ? currentArticles.sort((a, b) => a.localeCompare(b))
       : currentArticles.sort((a, b) => b.localeCompare(a));
 
-    const sortedObj = createObjTemplate(sortedArticles);
+    const sortedObj: Record<string, null> = {};
+    sortedArticles.forEach(item => {
+      sortedObj[item] = null;
+    });
+
+    //use the shape of sorted articles to reorganize articles;
     const newArticlesObj = Object.assign(sortedObj, articles);
     setArticles(newArticlesObj);
-  }
-
-  const createObjTemplate = (arr: string[]): Record<string, null> => {
-    const obj: Record<string, null> = {};
-    arr.forEach(item => {
-      obj[item] = null;
-    });
-    return obj;
   }
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
@@ -122,7 +127,7 @@ export const FeedList: React.FC<FeedListProps> = ({
 
     setShowSaveBtn(updatedSaveBtnStatus);
     setFeedNames(updatedFeedName);
-  };
+  }
 
   const removeAllSaveButtons = () => {
     let showSaveDefault: { [key: string]: boolean } = {};
@@ -139,7 +144,16 @@ export const FeedList: React.FC<FeedListProps> = ({
       return acc;
     }, {} as { [key: string]: boolean });
     setFeedVisibility(closedFeeds);
-  };
+  }
+
+  const preventFeedOpenOnEdit = (
+    e: React.MouseEvent<HTMLInputElement, MouseEvent>
+  ) => {
+    if (isEditable) {
+      e.stopPropagation();
+    }
+  }
+  //end of feed editing ---
 
   //request to allAritcles endpoint for articles
   const getFeedNames = async () => {
@@ -164,14 +178,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       console.error('error getting feed names or setting feed names to article', err);
     }
     setIsLoading(false);
-  };
-
-  //get articles on mount and when isAuthenticated refreshes
-  useEffect(() => {
-    if (isAuthenticated) {
-      getFeedNames();
-    }
-  }, [isAuthenticated]);
+  }
 
   //gets parsed feed or just toggles if already parsed
   const toggleFeedVisibility = async (feedIndex: string) => {
@@ -208,15 +215,7 @@ export const FeedList: React.FC<FeedListProps> = ({
       setIsParsing({...isParsing, [name]: false});
     }
 
-  };
-
-  const preventFeedOpenOnEdit = (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>
-  ) => {
-    if (isEditable) {
-      e.stopPropagation();
-    }
-  };
+  }
 
   const sendFeedNames = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
     e.stopPropagation();
