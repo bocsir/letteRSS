@@ -40,30 +40,33 @@ async function updateFeedDB(newURLs: string[], userID: number) {
   return renderFeed(names, feedURLs);
 }
 
-//get names and urls from db
+//get names and urls and folders from db
 async function getFeedData(req: any, id?: number): Promise<string[][]> {
   const connection = await getConnection();
   const userId = req ? getUserId(req) : id;
 
   let urls: string[] = [];
   let names: string[] = [];
+  let folders: string[] = [];
 
   try {
-    const query = "SELECT url, name FROM url WHERE user_id = ?";
+    const query = "SELECT url, name, folder FROM url WHERE user_id = ?";
     const rows = await connection.execute(query, [userId]);
 
-    rows.forEach((item: {url: string, name: string}) => {
+    rows.forEach((item: {url: string, name: string, folder: string}) => {
       urls.push(item.url);
       names.push(item.name);
+      folders.push(item.folder);
     });
 
   } catch (err) {
     console.error(err);
   }
 
-  return [urls, names];
+  return [urls, names, folders];
 }
 
+//need to also get folders
 router.get("/getFeedNames", authenticateToken, async (req, res) => {
   const data = await getFeedData(req);
   res.send(data);
