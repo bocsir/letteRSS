@@ -38,7 +38,7 @@
     *reddit feed from subreddit url
   */
   import React, { useEffect, useState } from "react";
-  import { FeedList } from "./components/FeedList";
+  import FeedContainer from "./components/FeedContainer";
   import { Logo } from "./components/Logo";
   import { AxiosResponse } from "axios";
   import api, { interceptors } from './api';
@@ -104,7 +104,7 @@
           </button>
         </div>
 
-        <FeedList isAuthenticated={isAuthenticated}/>
+        <FeedContainer isAuthenticated={isAuthenticated}/>
 
         {accountMenuVisible && (
           <AccountMenu toggleAccountMenu={toggleMenuVis} userEmail={userEmail} navigate={navigate}/>
