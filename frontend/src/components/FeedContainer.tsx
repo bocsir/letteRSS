@@ -9,6 +9,7 @@ import {
   faArrowDownZA,
   faArrowDownAZ,
   faFolder,
+  faFolderOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import Feed from "./Feed";
 import FeedMenu from "./FeedMenu";
@@ -303,6 +304,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     Object.keys(articles).forEach((name) => {
       console.log(name);
       //if folders has a folder for the article, add that folder to populatedFolders and populate it
+      console.log('filling feed');
       if (folders[name]) {
         const folderName = folders[name];
         console.log(folderName)
@@ -311,6 +313,8 @@ export const FeedContainer: React.FC<FeedListProps> = ({
             feeds: {},
             isOpen: false
           }
+        } else {
+          populatedFolders[folderName].isOpen = true
         }
         // Add the feed to the folder
         populatedFolders[folderName].feeds[name] = Object.values(articles[name]);
@@ -409,35 +413,36 @@ export const FeedContainer: React.FC<FeedListProps> = ({
               <div key={folderName}>
                 <div
                   onClick={() => toggleFolderOpen(folderName)}
-                  className="text-base cursor-pointer pl-3 border-2 border-transparent flex items-center justify-between"
+                  className="select-none text-base cursor-pointer pl-3 border-2 border-transparent flex items-center justify-between"
                 >
                   <span>
-                    <FontAwesomeIcon icon={faFolder} /> {folderName}
+                    {folderContent.isOpen ? (
+                      <FontAwesomeIcon icon={faFolderOpen} />
+                    ) : (
+                      <FontAwesomeIcon className="w-[18px]" icon={faFolder} />
+                    )}{" "}{folderName}
                   </span>
-                  {folderContent.isOpen ? (
-                    <FontAwesomeIcon icon={faMinus} />
-                  ) : (
-                    <FontAwesomeIcon icon={faPlus} />
-                  )}
                 </div>
-                {folderContent.isOpen &&
-                  <FeedList
-                    articles={populatedFolders[folderName].feeds}
-                    toggleFeedVisibility={toggleFeedVisibility}
-                    feedVisibility={feedVisibility}
-                    isEditable={isEditable}
-                    updateSelectedItems={updateSelectedItems}
-                    updateFeedNames={updateFeedName}
-                    feedNames={feedNames}
-                    preventFeedOpenOnEdit={preventFeedOpenOnEdit}
-                    updateFeedName={updateFeedName}
-                    showSaveBtn={showSaveBtn}
-                    sendFeedNames={sendFeedNames}
-                    isParsing={isParsing}
-                    folders={folders}
-                    isInFolder={true}
-                  />
-                }
+                <div className="ml-3 border-l">
+                  {folderContent.isOpen &&
+                    <FeedList
+                      articles={populatedFolders[folderName].feeds}
+                      toggleFeedVisibility={toggleFeedVisibility}
+                      feedVisibility={feedVisibility}
+                      isEditable={isEditable}
+                      updateSelectedItems={updateSelectedItems}
+                      updateFeedNames={updateFeedName}
+                      feedNames={feedNames}
+                      preventFeedOpenOnEdit={preventFeedOpenOnEdit}
+                      updateFeedName={updateFeedName}
+                      showSaveBtn={showSaveBtn}
+                      sendFeedNames={sendFeedNames}
+                      isParsing={isParsing}
+                      folders={folders}
+                      isInFolder={true}
+                    />
+                  }
+                </div>
               </div>
             )
           )}

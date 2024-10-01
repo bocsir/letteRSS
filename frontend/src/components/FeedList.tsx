@@ -63,7 +63,7 @@ const FeedList: React.FC<FeedListProps> = ({
             
           <div
             key={feedIndex}
-            className={`max-w-96 rounded pl-3 pr-3 border-2
+            className={`max-w-96 rounded pl-3 pr-3 border-2 ${isInFolder ? "ml-2" : "ml-0"}
               ${
                 feedVisibility[feedIndex]
                   ? "border-neutral-500 bg-black"
