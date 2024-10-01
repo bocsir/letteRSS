@@ -7,6 +7,7 @@ import api from "../api";
 
 interface FeedListProps {
   feeds: Feeds;
+  setFeeds: React.Dispatch<React.SetStateAction<Feeds>>;
   isEditable: boolean;
   updateSelectedItems: (e: any, feedIndex: string) => void;
   feedNames: {
@@ -27,10 +28,19 @@ interface FeedListProps {
     [key: string]: string | null;
   };
   isInFolder: boolean;
-  setFeeds: React.Dispatch<React.SetStateAction<Feeds>>;
+  urls: {
+    [key: string]: string;
+  };
+  feedVisibility: {
+    [key: string]: boolean;
+  };
+  setFeedVisibility: React.Dispatch<React.SetStateAction<{
+    [key: string]: boolean;
+  }>>;
 }
 const FeedList: React.FC<FeedListProps> = ({
   feeds,
+  setFeeds,
   isEditable,
   updateSelectedItems,
   feedNames,
@@ -39,13 +49,11 @@ const FeedList: React.FC<FeedListProps> = ({
   sendFeedNames,
   folders,
   isInFolder,
-  setFeeds
+  urls,
+  feedVisibility,
+  setFeedVisibility,
 }) => {
-  const [feedVisibility, setFeedVisibility] = useState<{
-    [key: string]: boolean;
-  }>({});
   const [isParsing, setIsParsing] = useState<{ [key: string]: boolean }>({});
-  const [urls, setUrls] = useState<{ [key: string]: string }>({});
 
   const preventFeedOpenOnEdit = (
     e: React.MouseEvent<HTMLInputElement, MouseEvent>
@@ -55,6 +63,7 @@ const FeedList: React.FC<FeedListProps> = ({
     }
   }
 
+  //will call server to render feeds if feed not already rendered
   const toggleFeedVisibility = async (feedIndex: string) => {
     //parse feeds at that index
     //**need to make sure when names are edited the changes are reflected in urls
@@ -120,7 +129,7 @@ const FeedList: React.FC<FeedListProps> = ({
               <input
                 type="text"
                 maxLength={50}
-                className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
+                className={`no-select relative focus:outline-none overflow-x cursor-pointer text-base whitespace-nowrap text-clip w-full pr-3
                       ${feedVisibility[feedIndex]
                     ? "text-amber-300"
                     : "text-white"

@@ -147,18 +147,24 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     feedIndex: string
   ) => {
     const newName = e.target.value;
+    
     const updatedFeedName: { [key: string]: string } = {
       ...feedNames,
       [feedIndex]: newName,
     };
+
+
     const updatedSaveBtnStatus = {
       ...showSaveBtn,
-      [feedIndex]: true
+      [feedIndex]: (feedNames[newName]) ? false : true
     }
 
     setShowSaveBtn(updatedSaveBtnStatus);
+
     setFeedNames(updatedFeedName);
   }
+
+  useEffect(()=>{console.log(feedNames)},[feedNames]);
 
   const removeAllSaveButtons = () => {
     let showSaveDefault: { [key: string]: boolean } = {};
@@ -170,6 +176,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   }
 
   const closeAllFeeds = () => {
+    console.log(feedVisibility);
     const closedFeeds = Object.keys(feedVisibility).reduce((acc, key) => {
       acc[key] = false;
       return acc;
@@ -345,6 +352,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           />
         </div>
         <LoadingAnimation isLoading={isLoading} />
+        <hr className="border-neutral-500 mb-2" />
         <FeedList
           feeds={feeds}
           setFeeds={setFeeds}
@@ -355,11 +363,14 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           showSaveBtn={showSaveBtn}
           sendFeedNames={sendFeedNames}
           folders={folders}
+          urls={urls}
+          feedVisibility={feedVisibility}
+          setFeedVisibility={setFeedVisibility}
           isInFolder={false}
         />
 
-        <hr className="border border-neutral-500 m-3" />
-        <div className="flex flex-col gap-2 ">
+        <hr className="border-neutral-500 mb-2 mt-2" />
+        <div className="flex flex-col gap-2">
           {Object.entries(populatedFolders).map(
             ([folderName, folderContent]) => (
               <div key={folderName}>
@@ -386,7 +397,10 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                       feedNames={feedNames}
                       showSaveBtn={showSaveBtn}
                       sendFeedNames={sendFeedNames}
+                      feedVisibility={feedVisibility}
+                      setFeedVisibility={setFeedVisibility}            
                       folders={folders}
+                      urls={urls}
                       isInFolder={true}
                     />
                   }
