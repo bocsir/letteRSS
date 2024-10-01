@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArticleItem, Articles } from "../interfaces";
+import { ArticleItem, Feeds } from "../interfaces";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareRss,
@@ -25,12 +25,12 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   isAuthenticated,
 }) => {
   //useState is useful because calling its update function will trigger re-render
-  const [articles, setArticles] = useState<Articles>({});
+  const [feeds, setFeeds] = useState<Feeds>({});
   const [feedVisibility, setFeedVisibility] = useState<{
     [key: string]: boolean;
   }>({});
   const [isEditable, setIsEditable] = useState<boolean>(false);
-  const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
+  const [selectedFeeds, setSelectedFeeds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [sortMenu, setSortMenu] = useState<boolean>(false);
 
@@ -50,21 +50,21 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   }
 
   const [populatedFolders, setPopulatedFolders] = useState<PopFolders>({});
-  const [articlesInFolder, setArticlesInFolder] = useState<Articles>({});
+  const [feedsInFolder, setFeedsInFolder] = useState<Feeds>({});
 
   useEffect(() => {
     const filtered = Object.entries(populatedFolders).filter(([key]) => key !== 'isOpen');
 
-    const newArticles: any = {};
+    const newFeeds: any = {};
     filtered.forEach(item => {
-      newArticles[item[0]] = []
+      newFeeds[item[0]] = []
     });
 
-    setArticlesInFolder(newArticles);
-    console.log(newArticles);
+    setFeedsInFolder(newFeeds);
+    console.log(newFeeds);
   }, [populatedFolders]);
 
-  //get articles on mount and when isAuthenticated refreshes
+  //get feeds on mount and when isAuthenticated refreshes
   useEffect(() => {
     if (isAuthenticated) {
       getFeedNames();
@@ -72,9 +72,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   }, [isAuthenticated]);
 
   useEffect(() => {
-    //update FeedNames when articles changes
+    //update FeedNames when feeds changes
     let feedNames: { [key: string]: string } = {};
-    Object.keys(articles).map((name) => {
+    Object.keys(feeds).map((name) => {
       feedNames[name] =
         name.length > 27 ? name.substring(0, 27).concat("...") : name;
 
@@ -84,29 +84,30 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     removeAllSaveButtons();
 
     storeFeedsInFolders();
-    console.log(articles);
-  }, [articles]);
+    console.log(feeds);
+  }, [feeds]);
 
   //feed editing ---
-  const sortArticles = (isAlphabetical: boolean) => {
-    const currentArticles: string[] = [];
+  const sortFeeds = (isAlphabetical: boolean) => {
+    const currentFeeds: string[] = [];
 
-    Object.keys(articles).map((name) => {
-      currentArticles.push(feedNames[name]);
+    Object.keys(feeds).map((name) => {
+      currentFeeds.push(feedNames[name]);
     });
 
-    const sortedArticles = (isAlphabetical)
-      ? currentArticles.sort((a, b) => a.localeCompare(b))
-      : currentArticles.sort((a, b) => b.localeCompare(a));
+    const sortedFeeds = (isAlphabetical)
+      ? currentFeeds.sort((a, b) => a.localeCompare(b))
+      : currentFeeds.sort((a, b) => b.localeCompare(a));
 
     const sortedObj: Record<string, null> = {};
-    sortedArticles.forEach(item => {
+    sortedFeeds.forEach(item => {
       sortedObj[item] = null;
     });
 
-    //use the shape of sorted articles to reorganize articles;
-    const newArticlesObj = Object.assign(sortedObj, articles);
-    setArticles(newArticlesObj);
+    //use the shape of sorted feeds to reorganize feeds;
+    const newFeedsObj = Object.assign(sortedObj, feeds);
+    setSortMenu(false);
+    setFeeds(newFeedsObj);
   }
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
@@ -115,27 +116,27 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     //delete if unckecked, add if checked
     if (e.target.checked) {
       newFeeds = [
-        ...selectedArticles,
+        ...selectedFeeds,
         feedIndex
       ]
     } else {
-      newFeeds = selectedArticles.filter(item => item !== feedIndex);
+      newFeeds = selectedFeeds.filter(item => item !== feedIndex);
     }
-    setSelectedArticles(newFeeds);
+    setSelectedFeeds(newFeeds);
   }
 
-  //delete selectedArticles from database using their key if key: true
+  //delete selectedFeeds from database using their key if key: true
   const deleteSelected = async () => {
-    if (selectedArticles.length === 0) {
+    if (selectedFeeds.length === 0) {
       return;
     }
 
-    const res = await api.post('/feed/deleteArticles', selectedArticles);
+    const res = await api.post('/feed/deleteFeeds', selectedFeeds);
     console.log(res);
     if (res.status === 200) {
-      selectedArticles.map(item => {
-        delete articles[item]
-        setSelectedArticles([]);
+      selectedFeeds.map(item => {
+        delete feeds[item]
+        setSelectedFeeds([]);
         setIsEditable(false);
       });
     }
@@ -161,7 +162,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
   const removeAllSaveButtons = () => {
     let showSaveDefault: { [key: string]: boolean } = {};
-    Object.keys(articles).map((name) => {
+    Object.keys(feeds).map((name) => {
 
       showSaveDefault[name] = false;
     });
@@ -176,16 +177,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     setFeedVisibility(closedFeeds);
   }
 
-  const preventFeedOpenOnEdit = (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>
-  ) => {
-    if (isEditable) {
-      e.stopPropagation();
-    }
-  }
   //end of feed editing ---
 
-  //request to allAritcles endpoint for articles
+  //request to allAritcles endpoint for feeds
   const getFeedNames = async () => {
     setIsLoading(true);
 
@@ -194,23 +188,23 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
       console.log(res.data);
 
-      //create default articles object to be filled with data when an article is clicked and parsed
-      const articlesObj: Record<string, []> = {};
+      //create default feeds object to be filled with data when an article is clicked and parsed
+      const feedsObj: Record<string, []> = {};
       res.data[1].forEach((name: string) => {
-        articlesObj[name] = [];
+        feedsObj[name] = [];
       });
 
       const urls: { [key: string]: string } = {};
       let index = 0;
       res.data[0].forEach((url: string) => {
-        urls[Object.keys(articlesObj)[index]] = url;
+        urls[Object.keys(feedsObj)[index]] = url;
         index++;
       });
 
       const folders: { [key: string]: string | null } = {};
       index = 0;
       res.data[2].forEach((folder: string | null) => {
-        folders[Object.keys(articlesObj)[index]] = folder
+        folders[Object.keys(feedsObj)[index]] = folder
         index++;
       });
 
@@ -218,48 +212,11 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
       setFolders(folders);
       setUrls(urls);
-      setArticles(articlesObj);
+      setFeeds(feedsObj);
     } catch (err) {
       console.error('error getting feed names or setting feed names to article', err);
     }
     setIsLoading(false);
-  }
-
-  //gets parsed feed or just toggles if already parsed
-  const toggleFeedVisibility = async (feedIndex: string) => {
-    //parse articles at that index
-    //**need to make sure when names are edited the changes are reflected in urls
-    if (!isEditable) {
-      setFeedVisibility((prev: { [key: string]: boolean }) => ({
-        ...prev,
-        [feedIndex]: !prev[feedIndex],
-      }));
-    }
-
-    if (articles[feedIndex].length === 0) {
-      const name = feedIndex;
-      const url = urls[feedIndex];
-
-      setIsParsing({ ...isParsing, [name]: true });
-      try {
-        const res = await api.post('/feed/getRenderedFeedData',
-          {
-            name: name,
-            url: url,
-          }
-        )
-        const data = Object.entries(res.data)[0][1] as ArticleItem[];
-        const newArticlesObj: Articles = {
-          ...articles,
-          [feedIndex]: data
-        }
-        setArticles(newArticlesObj);
-      } catch (err) {
-        console.error(err);
-      }
-      setIsParsing({ ...isParsing, [name]: false });
-    }
-
   }
 
   const sendFeedNames = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
@@ -272,10 +229,10 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     }
     setShowSaveBtn(updatedSaveBtnStatus);
 
-    //change the key for articles
-    let newArticles: Articles = { ...articles, [feedNames[name]]: articles[name] };
-    delete newArticles[name];
-    setArticles(newArticles);
+    //change the key for feeds
+    let newFeeds: Feeds = { ...feeds, [feedNames[name]]: feeds[name] };
+    delete newFeeds[name];
+    setFeeds(newFeeds);
 
     //change the key for urls
     let newUrls: { [key: string]: string } = { ...urls, [feedNames[name]]: urls[name] };
@@ -297,11 +254,10 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     console.log(res);
   }
 
-
   const storeFeedsInFolders = () => {
     const populatedFolders: PopFolders = {}
 
-    Object.keys(articles).forEach((name) => {
+    Object.keys(feeds).forEach((name) => {
       console.log(name);
       //if folders has a folder for the article, add that folder to populatedFolders and populate it
       console.log('filling feed');
@@ -317,7 +273,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           populatedFolders[folderName].isOpen = true
         }
         // Add the feed to the folder
-        populatedFolders[folderName].feeds[name] = Object.values(articles[name]);
+        populatedFolders[folderName].feeds[name] = Object.values(feeds[name]);
 
         console.log("feeds for ", name, ' ', populatedFolders);
       }
@@ -361,14 +317,14 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    onClick={(e) => sortArticles(true)}
+                    onClick={(e) => sortFeeds(true)}
                     className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
                   >
                     <FontAwesomeIcon icon={faArrowDownAZ} />
                   </button>
                   <hr className="border-neutral-500 border-inset border-1 w-full" />
                   <button
-                    onClick={() => sortArticles(false)}
+                    onClick={() => sortFeeds(false)}
                     className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
                   >
                     <FontAwesomeIcon icon={faArrowDownZA} />
@@ -380,9 +336,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
             </div>
           </div>
           <FeedMenu
-            callGetArticles={getFeedNames}
+            callGetFeeds={getFeedNames}
             closeAllFeeds={closeAllFeeds}
-            articles={articles}
+            feeds={feeds}
             setIsEditable={setIsEditable}
             isEditable={isEditable}
             deleteSelected={deleteSelected}
@@ -390,18 +346,14 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         </div>
         <LoadingAnimation isLoading={isLoading} />
         <FeedList
-          articles={articles}
-          toggleFeedVisibility={toggleFeedVisibility}
-          feedVisibility={feedVisibility}
+          feeds={feeds}
+          setFeeds={setFeeds}
           isEditable={isEditable}
           updateSelectedItems={updateSelectedItems}
-          updateFeedNames={updateFeedName}
-          feedNames={feedNames}
-          preventFeedOpenOnEdit={preventFeedOpenOnEdit}
           updateFeedName={updateFeedName}
+          feedNames={feedNames}
           showSaveBtn={showSaveBtn}
           sendFeedNames={sendFeedNames}
-          isParsing={isParsing}
           folders={folders}
           isInFolder={false}
         />
@@ -423,21 +375,17 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                     )}{" "}{folderName}
                   </span>
                 </div>
-                <div className="ml-3 border-l">
+                <div className="ml-3 border-l border-neutral-500">
                   {folderContent.isOpen &&
                     <FeedList
-                      articles={populatedFolders[folderName].feeds}
-                      toggleFeedVisibility={toggleFeedVisibility}
-                      feedVisibility={feedVisibility}
+                      feeds={populatedFolders[folderName].feeds}
+                      setFeeds={setFeeds}
                       isEditable={isEditable}
                       updateSelectedItems={updateSelectedItems}
-                      updateFeedNames={updateFeedName}
-                      feedNames={feedNames}
-                      preventFeedOpenOnEdit={preventFeedOpenOnEdit}
                       updateFeedName={updateFeedName}
+                      feedNames={feedNames}
                       showSaveBtn={showSaveBtn}
                       sendFeedNames={sendFeedNames}
-                      isParsing={isParsing}
                       folders={folders}
                       isInFolder={true}
                     />

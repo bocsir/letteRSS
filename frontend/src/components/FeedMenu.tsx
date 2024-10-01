@@ -13,24 +13,24 @@ import {
   faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { Articles } from "../interfaces";
+import { Feeds } from "../interfaces";
 import api from "../api";
 import LoadingAnimation from "./LoadingAnimation";
 import FolderMenu from "./FolderMenu";
 
 interface FeedMenuProps {
-  callGetArticles: any;
+  callGetFeeds: any;
   closeAllFeeds: any;
-  articles: Articles;
+  feeds: Feeds;
   setIsEditable: any;
   isEditable: any;
   deleteSelected: any;
 }
-//somehow FeedMenu needs to tell FeedList to call getArticles again
+//somehow FeedMenu needs to tell FeedList to call getFeeds again
 const FeedMenu: React.FC<FeedMenuProps> = ({
-  callGetArticles,
+  callGetFeeds,
   closeAllFeeds,
-  articles,
+  feeds,
   setIsEditable,
   isEditable,
   deleteSelected
@@ -77,16 +77,16 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       const formData = new FormData();
       formData.append("file", file[0]);
 
-      const articlesJson = JSON.stringify(articles);
+      const feedsJson = JSON.stringify(feeds);
       // const urls =
-      formData.append("articles", articlesJson);
+      formData.append("feeds", feedsJson);
 
       const res = await api.post("feed/fileImport", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
 
-      callGetArticles();
+      callGetFeeds();
       setMenuVis(false);
       setfile([]);
     } catch (err) {
@@ -113,8 +113,8 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
         }
       );
 
-      //call async getArticles in parent to update frontend after new url addition
-      callGetArticles();
+      //call async getFeeds in parent to update frontend after new url addition
+      callGetFeeds();
       setMenuVis(false);
     } catch (error) {
       seturlNotFound(true);
@@ -150,6 +150,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setDoneBtnVis(false);
   };
 
+  
   return (
     <>
       <LoadingAnimation isLoading={isLaoding} />

@@ -1,26 +1,17 @@
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ArticleItem, Articles } from "../interfaces";
+import { ArticleItem, Feeds } from "../interfaces";
 import Feed from "./Feed";
+import { useState } from "react";
+import api from "../api";
 
 interface FeedListProps {
-  articles: Articles;
-  toggleFeedVisibility: (feedIndex: string) => Promise<void>;
-  feedVisibility: {
-    [key: string]: boolean;
-  };
+  feeds: Feeds;
   isEditable: boolean;
   updateSelectedItems: (e: any, feedIndex: string) => void;
-  updateFeedNames: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    feedIndex: string
-  ) => void;
   feedNames: {
     [key: string]: string;
   };
-  preventFeedOpenOnEdit: (
-    e: React.MouseEvent<HTMLInputElement, MouseEvent>
-  ) => void;
   updateFeedName: (
     e: React.ChangeEvent<HTMLInputElement>,
     feedIndex: string
@@ -32,48 +23,91 @@ interface FeedListProps {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     name: string
   ) => Promise<void>;
-  isParsing: {
-    [key: string]: boolean;
-  };
   folders: {
     [key: string]: string | null;
   };
   isInFolder: boolean;
+  setFeeds: React.Dispatch<React.SetStateAction<Feeds>>;
 }
 const FeedList: React.FC<FeedListProps> = ({
-  articles,
-  toggleFeedVisibility,
-  feedVisibility,
+  feeds,
   isEditable,
   updateSelectedItems,
-  updateFeedNames,
   feedNames,
-  preventFeedOpenOnEdit,
   updateFeedName,
   showSaveBtn,
   sendFeedNames,
-  isParsing,
   folders,
-  isInFolder
+  isInFolder,
+  setFeeds
 }) => {
+  const [feedVisibility, setFeedVisibility] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [isParsing, setIsParsing] = useState<{ [key: string]: boolean }>({});
+  const [urls, setUrls] = useState<{ [key: string]: string }>({});
+
+  const preventFeedOpenOnEdit = (
+    e: React.MouseEvent<HTMLInputElement, MouseEvent>
+  ) => {
+    if (isEditable) {
+      e.stopPropagation();
+    }
+  }
+
+  const toggleFeedVisibility = async (feedIndex: string) => {
+    //parse feeds at that index
+    //**need to make sure when names are edited the changes are reflected in urls
+    if (!isEditable) {
+      setFeedVisibility((prev: { [key: string]: boolean }) => ({
+        ...prev,
+        [feedIndex]: !prev[feedIndex],
+      }));
+    }
+
+    if (feeds[feedIndex].length === 0) {
+      const name = feedIndex;
+      const url = urls[feedIndex];
+
+      setIsParsing({ ...isParsing, [name]: true });
+      try {
+        const res = await api.post('/feed/getRenderedFeedData',
+          {
+            name: name,
+            url: url,
+          }
+        )
+        const data = Object.entries(res.data)[0][1] as ArticleItem[];
+        const newFeedsObj: Feeds = {
+          ...feeds,
+          [feedIndex]: data
+        }
+        setFeeds(newFeedsObj);
+      } catch (err) {
+        console.error(err);
+      }
+      setIsParsing({ ...isParsing, [name]: false });
+    }
+
+  }
+
+
   return (
     <>
-      {Object.entries(articles).filter(([feedIndex, feedArray]: [string, ArticleItem[]]) => (isInFolder || !(folders[feedIndex]))).map(
+      {Object.entries(feeds).filter(([feedIndex, feedArray]: [string, ArticleItem[]]) => (isInFolder || !(folders[feedIndex]))).map(
         ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
-            
+
           <div
             key={feedIndex}
             className={`max-w-96 rounded pl-3 pr-3 border-2 ${isInFolder ? "ml-2" : "ml-0"}
-              ${
-                feedVisibility[feedIndex]
-                  ? "border-neutral-500 bg-black"
-                  : "border-transparent"
+              ${feedVisibility[feedIndex]
+                ? "border-neutral-500 bg-black"
+                : "border-transparent"
               }`}
           >
             <div
-              className={`h-6 flex justify-between items-center relative ${
-                !isEditable ? "cursor-pointer" : ""
-              }`}
+              className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""
+                }`}
               onClick={() => toggleFeedVisibility(feedIndex)}
             >
               {isEditable && (
@@ -87,16 +121,14 @@ const FeedList: React.FC<FeedListProps> = ({
                 type="text"
                 maxLength={50}
                 className={`relative focus:outline-none overflow-x cursor-pointer text-base select-none whitespace-nowrap text-clip w-full pr-3
-                      ${
-                        feedVisibility[feedIndex]
-                          ? "text-amber-300"
-                          : "text-white"
-                      }
-                      ${
-                        isEditable
-                          ? " pl-1 rounded bg-neutral-500 cursor-text"
-                          : "bg-transparent "
-                      }`}
+                      ${feedVisibility[feedIndex]
+                    ? "text-amber-300"
+                    : "text-white"
+                  }
+                      ${isEditable
+                    ? " pl-1 rounded bg-neutral-500 cursor-text"
+                    : "bg-transparent "
+                  }`}
                 // feedNames[feedIndex] || ''
                 value={feedNames[feedIndex] || ""}
                 onClick={preventFeedOpenOnEdit}
@@ -118,11 +150,10 @@ const FeedList: React.FC<FeedListProps> = ({
 
               {!isEditable && (
                 <button
-                  className={`text-sm pl-2 font-bold relative z-1 ${
-                    feedVisibility[feedIndex]
+                  className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
                       ? "text-yellow-500"
                       : "text-neutral-500"
-                  }`}
+                    }`}
                 >
                   {feedVisibility[feedIndex] ? (
                     <FontAwesomeIcon icon={faMinus} />

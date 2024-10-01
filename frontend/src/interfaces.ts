@@ -10,7 +10,7 @@ export interface ArticleItem {
   item: FeedItem;
 }
 
-export interface Articles {
+export interface Feeds {
   [feedIndex: string]: ArticleItem[] | [];
 }
   
