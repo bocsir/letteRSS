@@ -9,7 +9,6 @@ import {
   faArrowRight,
   faEllipsis,
   faFileArrowUp,
-  faFolderOpen,
   faTrashCan,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";

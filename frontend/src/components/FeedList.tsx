@@ -28,19 +28,16 @@ interface FeedListProps {
     [key: string]: string | null;
   };
   isInFolder: boolean;
-  urls: {
-    [key: string]: string;
-  };
   feedVisibility: {
     [key: string]: boolean;
   };
-  setFeedVisibility: React.Dispatch<React.SetStateAction<{
+  toggleFeedVisibility: (feedIndex: string) => Promise<void>;
+  isParsing: {
     [key: string]: boolean;
-  }>>;
+  };
 }
 const FeedList: React.FC<FeedListProps> = ({
   feeds,
-  setFeeds,
   isEditable,
   updateSelectedItems,
   feedNames,
@@ -49,11 +46,10 @@ const FeedList: React.FC<FeedListProps> = ({
   sendFeedNames,
   folders,
   isInFolder,
-  urls,
+  isParsing,
   feedVisibility,
-  setFeedVisibility,
+  toggleFeedVisibility
 }) => {
-  const [isParsing, setIsParsing] = useState<{ [key: string]: boolean }>({});
 
   const preventFeedOpenOnEdit = (
     e: React.MouseEvent<HTMLInputElement, MouseEvent>
@@ -63,42 +59,6 @@ const FeedList: React.FC<FeedListProps> = ({
     }
   }
 
-  //will call server to render feeds if feed not already rendered
-  const toggleFeedVisibility = async (feedIndex: string) => {
-    //parse feeds at that index
-    //**need to make sure when names are edited the changes are reflected in urls
-    if (!isEditable) {
-      setFeedVisibility((prev: { [key: string]: boolean }) => ({
-        ...prev,
-        [feedIndex]: !prev[feedIndex],
-      }));
-    }
-
-    if (feeds[feedIndex].length === 0) {
-      const name = feedIndex;
-      const url = urls[feedIndex];
-
-      setIsParsing({ ...isParsing, [name]: true });
-      try {
-        const res = await api.post('/feed/getRenderedFeedData',
-          {
-            name: name,
-            url: url,
-          }
-        )
-        const data = Object.entries(res.data)[0][1] as ArticleItem[];
-        const newFeedsObj: Feeds = {
-          ...feeds,
-          [feedIndex]: data
-        }
-        setFeeds(newFeedsObj);
-      } catch (err) {
-        console.error(err);
-      }
-      setIsParsing({ ...isParsing, [name]: false });
-    }
-
-  }
 
 
   return (

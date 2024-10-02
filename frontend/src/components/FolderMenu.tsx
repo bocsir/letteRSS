@@ -1,5 +1,4 @@
 import {
-    faArrowRight,
     faFolder,
     faFolderOpen,
     faPlus,

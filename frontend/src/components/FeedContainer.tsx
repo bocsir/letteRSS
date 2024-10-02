@@ -3,7 +3,6 @@ import { ArticleItem, Feeds } from "../interfaces";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareRss,
-  faPlus,
   faMinus,
   faSort,
   faArrowDownZA,
@@ -86,6 +85,44 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     storeFeedsInFolders();
     console.log(feeds);
   }, [feeds]);
+
+  //will call server to render feeds if feed not already rendered
+  const toggleFeedVisibility = async (feedIndex: string) => {
+    //parse feeds at that index
+    //**need to make sure when names are edited the changes are reflected in urls
+    if (!isEditable) {
+      setFeedVisibility((prev: { [key: string]: boolean }) => ({
+        ...prev,
+        [feedIndex]: !prev[feedIndex],
+      }));
+    }
+
+    if (feeds[feedIndex].length === 0) {
+      const name = feedIndex;
+      const url = urls[feedIndex];
+
+      setIsParsing({ ...isParsing, [name]: true });
+      try {
+        const res = await api.post('/feed/getRenderedFeedData',
+          {
+            name: name,
+            url: url,
+          }
+        )
+        const data = Object.entries(res.data)[0][1] as ArticleItem[];
+        const newFeedsObj: Feeds = {
+          ...feeds,
+          [feedIndex]: data
+        }
+        setFeeds(newFeedsObj);
+      } catch (err) {
+        console.error(err);
+      }
+      setIsParsing({ ...isParsing, [name]: false });
+    }
+
+  }
+
 
   //feed editing ---
   const sortFeeds = (isAlphabetical: boolean) => {
@@ -320,16 +357,16 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                 className="text-base text-neutral-500 cursor-pointer active:text-yellow-500" icon={faSort} />
               {sortMenu && (
                 <div
-                  className="flex flex-col font-bold items-center justify-around absolute left-4 top-0 z-20 bg-neutral-900 border-2 border-neutral-500 rounded-md w-max"
+                  className="flex font-bold items-center justify-around absolute left-4 top-0 z-20 bg-neutral-900 border-2 border-neutral-500 rounded-md w-max"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    onClick={(e) => sortFeeds(true)}
+                    onClick={() => sortFeeds(true)}
                     className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
                   >
                     <FontAwesomeIcon icon={faArrowDownAZ} />
                   </button>
-                  <hr className="border-neutral-500 border-inset border-1 w-full" />
+                  <div className="w-[2px] h-[24px] bg-neutral-500"></div>
                   <button
                     onClick={() => sortFeeds(false)}
                     className="text-white transition-color duration-300 hover:text-amber-300 pl-4 pr-4"
@@ -352,7 +389,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           />
         </div>
         <LoadingAnimation isLoading={isLoading} />
-        <hr className="border-neutral-500 mb-2" />
+        <hr className="border-neutral-500 mb-2 mt-1" />
         <FeedList
           feeds={feeds}
           setFeeds={setFeeds}
@@ -363,9 +400,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           showSaveBtn={showSaveBtn}
           sendFeedNames={sendFeedNames}
           folders={folders}
-          urls={urls}
           feedVisibility={feedVisibility}
-          setFeedVisibility={setFeedVisibility}
+          toggleFeedVisibility={toggleFeedVisibility}
+          isParsing={isParsing}
           isInFolder={false}
         />
 
@@ -397,10 +434,10 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                       feedNames={feedNames}
                       showSaveBtn={showSaveBtn}
                       sendFeedNames={sendFeedNames}
+                      isParsing={isParsing}
                       feedVisibility={feedVisibility}
-                      setFeedVisibility={setFeedVisibility}            
+                      toggleFeedVisibility={toggleFeedVisibility}      
                       folders={folders}
-                      urls={urls}
                       isInFolder={true}
                     />
                   }

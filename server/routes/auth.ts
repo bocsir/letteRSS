@@ -111,7 +111,7 @@ router.post("/logout", (req, res) => {
 
 router.post("/refresh-token", async(req, res) => {
   const refreshToken = getCookieValue("refreshToken", req);
-  if (!refreshToken) return res.sendStatus(401);
+  if (!refreshToken) {return res.sendStatus(403);}
 
   try {
     const connection = await getConnection();
@@ -140,7 +140,7 @@ router.post("/refresh-token", async(req, res) => {
     });
     
     console.log('access token refreshed :)');
-    res.json({ message: "Token refreshed" });
+    
   } catch (err) {
     return res.sendStatus(403);
   }

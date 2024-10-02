@@ -29,6 +29,7 @@ export function authenticateToken(
   const accessToken = getCookieValue("accessToken", req);
   if (!accessToken) {
     console.log('no access token');
+    //endpoint to refresh token then re-call the original endpoint call
     return res.sendStatus(401);
   }
 
@@ -37,7 +38,6 @@ export function authenticateToken(
     console.log('no refresh token')
     return res.sendStatus(403);
   }
-
 
   jwt.verify(accessToken, JWT_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
