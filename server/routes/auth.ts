@@ -112,7 +112,6 @@ router.post("/logout", (req, res) => {
 router.post("/refresh-token", async(req, res) => {
   const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) {return res.sendStatus(403);}
-
   try {
     const connection = await getConnection();
     const row = await connection.query(
@@ -125,6 +124,7 @@ router.post("/refresh-token", async(req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.cookie("accessToken", newAccessToken, {
       httpOnly: false,
       secure: false,
@@ -140,8 +140,9 @@ router.post("/refresh-token", async(req, res) => {
     });
     
     console.log('access token refreshed :)');
-    
+    res.sendStatus(200);
   } catch (err) {
+    console.error(err);
     return res.sendStatus(403);
   }
 });

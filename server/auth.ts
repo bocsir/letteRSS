@@ -25,7 +25,6 @@ export function authenticateToken(
   res: Response,
   next: NextFunction
 ) {
-
   const accessToken = getCookieValue("accessToken", req);
   if (!accessToken) {
     console.log('no access token');

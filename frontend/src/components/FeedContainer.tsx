@@ -3,14 +3,12 @@ import { ArticleItem, Feeds } from "../interfaces";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareRss,
-  faMinus,
   faSort,
   faArrowDownZA,
   faArrowDownAZ,
   faFolder,
   faFolderOpen,
 } from "@fortawesome/free-solid-svg-icons";
-import Feed from "./Feed";
 import FeedMenu from "./FeedMenu";
 import api from "../api";
 import LoadingAnimation from "./LoadingAnimation";
@@ -49,7 +47,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   }
 
   const [populatedFolders, setPopulatedFolders] = useState<PopFolders>({});
-  const [feedsInFolder, setFeedsInFolder] = useState<Feeds>({});
 
   useEffect(() => {
     const filtered = Object.entries(populatedFolders).filter(([key]) => key !== 'isOpen');
@@ -59,8 +56,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
       newFeeds[item[0]] = []
     });
 
-    setFeedsInFolder(newFeeds);
-    console.log(newFeeds);
   }, [populatedFolders]);
 
   //get feeds on mount and when isAuthenticated refreshes
@@ -83,7 +78,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     removeAllSaveButtons();
 
     storeFeedsInFolders();
-    console.log(feeds);
+    
   }, [feeds]);
 
   //will call server to render feeds if feed not already rendered
@@ -149,7 +144,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
   const updateSelectedItems = (e: any, feedIndex: string) => {
     let newFeeds;
-
     //delete if unckecked, add if checked
     if (e.target.checked) {
       newFeeds = [
@@ -159,6 +153,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     } else {
       newFeeds = selectedFeeds.filter(item => item !== feedIndex);
     }
+    console.log(newFeeds);
     setSelectedFeeds(newFeeds);
   }
 
@@ -173,6 +168,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     if (res.status === 200) {
       selectedFeeds.map(item => {
         delete feeds[item]
+        Object.keys(populatedFolders).forEach((name)=>{
+          delete populatedFolders[name].feeds[item];
+        });
         setSelectedFeeds([]);
         setIsEditable(false);
       });
@@ -201,8 +199,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     setFeedNames(updatedFeedName);
   }
 
-  useEffect(()=>{console.log(feedNames)},[feedNames]);
-
   const removeAllSaveButtons = () => {
     let showSaveDefault: { [key: string]: boolean } = {};
     Object.keys(feeds).map((name) => {
@@ -213,7 +209,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   }
 
   const closeAllFeeds = () => {
-    console.log(feedVisibility);
     const closedFeeds = Object.keys(feedVisibility).reduce((acc, key) => {
       acc[key] = false;
       return acc;
@@ -251,8 +246,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         folders[Object.keys(feedsObj)[index]] = folder
         index++;
       });
-
-      console.log(folders);
 
       setFolders(folders);
       setUrls(urls);
@@ -302,12 +295,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     const populatedFolders: PopFolders = {}
 
     Object.keys(feeds).forEach((name) => {
-      console.log(name);
       //if folders has a folder for the article, add that folder to populatedFolders and populate it
-      console.log('filling feed');
       if (folders[name]) {
         const folderName = folders[name];
-        console.log(folderName)
         if (!populatedFolders[folderName]) {
           populatedFolders[folderName] = {
             feeds: {},
@@ -318,8 +308,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         }
         // Add the feed to the folder
         populatedFolders[folderName].feeds[name] = Object.values(feeds[name]);
-
-        console.log("feeds for ", name, ' ', populatedFolders);
       }
     })
     setPopulatedFolders(populatedFolders);

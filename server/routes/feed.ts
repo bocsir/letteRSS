@@ -181,7 +181,7 @@ router.post("/fileImport", authenticateToken, upload.single("file"), async (req,
   }
 });
 
-router.post('/deleteArticles', authenticateToken, async(req, res) => {
+router.post('/deleteFeeds', authenticateToken, async(req, res) => {
   const names = req.body;
   const formattedValues: string = names.map((name: string) => `'${name.replace(/'/g, "''")}'`).join(', ');
   const query = `DELETE FROM url WHERE name IN (${formattedValues})`;
