@@ -36,7 +36,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
   const [showSaveBtn, setShowSaveBtn] = useState<{ [key: string]: boolean }>({});
   const [urls, setUrls] = useState<{ [key: string]: string }>({});
   const [isParsing, setIsParsing] = useState<{ [key: string]: boolean }>({});
-  const [folders, setFolders] = useState<{ [key: string]: string | null }>({});
+  const [folders, setFolders] = useState<{ [feedName: string]: string | null }>({});
 
   type FolderContent = {
     feeds: { [feedName: string]: ArticleItem[] };
@@ -77,7 +77,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
     removeAllSaveButtons();
 
-    storeFeedsInFolders();
+    storeFeedsInFolders(null);
     
   }, [feeds]);
 
@@ -291,7 +291,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     console.log(res);
   }
 
-  const storeFeedsInFolders = () => {
+  const storeFeedsInFolders = (folderNames: string[] | null) => {
     const populatedFolders: PopFolders = {}
 
     Object.keys(feeds).forEach((name) => {
@@ -364,16 +364,18 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
                 </div>
               )}
-
             </div>
           </div>
           <FeedMenu
             callGetFeeds={getFeedNames}
             closeAllFeeds={closeAllFeeds}
             feeds={feeds}
+            selectedFeeds={selectedFeeds}
             setIsEditable={setIsEditable}
             isEditable={isEditable}
             deleteSelected={deleteSelected}
+            folders={folders}
+            getFeedNames={getFeedNames}
           />
         </div>
         <LoadingAnimation isLoading={isLoading} />

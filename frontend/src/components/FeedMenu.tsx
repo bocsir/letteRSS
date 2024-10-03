@@ -24,6 +24,11 @@ interface FeedMenuProps {
   setIsEditable: any;
   isEditable: any;
   deleteSelected: any;
+  selectedFeeds: string[];
+  folders: {
+    [key: string]: string | null;
+  };
+  getFeedNames: any
 }
 //somehow FeedMenu needs to tell FeedList to call getFeeds again
 const FeedMenu: React.FC<FeedMenuProps> = ({
@@ -32,7 +37,10 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   feeds,
   setIsEditable,
   isEditable,
-  deleteSelected
+  deleteSelected,
+  selectedFeeds,
+  folders,
+  getFeedNames,
 }) => {
   const [newFeedMenuVis, setNewFeedMenuVis] = useState<boolean>(false);
   const [importHover, setImportHover] = useState<boolean>(false);
@@ -149,7 +157,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setDoneBtnVis(false);
   };
 
-  
+
   return (
     <>
       <LoadingAnimation isLoading={isLaoding} />
@@ -157,7 +165,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       <div className="relative">
         {doneBtnVis ? (
           <div className="flex gap-3 items-center h-max">
-              <FolderMenu updateMenuBtnHover={updateMenuBtnHover}/>
+            <FolderMenu updateMenuBtnHover={updateMenuBtnHover} selectedFeeds={selectedFeeds} getFeedNames={getFeedNames} folders={folders}/>
             {menuBtnHover[1] && (
               <div className="bg-amber-300 z-30 absolute -left-16 top-7 pl-2 pr-2 w-max h-min cursor-none">
                 <p className="text-sm text-black">organize selected</p>

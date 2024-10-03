@@ -5,32 +5,59 @@ import {
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import api from "../api";
 
 interface FolderMenuProps {
     updateMenuBtnHover: (index: number, isHovering: boolean) => void;
-    // folderList: string[]
+    selectedFeeds: string[];
+    folders: {
+        [key: string]: string | null;
+    };
+    getFeedNames: any;
 }
 
-const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover }) => {
+const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover, selectedFeeds, folders, getFeedNames }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [creatingNewFolder, setCreatingNewFolder] = useState<boolean>(false);
     const [newFolderName, setNewFolderName] = useState<string>('');
-
-    const toggleIsOpen = () => {
-        if (isOpen) {
-            updateMenuBtnHover(1, false);
-        }
-        setIsOpen(!isOpen);
-    };
+    const [folderNames, setFolderNames] = useState<string[]>([]);
 
     const createNewFolder = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         setCreatingNewFolder(!creatingNewFolder);
     };
 
-    const updateFolderName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewFolderName(e.target.value);
+    const addNewFolder = () => {
+        const newFolderNames: string[] = folderNames;
+        console.log(newFolderName);
+        newFolderNames.push(newFolderName);
+        setCreatingNewFolder(false)
+        setFolderNames(newFolderNames);
+    }
+
+    useEffect(() => {
+        const newFolderNames: string[] = Object.values(folders)
+            .filter((folderName): folderName is string => Boolean(folderName))
+            .filter((folderName, index, self) => self.indexOf(folderName) === index);
+
+        setFolderNames(newFolderNames);
+    }, [folders])
+
+    const addToFolder = async (folderName: string) => {
+        try {
+            const res = await api.post('/feed/updateFolderStatus',
+                {
+                    folderName: folderName,
+                    feedsInFolder: selectedFeeds,
+                }
+            );
+            console.log(res);
+            setIsOpen(!isOpen);
+            await getFeedNames();
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     return (
@@ -65,22 +92,27 @@ const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover }) => {
                         </div>
 
                         <p className="text-xl text-neutral-500">Organize selected feeds</p>
+                        <p className="font-bold -mb-2">Feeds:</p>
                         <div className="border border-neutral-500 w-full rounded p-3 pt-2">
                             <ul className="text-sm">
-                                <li>Psychcool</li>
-                                <li>Non Sequitor</li>
-                                <li>Fat Cat</li>
+
+                                {selectedFeeds.map((feed, index) => (
+                                    <li key={index}>{feed}</li>
+                                ))}
+                                {selectedFeeds.length < 1 && (
+                                    <p className="text-neutral-300">sry - pls go back and select one or more feeds</p>
+                                )}
+
                             </ul>
                         </div>
 
-                        <form className="flex flex-col items-start">
+                        <div className="flex flex-col items-start">
                             {/* list all folders as buttons  */}
                             <p className="font-bold">Select destination folder:</p>
-                            <div className="flex flex-col gap-1 items-start w-full [&>button]:text-white [&>button]:hover:text-amber-300 [&>button]:transition-color [&>button]:duration-150">
-                                <button><FontAwesomeIcon icon={faFolder}/> default</button>
-                                <button><FontAwesomeIcon icon={faFolder}/> reddit</button>
-                                <button><FontAwesomeIcon icon={faFolder}/> news</button>
-
+                            <div className="flex flex-col gap-1 items-start w-full">
+                                {folderNames.filter((name) => name !== '').map((name, index) => (
+                                    <button onClick={() => addToFolder(name)} className="text-white hover:text-amber-300 transition-color duration-150" key={index}><FontAwesomeIcon icon={faFolder} className="mr-2" />{name}</button>
+                                ))}
                             </div>
                             {!creatingNewFolder
                                 ? (
@@ -89,24 +121,27 @@ const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover }) => {
                                         new folder
                                     </button>
                                 ) : (
-                                    <form className="w-full bg-black rounded p-3 pt-1 mt-2 flex flex-col gap-2">
+                                    <form onSubmit={(e) => {
+                                        e.preventDefault();
+                                        addNewFolder()
+                                    }} className="w-full bg-black rounded p-3 pt-1 mt-2 flex flex-col gap-2">
                                         <p className="text-amber-300">Creating new folder...</p>
                                         <input
                                             type="text"
                                             id="feed-url"
                                             name="feed-url"
                                             value={newFolderName}
-                                            onChange={(e) => updateFolderName(e)}
+                                            onChange={(e) => setNewFolderName(e.target.value)}
                                             className="text-white placeholder:text-neutral-500 bg-black text-base pl-2 pr-1 rounded w-full h-8 mr-10 border border-neutral-500"
                                             placeholder="enter folder name"
                                         ></input>
                                         <div className="grid grid-flow-col justify-stretch gap-2 w-full">
-                                            <button className="hover:text-neutral-500 text-white transition-color duration-150 ease-in-out bg-neutral-900 rounded" onClick={() => {setCreatingNewFolder(false); setNewFolderName('');}}>cancel</button>
-                                            <button type="submit" className="hover:text-amber-300 text-white transition-color duration-150 ease-in-out bg-neutral-900 rounded" onClick={() => setCreatingNewFolder(false)}>submit</button>
+                                            <button type="button" className="hover:text-neutral-500 text-white transition-color duration-150 ease-in-out bg-neutral-900 rounded" onClick={() => { setCreatingNewFolder(false); setNewFolderName(''); }}>cancel</button>
+                                            <button type="submit" className="hover:text-amber-300 text-white transition-color duration-150 ease-in-out bg-neutral-900 rounded">submit</button>
                                         </div>
                                     </form>
                                 )}
-                        </form>
+                        </div>
                     </div>
                 </div>
             )}

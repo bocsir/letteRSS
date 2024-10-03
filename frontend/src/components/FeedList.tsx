@@ -2,8 +2,6 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ArticleItem, Feeds } from "../interfaces";
 import Feed from "./Feed";
-import { useState } from "react";
-import api from "../api";
 
 interface FeedListProps {
   feeds: Feeds;
@@ -58,7 +56,6 @@ const FeedList: React.FC<FeedListProps> = ({
       e.stopPropagation();
     }
   }
-
 
 
   return (

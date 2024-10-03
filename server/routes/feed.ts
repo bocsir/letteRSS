@@ -148,6 +148,27 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 5 }, // 5MB
 });
 
+router.post('/updateFolderStatus', authenticateToken, async(req, res) => {
+  const folderName: string = req.body.folderName;
+  const feeds = req.body.feedsInFolder;
+  console.log('feeds: ', feeds);
+  console.log('folder: ', folderName);
+
+  const query = `UPDATE url SET folder = ? WHERE name IN (${feeds.map((feed: string) => `'${feed}'`).join(',')})`;
+
+  const connection = await getConnection();
+  try {
+    await connection.execute(query, [folderName]);
+    res.status(200).json({ message: "folder status updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500)
+  }
+
+
+
+});
+
 router.post("/fileImport", authenticateToken, upload.single("file"), async (req, res) => {
   if (req.file) {
     try {
