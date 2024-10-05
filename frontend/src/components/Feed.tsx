@@ -37,12 +37,10 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         <br />
         <span className="font-light text-sm">{articleDate}</span>
       </a>
-      {/* setIsYellow shoudl be useContext maybe? */}
       <ReaderButton
         item={articleContent}
         isYellow={isYellow}
         setIsYellow={setisYellow}
-
       />
     </>
   );

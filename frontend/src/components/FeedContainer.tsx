@@ -150,7 +150,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     } else {
       newFeeds = selectedFeeds.filter(item => item !== feedIndex);
     }
-    console.log(newFeeds);
     setSelectedFeeds(newFeeds);
   }
 
@@ -288,8 +287,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     console.log(res);
   }
 
-  //isOpen needs to stay true after a feed is parsed which changes feeds.
-
   const storeFeedsInFolders = () => {
     const tempPopulatedFolders: PopFolders = {}
     Object.keys(feeds).forEach((name) => {
@@ -297,7 +294,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         const folderName = folders[name];
 
         let newFeeds: Feeds = { ...(tempPopulatedFolders[folderName]?.feeds || {}) };
-        console.log(newFeeds);
         newFeeds[name] = Object.values(feeds[name]);
 
         tempPopulatedFolders[folderName] = {
@@ -311,7 +307,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
   //toggle isOpen property. called on folder click
   const toggleFolderOpen = (folderName: string) => {
-    console.log('toggling folder open');
     setPopulatedFolders(prevFolders => {
       const newFolders = { ...prevFolders };
       newFolders[folderName] = {
