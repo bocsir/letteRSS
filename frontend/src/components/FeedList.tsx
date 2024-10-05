@@ -112,8 +112,6 @@ const FeedList: React.FC<FeedListProps> = ({
                   save
                 </button>
               )}
-              {/* <FontAwesomeIcon className="absolute text-xs right-8" icon={faPen}/> */}
-
               {!isEditable && (
                 <button
                   className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]

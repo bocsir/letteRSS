@@ -77,8 +77,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
     removeAllSaveButtons();
 
-    storeFeedsInFolders(null);
-    
+    storeFeedsInFolders();
   }, [feeds]);
 
   //will call server to render feeds if feed not already rendered
@@ -115,9 +114,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
       }
       setIsParsing({ ...isParsing, [name]: false });
     }
-
   }
-
 
   //feed editing ---
   const sortFeeds = (isAlphabetical: boolean) => {
@@ -291,30 +288,30 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     console.log(res);
   }
 
-  const storeFeedsInFolders = (folderNames: string[] | null) => {
-    const populatedFolders: PopFolders = {}
+  //isOpen needs to stay true after a feed is parsed which changes feeds.
 
+  const storeFeedsInFolders = () => {
+    const tempPopulatedFolders: PopFolders = {}
     Object.keys(feeds).forEach((name) => {
-      //if folders has a folder for the article, add that folder to populatedFolders and populate it
       if (folders[name]) {
         const folderName = folders[name];
-        if (!populatedFolders[folderName]) {
-          populatedFolders[folderName] = {
-            feeds: {},
-            isOpen: false
-          }
-        } else {
-          populatedFolders[folderName].isOpen = true
+
+        let newFeeds: Feeds = { ...(tempPopulatedFolders[folderName]?.feeds || {}) };
+        console.log(newFeeds);
+        newFeeds[name] = Object.values(feeds[name]);
+
+        tempPopulatedFolders[folderName] = {
+          feeds: newFeeds,
+          isOpen: (populatedFolders[folderName]?.isOpen) ? true : false
         }
-        // Add the feed to the folder
-        populatedFolders[folderName].feeds[name] = Object.values(feeds[name]);
       }
     })
-    setPopulatedFolders(populatedFolders);
+    setPopulatedFolders(tempPopulatedFolders);
   };
 
-  //toggle isOpen property
+  //toggle isOpen property. called on folder click
   const toggleFolderOpen = (folderName: string) => {
+    console.log('toggling folder open');
     setPopulatedFolders(prevFolders => {
       const newFolders = { ...prevFolders };
       newFolders[folderName] = {
@@ -413,7 +410,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                     )}{" "}{folderName}
                   </span>
                 </div>
-                <div className="ml-3 border-l border-neutral-500">
+                <div onClick={(e) => e.stopPropagation()} className="ml-3 border-l border-neutral-500">
                   {folderContent.isOpen &&
                     <FeedList
                       feeds={populatedFolders[folderName].feeds}
