@@ -371,7 +371,9 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           />
         </div>
         <LoadingAnimation isLoading={isLoading} />
-        <hr className="border-neutral-500 mb-2 mt-1" />
+        {Object.values(folders).filter((value) => value === null).length > 0 && 
+          <hr className="border-neutral-500 mb-2 mt-1" />
+        }
         <FeedList
           feeds={feeds}
           setFeeds={setFeeds}
