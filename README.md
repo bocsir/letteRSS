@@ -10,16 +10,16 @@ This reader has no social media-like reccommendations or tab to look through cur
     <li>Auth uses JWT for access and refresh tokens</li>
     <li>Users can add feeds by individual site link or with an .opml file</li>
     <li>Feeds can be deleted and their names can be edited</li>
+    <li>Feeds can be sorted into folders</li>
     <li>Feeds can be read in-site or with an iframe to the original page</li>
   </ul>
   
 ### Future Features
   <ul>
-    <li>Folders for feeds</li>
     <li>Feed search</li>
     <li>Change theme / font</li>
     <li>Feed export</li>
-    <li>Moble app</li>
+    <li>Mobile app</li>
   </ul>
 
 ### Some Pics
