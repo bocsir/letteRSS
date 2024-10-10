@@ -42,6 +42,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     feeds: { [feedName: string]: ArticleItem[] };
     isOpen: boolean;
   }
+
   type PopFolders = {
     [folderName: string]: FolderContent;
   }
@@ -164,7 +165,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     if (res.status === 200) {
       selectedFeeds.map(item => {
         delete feeds[item]
-        Object.keys(populatedFolders).forEach((name)=>{
+        Object.keys(populatedFolders).forEach((name) => {
           delete populatedFolders[name].feeds[item];
         });
         setSelectedFeeds([]);
@@ -178,7 +179,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     feedIndex: string
   ) => {
     const newName = e.target.value;
-    
+
     const updatedFeedName: { [key: string]: string } = {
       ...feedNames,
       [feedIndex]: newName,
@@ -194,6 +195,30 @@ export const FeedContainer: React.FC<FeedListProps> = ({
 
     setFeedNames(updatedFeedName);
   }
+
+  // const updatefolderName = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   folderName: string
+  // ) => {
+  //   const newName = e.target.value;
+
+  //   const updatedFeedName: { [key: string]: string } = {
+  //     ...feedNames,
+  //     [feedIndex]: newName,
+  //   };
+
+
+  //   const updatedSaveBtnStatus = {
+  //     ...showSaveBtn,
+  //     [feedIndex]: (feedNames[newName]) ? false : true
+  //   }
+
+  //   setShowSaveBtn(updatedSaveBtnStatus);
+
+  //   setFeedNames(updatedFeedName);
+  // }
+
+
 
   const removeAllSaveButtons = () => {
     let showSaveDefault: { [key: string]: boolean } = {};
@@ -292,6 +317,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     Object.keys(feeds).forEach((name) => {
       if (folders[name]) {
         const folderName = folders[name];
+        if (folderName === null) {return;}
 
         let newFeeds: Feeds = { ...(tempPopulatedFolders[folderName]?.feeds || {}) };
         newFeeds[name] = Object.values(feeds[name]);
@@ -371,7 +397,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
           />
         </div>
         <LoadingAnimation isLoading={isLoading} />
-        {Object.values(folders).filter((value) => value === null).length > 0 && 
+        {Object.values(folders).filter((value) => value === null).length > 0 &&
           <hr className="border-neutral-500 mb-2 mt-1" />
         }
         <FeedList
@@ -391,7 +417,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         />
 
         <hr className="border-neutral-500 mb-2 mt-2" />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {Object.entries(populatedFolders).map(
             ([folderName, folderContent]) => (
               <div key={folderName}>
@@ -399,13 +425,22 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                   onClick={() => toggleFolderOpen(folderName)}
                   className="select-none text-base cursor-pointer pl-3 border-2 border-transparent flex items-center justify-between"
                 >
-                  <span>
+                  <div className="flex items-center gap-2">
                     {folderContent.isOpen ? (
                       <FontAwesomeIcon icon={faFolderOpen} />
                     ) : (
                       <FontAwesomeIcon className="w-[18px]" icon={faFolder} />
-                    )}{" "}{folderName}
-                  </span>
+                    )}
+                    <input
+                      type="text"
+                      maxLength={50}
+                      className={`bg-transparent no-select relative focus:outline-none overflow-x cursor-pointer text-base whitespace-nowrap text-clip w-full pr-3`}
+                      value={folderName}
+                      onClick={()=>{}}
+                      // onChange={(e) => updateFolderName(e, folderName)}
+                      readOnly={!isEditable}
+                    ></input>
+                  </div>
                 </div>
                 <div onClick={(e) => e.stopPropagation()} className="ml-3 border-l border-neutral-500">
                   {folderContent.isOpen &&
@@ -420,7 +455,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
                       sendFeedNames={sendFeedNames}
                       isParsing={isParsing}
                       feedVisibility={feedVisibility}
-                      toggleFeedVisibility={toggleFeedVisibility}      
+                      toggleFeedVisibility={toggleFeedVisibility}
                       folders={folders}
                       isInFolder={true}
                     />

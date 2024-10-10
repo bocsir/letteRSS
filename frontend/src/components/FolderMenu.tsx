@@ -100,7 +100,7 @@ const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover, selectedFee
                                     <li key={index}>{feed}</li>
                                 ))}
                                 {selectedFeeds.length < 1 && (
-                                    <p className="text-neutral-300">sry - pls go back and select one or more feeds</p>
+                                    <p className="text-neutral-300">no feeds selected</p>
                                 )}
 
                             </ul>

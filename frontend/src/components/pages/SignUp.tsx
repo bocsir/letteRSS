@@ -52,7 +52,7 @@ const SignUp = () => {
     if (goodPw && goodEmail) {
       try {
         //call /signup endpoint to put email and hashed password into database
-        await axios.post("http://localhost:3001/auth/signup", {
+        await api.post("/auth/signup", {
           email,
           password,
         });

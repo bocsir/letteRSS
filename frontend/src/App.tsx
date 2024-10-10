@@ -2,10 +2,8 @@
   *TODO:
   
     *folder stuff 
-      *add to folder
-        *create new folder
-        *store folders in database
-          *new optional column in url table: folder varchar(30)
+      *delete folder
+      *change folder name
 
     *mark read/ unread
     *dot for unread?
@@ -82,7 +80,10 @@
         setIsAuthenticated(response.data.authenticated);
         setUserEmail(response.data.user.email);
       } catch (err) {
-        getAuthStatus();      
+        //prevent loop if user is sent to login page
+        if (window.location.pathname === '/') {
+          getAuthStatus();      
+        }
       }
     }
 

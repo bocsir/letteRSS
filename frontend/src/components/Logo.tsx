@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import whiteLogo from '../assets/images/white-rss-logo.svg';
 import yellowLogo from '../assets/images/yellow-rss-logo.svg';
+import whiteLogo from '../assets/images/white-rss-logo.svg';
 
 interface LogoProps {
     isWhite: boolean;
@@ -8,6 +8,7 @@ interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({isWhite}) => {
 
+    //favicon
     useEffect(() => {
         const link = document.createElement('link');
         link.rel = 'icon';

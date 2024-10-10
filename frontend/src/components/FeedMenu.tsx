@@ -111,8 +111,8 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     }
     try {
       //send new url to server
-      const res = await axios.post(
-        "http://localhost:3000/feed/newFeed",
+      const res = await api.post(
+        "/feed/newFeed",
         { feedUrl: newFeedUrl },
         {
           headers: { "Content-Type": "application/json" },
