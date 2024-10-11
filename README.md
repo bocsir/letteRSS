@@ -4,7 +4,7 @@ Minimal RSS reader
 The goal of this project is to create an RSS reader that doesn't feel as busy as other readers.
 Its built to show as little information at a time as possible.
 
-A working beta is hosted on AWS at https://letterss.net
+A working beta is hosted on AWS at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'
 
 ### Curent Features
   <ul>
