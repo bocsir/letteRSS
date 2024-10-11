@@ -161,7 +161,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     }
 
     const res = await api.post('/feed/deleteFeeds', selectedFeeds);
-    console.log(res);
     if (res.status === 200) {
       selectedFeeds.map(item => {
         delete feeds[item]
@@ -246,8 +245,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
     try {
       const res = await api.get('/feed/getFeedNames');
 
-      console.log(res.data);
-
       //create default feeds object to be filled with data when an article is clicked and parsed
       const feedsObj: Record<string, []> = {};
       res.data[1].forEach((name: string) => {
@@ -309,7 +306,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({
         oldName: name
       }
     );
-    console.log(res);
   }
 
   const storeFeedsInFolders = () => {
@@ -389,6 +385,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({
             closeAllFeeds={closeAllFeeds}
             feeds={feeds}
             selectedFeeds={selectedFeeds}
+            setSelectedFeeds={setSelectedFeeds}
             setIsEditable={setIsEditable}
             isEditable={isEditable}
             deleteSelected={deleteSelected}

@@ -30,7 +30,6 @@ const FolderMenu: React.FC<FolderMenuProps> = ({ updateMenuBtnHover, selectedFee
 
     const addNewFolder = () => {
         const newFolderNames: string[] = folderNames;
-        console.log(newFolderName);
         newFolderNames.push(newFolderName);
         setCreatingNewFolder(false)
         setFolderNames(newFolderNames);

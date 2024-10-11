@@ -35,7 +35,6 @@ const Login: React.FC = () => {
         console.log("password valid: ", response.data.valid , ", query failed: ", response.data.queryFailed, ", response: ", response);
         if (!response.data.queryFailed) setPasswordValid(response.data.valid);
         setQueryFailed(response.data.queryFailed);
-        console.log(response.data.accessToken);
         //successful login
         if(response.data.valid && !response.data.queryFailed) {
           window.location.href="/";

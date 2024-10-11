@@ -25,6 +25,7 @@ interface FeedMenuProps {
   isEditable: any;
   deleteSelected: any;
   selectedFeeds: string[];
+  setSelectedFeeds: React.Dispatch<React.SetStateAction<string[]>>;
   folders: {
     [key: string]: string | null;
   };
@@ -36,6 +37,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   closeAllFeeds,
   feeds,
   setIsEditable,
+  setSelectedFeeds,
   isEditable,
   deleteSelected,
   selectedFeeds,
@@ -153,6 +155,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   };
 
   const closeEditMenu = () => {
+    setSelectedFeeds([]);
     setIsEditable(false);
     setDoneBtnVis(false);
   };
