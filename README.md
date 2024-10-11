@@ -1,16 +1,18 @@
-# LetteRSS - RSS Reader
+# <img style="width: 35px" src="https://github.com/user-attachments/assets/507295c4-b8bd-4219-9bcf-f64849fe34d3"/> LetteRSS - RSS Reader
 Minimal RSS reader
 
-## Description
 The goal of this project is to create an RSS reader that doesn't feel as busy as other readers.
-This reader has no social media-like reccommendations or tab to look through curated feeds to add to your list. It is just an RSS reader that you can add your RSS feeds to.
+Its built to show as little information at a time as possible.
+
+A working beta is hosted on AWS at https://letterss.net
 
 ### Curent Features
   <ul>
     <li>Auth uses JWT for access and refresh tokens</li>
     <li>Users can add feeds by individual site link or with an .opml file</li>
     <li>Feeds can be deleted and their names can be edited</li>
-    <li>Feeds can be sorted into folders</li>
+    <li>Feeds can be filed into folders</li>
+    <li>Feeds can be sorted</li>
     <li>Feeds can be read in-site or with an iframe to the original page</li>
   </ul>
   
@@ -23,9 +25,10 @@ This reader has no social media-like reccommendations or tab to look through cur
   </ul>
 
 ### Some Pics
-![image](https://github.com/user-attachments/assets/953b5d74-d868-438a-9263-bccf06534ecb)
-![image](https://github.com/user-attachments/assets/ca6231d5-7461-4518-9f53-bd5e368897dc)
-![image](https://github.com/user-attachments/assets/a4dce54f-af89-40c6-9ada-f4f9653ca214)
+![feed](https://github.com/user-attachments/assets/dcd64f72-ea5c-44e8-aa2d-98f6969d691e)
+![new feed](https://github.com/user-attachments/assets/5378a07c-54eb-4861-b4de-b9458e66bbae)
+![article](https://github.com/user-attachments/assets/e0faffd0-f88e-4d15-a2ac-5e2b31b4ff84)
+![comic](https://github.com/user-attachments/assets/8a429084-1135-433b-8950-a69336519d0f)
 ![image](https://github.com/user-attachments/assets/489161b0-215d-4630-a1b4-512a18e19ee5)  
 
 ### Libraries / Middleware
