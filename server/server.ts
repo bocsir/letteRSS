@@ -48,7 +48,7 @@ app.get('*', (req, res) => {
 });
 
 
-const server = app.listen(3000, '0.0.0.0', () => {
+const server = app.listen(3000, () => {
   console.log("app listening on port 3000");
 });
 
