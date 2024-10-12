@@ -10,7 +10,7 @@ const path = require('path');
 const app: Express = express();
 
 app.options('*', cors({
-    origin: "http://localhost:3000", 
+    origin: ["http://localhost:3000", "http://localhost:5173", "https://letterss.net"], 
     credentials: true,
     optionsSuccessStatus: 200
   })
@@ -18,7 +18,7 @@ app.options('*', cors({
 
 
 //serve static files
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.use(
   helmet.contentSecurityPolicy({
