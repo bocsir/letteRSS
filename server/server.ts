@@ -10,7 +10,7 @@ const path = require('path');
 const app: Express = express();
 
 app.options('*', cors({
-    origin: "https://letterss.net", 
+    origin: "https://letterss.net", //'http://localhost:3000'
     credentials: true,
     optionsSuccessStatus: 200
   })
