@@ -33,10 +33,6 @@ git clone https://github.com/bocsir/letteRSS
 ```bash
 cd letteRSS/frontend && npm install && cd ../server && npm install
 ```
-#### Build frontend to be served
-```bash
-cd ../frontend && npm run build
-```
 #### Create database
 - use the sql queries in `create_rss_db.sql`
 
@@ -50,6 +46,11 @@ DB_USER=
 USER_PW=
 JWT_SECRET=
 REFRESH_TOKEN_SECRET=
+```
+
+#### Start frontend
+```bash
+cd ../frontend && npm run dev
 ```
 
 #### Start server
