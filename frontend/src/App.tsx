@@ -1,38 +1,29 @@
   /*
   *TODO:
-  
     *folder stuff 
-      *delete folder
       *change folder name
 
-    *mark read/ unread
-    *dot for unread?
+    *feed stuff
+      *mark read/ unread
+      *dot for unread?
 
-    *search feeds
-      *ctrl+k brings up search box to look through all feeds by name with suggestions
+      *search feeds
+        *ctrl+k brings up search box to look through all feeds by name with suggestions
 
-    *auto-discovery
-      *enter site url, automatically find feed
-        *or maybe use a library to make one???? (fetchRSS)
+      *auto-discovery
+        *enter site url, automatically find feed
+          *maybe use a library???? (fetchRSS)
 
-    *hide iframe option if unavailable 
-      *tried but failed to get it to work by creating an example iframe and checking for errors
-
-    *AWS hosting
-    
-    *serch function for finding new feeds
-
+      *hide iframe option if unavailable 
+        *tried but failed to get it to work by creating an example iframe and checking for errors
+      
     *change theme like https://tty1.blog/
 
   *MORE THINGS:
     *READER VIEW
       *next, prev buttons for feed 
-    *keybinds for each click. 
-      *alt text describing bind
-    *save read / unread posts
-    *red dot for new posts
-    *set profile picture
-    *reddit feed from subreddit url
+    *keybinds for each click?
+      *alt text describing keybind or show them in help menu
   */
   import React, { useEffect, useState } from "react";
   import FeedContainer from "./components/FeedContainer";

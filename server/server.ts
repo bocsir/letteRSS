@@ -10,11 +10,12 @@ const path = require('path');
 const app: Express = express();
 
 app.options('*', cors({
-    origin: "https://letterss.net", 
+    origin: "http://localhost:3000", 
     credentials: true,
     optionsSuccessStatus: 200
   })
 );
+
 
 //serve static files
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
@@ -35,7 +36,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 // Setup database connection
 setupDatabase();
 
@@ -47,9 +47,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
-
-const server = app.listen(3000, '0.0.0.0', () => {
-  console.log("app listening on port 3000");
+const server = app.listen(3000, () => {
+  console.log("app listening at localhost:3000");
 });
 
 process.on("SIGTERM", () => {

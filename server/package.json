@@ -15,25 +15,25 @@
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
     "helmet": "^8.0.0",
-    "mariadb": "^3.3.1",
+    "mariadb": "^3.3.2",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.1.4",
-    "opml": "^0.5.5",
+    "nodemon": "^3.1.7",
+    "opml": "^0.5.6",
     "rss-parser": "^3.13.0",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.6",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
-    "@types/react": "^18.3.4",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
     "jsonwebtoken": "^9.0.2",
     "opmlparser": "^0.8.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
   }
 }
