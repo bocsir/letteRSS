@@ -36,7 +36,7 @@ cd letteRSS/frontend && npm install && cd ../server && npm install
 #### Create database
 - use the sql queries in `create_rss_db.sql`
 
-#### Create a .env file with the following, specifying the database name, user, pw, and secrets
+#### Create a .env file in /server with the following, specifying the database name, user, pw, and secrets
 
 ```bash
 DB_PORT=3306
