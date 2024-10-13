@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const api: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:3000', //'https://letterss.net'
+    baseURL: 'http://localhost:8008', //'https://letterss.net'
     withCredentials: true
 });
 
@@ -23,7 +23,7 @@ export const interceptors = (navigate: any) => {
                     return await api.request(ogRequest);
     
                 } catch(err){
-                    console.error(err);
+                    console.error('navigating to login', err);
                     navigate("/login");
                 }
                 

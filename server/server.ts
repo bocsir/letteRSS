@@ -1,78 +1,77 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import "dotenv/config";
 import authRoutes from './routes/auth';
 import feedRoutes from './routes/feed';
 import { setupDatabase } from "./database";
 import helmet from 'helmet';
-const path = require('path');
+import path from 'path';
 
 const app: Express = express();
 
-app.options('*', cors({
-    origin: "http://localhost:3000", //'https://letterss.net'
-    credentials: true,
-    optionsSuccessStatus: 200
-  })
-);
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://letterss.net"];
 
-//serve static files
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'"],
-      // Add more directives as needed, like fontSrc, frameSrc, etc.
-    },
-  })
-);
+app.use(helmet());
+
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "data:"],
+    connectSrc: ["'self'", ...allowedOrigins],
+    fontSrc: ["'self'", "https:", "data:"],
+    objectSrc: ["'none'"],
+    upgradeInsecureRequests: [],
+  },
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 // Setup database connection
 setupDatabase();
+
+// Logging middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 // Routes
 app.use("/auth", authRoutes);
 app.use("/feed", feedRoutes);
-//cath-all route
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-const server = app.listen(3000, () => {
-  console.log("app listening on port 3000");
+  app.get('*', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+}
+
+const PORT = process.env.PORT || 8008;
+const server = app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`);
 });
 
 process.on("SIGTERM", () => {
   server.close(() => {
-    console.log("server terminated");
+    console.log("Server terminated");
   });
 });
 
 export default server;
-
-app.use((req, res, next) => {
-  console.log(`serving request for : ${req.url}`);
-  next();
-});
-
-//strucutre:
-/*
-1. server.ts - main server file
-2. database.ts - db connection and startup
-3. auth.ts - auth-related functions and middleware
-4. rss.ts - RSS feed handling functions
-5. routes/auth.ts - auth routes
-6. routes/feed.ts - feed routes
-7. types.ts - type declarations
-8. util.ts - utility functions
-*/
