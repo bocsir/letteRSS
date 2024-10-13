@@ -4,7 +4,7 @@ Minimal RSS reader
 The goal of this project is to create an RSS reader that doesn't feel as busy as other readers.
 Its built to show as little information at a time as possible.
 
-A working beta is hosted on AWS at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'
+Find it at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'
 
 ### Curent Features
   <ul>
@@ -18,11 +18,44 @@ A working beta is hosted on AWS at https://letterss.net. If you want to see what
   
 ### Future Features
   <ul>
+    <li>Save read/unread feeds</li>
     <li>Feed search</li>
     <li>Change theme / font</li>
     <li>Feed export</li>
     <li>Mobile app</li>
   </ul>
+
+### Run it locally
+```bash
+git clone https://github.com/bocsir/letteRSS
+```
+#### Install npm
+```bash
+cd letteRSS/frontend && npm install && cd ../server && npm install
+```
+#### Build frontend to be served
+```bash
+cd ../frontend && npm run build
+```
+#### Create database
+- use the sql queries in `create_rss_db.sql`
+
+#### Create a .env file with the following, specifying the database name, user, pw, and secrets
+
+```bash
+DB_PORT=3306
+DB_HOST=localhost
+DB_NAME=
+DB_USER=
+USER_PW=
+JWT_SECRET=
+REFRESH_TOKEN_SECRET=
+```
+
+#### Start server
+```bash
+cd ../server && npm start
+```
 
 ### Some Pics
 ![feed](https://github.com/user-attachments/assets/dcd64f72-ea5c-44e8-aa2d-98f6969d691e)
@@ -30,6 +63,7 @@ A working beta is hosted on AWS at https://letterss.net. If you want to see what
 ![article](https://github.com/user-attachments/assets/e0faffd0-f88e-4d15-a2ac-5e2b31b4ff84)
 ![comic](https://github.com/user-attachments/assets/8a429084-1135-433b-8950-a69336519d0f)
 ![image](https://github.com/user-attachments/assets/489161b0-215d-4630-a1b4-512a18e19ee5)  
+
 
 ### Libraries / Middleware
 <ul>
