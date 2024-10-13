@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { UserInfo, AuthenticatedRequest } from "./types";
-import { getCookieValue } from './utils';
+import { getCookieValue } from "./utils";
 
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 const saltRounds: number = 10;
@@ -24,18 +24,20 @@ export function authenticateToken(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-) {
+): void {
   const accessToken = getCookieValue("accessToken", req);
   if (!accessToken) {
-    console.log('no access token');
+    console.log("no access token");
     //endpoint to refresh token then re-call the original endpoint call
-    return res.sendStatus(401);
+    res.sendStatus(401);
+    return;
   }
 
-  const refreshToken = getCookieValue('refreshToken', req);
+  const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) {
-    console.log('no refresh token')
-    return res.sendStatus(403);
+    console.log("no refresh token");
+    res.sendStatus(403);
+    return;
   }
 
   jwt.verify(accessToken, JWT_SECRET, (err, user) => {

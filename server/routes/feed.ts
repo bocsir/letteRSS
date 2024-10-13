@@ -79,7 +79,7 @@ router.post("/getRenderedFeedData", authenticateToken, async (req, res) => {
   res.send(renderedFeed);
 });
 
-router.post("/newFeed", authenticateToken, async (req, res) => {
+router.post("/newFeed", authenticateToken, async (req: any, res: any) => {
   try {
     const feedUrl = req.body.feedUrl;
     if (!feedUrl) {
@@ -169,7 +169,7 @@ router.post('/updateFolderStatus', authenticateToken, async(req, res) => {
 
 });
 
-router.post("/fileImport", authenticateToken, upload.single("file"), async (req, res) => {
+router.post("/fileImport", authenticateToken, upload.single("file"), async (req: any, res: any) => {
   if (req.file) {
     try {
       const opmlContent = fs.readFileSync(req.file.path, 'utf8');
@@ -221,7 +221,7 @@ router.post('/deleteFeeds', authenticateToken, async(req, res) => {
 });
 
 // Error handling middleware
-router.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.use((err: any, req: any, res: any, next: any) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.status(400).json({ message: "File size is too large. Max limit is 5MB" });
