@@ -7,7 +7,6 @@ const pool: Pool = mariadb.createPool({
   password: process.env.USER_PW,
   database: process.env.DB_NAME,
   port: parseInt(process.env.DB_PORT || "3306", 10),
-  connectionLimit: 5,
 });
 
 export async function setupDatabase() {
@@ -16,9 +15,7 @@ export async function setupDatabase() {
     console.log("Database connected successfully");
   } catch (err) {
     console.error("Error connecting to the database:", err);
-  } finally {
-    if (connection) connection.end(); // Release the connection back to the pool
-  }
+  } 
 }
 
 export async function getConnection(): Promise<Connection> {
