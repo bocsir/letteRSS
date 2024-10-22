@@ -13,7 +13,7 @@ router.post("/signup", async (req, res) => {
   const connection = await getConnection();
   try {
     const hashedPw = await getHashedPw(req.body.password);
-    const signupValues = [req.body.email, hashedPw];
+    const signupValues = [req.body.email.toLowerCase(), hashedPw];
 
     const query = "INSERT INTO user (email, password) VALUES (?, ?)";
     await connection.query(query, signupValues);
@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     //email not found or server error happened
-    console.error(err);
+    console.error("login error: ", err);
     res.json({ valid: false, queryFailed: true });
   }
 });
