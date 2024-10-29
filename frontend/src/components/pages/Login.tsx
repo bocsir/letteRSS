@@ -57,30 +57,6 @@ const Login: React.FC = () => {
     }
   }
 
-  //if user is logged in already, send them to '/'
-  useEffect(()=> {
-    getAuthStatus()
-  }, [])
-
-  useEffect(()=> {
-    if (isAuthenticated) {
-      document.location.href = "/";
-    }
-  }, [isAuthenticated])
-
-  async function getAuthStatus() {
-    try {
-      const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth/auth');
-      setIsAuthenticated(response.data.authenticated);
-    } catch (err) {
-      //prevent loop if user is sent to login page
-      if (window.location.pathname === '/') {
-        getAuthStatus();      
-      }
-    }
-  }
-
-
   return (
     <>
       <div
