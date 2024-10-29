@@ -1,11 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const api: AxiosInstance = axios.create({
-<<<<<<< HEAD
-    baseURL: 'http://localhost:8008',
-=======
     baseURL: 'http://localhost:3000', //'https://letterss.net'
->>>>>>> f0ef740734d949b17ac6339bbc98cc159bb72b83
     withCredentials: true
 });
 
@@ -38,4 +34,3 @@ export const interceptors = (navigate: any) => {
 }
 
 export default api;
-~                                                                                                                                                            ~                                   
