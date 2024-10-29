@@ -1,8 +1,5 @@
   /*
   *TODO:
-    *folder stuff 
-      *change folder name
-
     *feed stuff
       *mark read/ unread
       *dot for unread?
@@ -73,7 +70,7 @@
       } catch (err) {
         //prevent loop if user is sent to login page
         if (window.location.pathname === '/') {
-          getAuthStatus();      
+          await getAuthStatus();      
         }
       }
     }
