@@ -12,7 +12,7 @@ const api: AxiosInstance = axios.create({
 export const interceptors = (navigate: any) => {
 
     api.interceptors.response.use(
-        (response) => response, 
+        (response) => response,
         async (err) => {
             //if 401, send user to login
             if (err.response && err.response.status === 403) {
@@ -25,12 +25,12 @@ export const interceptors = (navigate: any) => {
                     console.log(res);
                     const ogRequest = err.config;
                     return await api.request(ogRequest);
-    
+
                 } catch(err){
                     console.error(err);
                     navigate("/login");
                 }
-                
+
             }
             return Promise.reject(err);
         }
@@ -38,3 +38,4 @@ export const interceptors = (navigate: any) => {
 }
 
 export default api;
+~                                                                                                                                                            ~                                   

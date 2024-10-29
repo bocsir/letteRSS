@@ -6,6 +6,9 @@ Its built to show as little information at a time as possible.
 
 Find it at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'
 
+#### Tip:
+If you want to add a blog that doesn't have a url that works, create one using https://fetchrss.com.
+
 ### Curent Features
   <ul>
     <li>Auth uses JWT for access and refresh tokens</li>
