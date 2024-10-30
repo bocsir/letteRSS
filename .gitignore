@@ -3,6 +3,6 @@ frontend/dist
 
 server/node_modules
 server/.env
-server\dist
+server/dist
 
 create_rss_db.sql
