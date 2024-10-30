@@ -10,8 +10,7 @@ export const interceptors = (navigate: any) => {
     api.interceptors.response.use(
         (response) => response,
         async (err) => {
-            //if 401, send user to login
-            if (err.response) {
+            if (err.response.status === 403) {
                 //refresh token then re call the function that triggered the error
                 try {
                     const res = await api.post('/auth/refresh-token');
@@ -23,7 +22,9 @@ export const interceptors = (navigate: any) => {
                     console.error(err);
                     navigate("/login");
                 }
-
+            } else if (err.response.status === 401) {
+                console.error(err);
+                navigate("/login");
             }
             return Promise.reject(err);
         }
