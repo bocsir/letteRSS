@@ -23,7 +23,7 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ error: "Error creating user" });
   }
 });
-
+  
 router.post("/login", async (req, res) => {
   const connection = await getConnection();
   const query = "SELECT * FROM user WHERE email = ?";
