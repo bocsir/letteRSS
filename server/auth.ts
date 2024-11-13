@@ -29,19 +29,19 @@ export function authenticateToken(
   if (!accessToken) {
     console.log("no access token");
     //endpoint to refresh token then re-call the original endpoint call
-    res.sendStatus(401);
+    res.sendStatus(403);
     return;
   }
 
   const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) {
     console.log("no refresh token");
-    res.sendStatus(403);
+    res.sendStatus(401);
     return;
   }
 
   jwt.verify(accessToken, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) return res.sendStatus(401);
     req.user = user as UserInfo;
     next();
   });
