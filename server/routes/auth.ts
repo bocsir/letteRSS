@@ -1,5 +1,5 @@
 import express from "express";
-import { getConnection, query } from "../database";
+import { query } from "../database";
 import { getHashedPw, generateRefreshToken, authenticateToken } from "../auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
