@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 const opml = require('opml');
-import { getConnection } from "../database";
+import { getPool } from "../database";
 import { authenticateToken } from "../auth";
 import { getDefaultFeedName, renderFeed, parse } from '../rss';
 import { getUserId } from '../utils';
@@ -11,7 +11,8 @@ import { getUserId } from '../utils';
 const router = express.Router();
 
 async function updateFeedDB(newURLs: string[], userID: number) {
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   const data = await getFeedData(null, userID);
   let feedURLs: string[] = [];
   let names: string[] = [];
@@ -30,11 +31,17 @@ async function updateFeedDB(newURLs: string[], userID: number) {
   const uniqueURLs = newURLs.filter((url) => !feedURLs.includes(url));
   feedURLs = [...new Set([...feedURLs, ...newURLs])];
 
-  const query = "INSERT INTO url (user_id, url, name) VALUES (?, ?, ?)";
+  try {
+    const query = "INSERT INTO url (user_id, url, name) VALUES (?, ?, ?)";
   
-  for (const url of uniqueURLs) {
-    const feedName = await getDefaultFeedName(url);
-    await connection.execute(query, [userID, url, feedName]);
+    for (const url of uniqueURLs) {
+      const feedName = await getDefaultFeedName(url);
+      await connection.execute(query, [userID, url, feedName]);
+    }  
+  } catch(err) {
+    console.error('error updating feed db', err);
+  } finally {
+    if (connection) connection.release();
   }
 
   return renderFeed(names, feedURLs);
@@ -42,7 +49,8 @@ async function updateFeedDB(newURLs: string[], userID: number) {
 
 //get names and urls and folders from db
 async function getFeedData(req: any, id?: number): Promise<string[][]> {
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   const userId = req ? getUserId(req) : id;
 
   let urls: string[] = [];
@@ -61,6 +69,8 @@ async function getFeedData(req: any, id?: number): Promise<string[][]> {
 
   } catch (err) {
     console.error(err);
+  } finally {
+    if (connection) connection.release();
   }
 
   return [urls, names, folders];
@@ -101,7 +111,8 @@ router.post("/newFeed", authenticateToken, async (req: any, res: any) => {
 });
 
 router.post("/changeFeedName", authenticateToken, async(req, res) => {
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   const query = "UPDATE url SET name = ? WHERE name = ?";
   const values = [req.body.newName, req.body.oldName];
 
@@ -114,6 +125,8 @@ router.post("/changeFeedName", authenticateToken, async(req, res) => {
   } catch(err) {
     console.error(err);
     res.status(500).json({ message: "Error updating feed name" });
+  } finally {
+    if (connection) connection.release();
   }
 });
 
@@ -156,17 +169,17 @@ router.post('/updateFolderStatus', authenticateToken, async(req, res) => {
 
   const query = `UPDATE url SET folder = ? WHERE name IN (${feeds.map((feed: string) => `'${feed}'`).join(',')})`;
 
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   try {
     await connection.execute(query, [folderName]);
     res.status(200).json({ message: "folder status updated" });
   } catch (err) {
     console.error(err);
     res.status(500)
+  } finally {
+    if (connection) connection.release();
   }
-
-
-
 });
 
 router.post("/fileImport", authenticateToken, upload.single("file"), async (req: any, res: any) => {
@@ -209,13 +222,16 @@ router.post('/deleteFeeds', authenticateToken, async(req, res) => {
 
   console.log('formatted vals: ', formattedValues);
   
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   try {
     await connection.execute(query, formattedValues);
     res.status(200).json({ message: "RSS feed successfully removed" });
   } catch (err) {
     console.error(err);
     res.status(500)
+  } finally {
+    if (connection) connection.release();
   }
 
 });

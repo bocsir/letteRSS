@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import grid2 from "../../assets/images/grid-bg_4x.webp";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {Link} from 'react-router-dom';
 import { Logo } from "../Logo";
 import api from '../../api';
+import { AxiosResponse } from "axios";
 
 const Login: React.FC = () => {
 
@@ -16,7 +17,17 @@ const Login: React.FC = () => {
 
   const [passwordValid, setPasswordValid] = useState<boolean>(true);
   const [queryFailed, setQueryFailed] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   // const [isLogin, setIsLogin] = useState(false);
+
+  interface User {
+    email: string;
+  }
+
+  interface AuthStatusResponse {
+    authenticated: boolean;
+    user: User;
+  }
 
   const togglePasswordVis = () => {
     if (eyeIcon.iconName === "eye") {

@@ -9,7 +9,7 @@ import path from 'path';
 
 const app: Express = express();
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", "https://letterss.net"];
+const allowedOrigins = ["http://localhost:5173", "https://letterss.net"];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -63,7 +63,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const PORT = process.env.PORT || 8008;
+const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });

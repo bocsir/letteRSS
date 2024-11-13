@@ -1,5 +1,5 @@
 import express from "express";
-import { getConnection } from "../database";
+import { getPool } from "../database";
 import { getHashedPw, generateRefreshToken, authenticateToken } from "../auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -10,7 +10,8 @@ const router = express.Router();
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 
 router.post("/signup", async (req, res) => {
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   try {
     const hashedPw = await getHashedPw(req.body.password);
     const signupValues = [req.body.email.toLowerCase(), hashedPw];
@@ -21,11 +22,14 @@ router.post("/signup", async (req, res) => {
   } catch (err) {
     console.error("Signup error: ", err);
     res.status(500).json({ error: "Error creating user" });
+  } finally {
+    if (connection) connection.release();
   }
 });
   
 router.post("/login", async (req, res) => {
-  const connection = await getConnection();
+  const pool = getPool();
+  const connection = await pool.getConnection();
   const query = "SELECT * FROM user WHERE email = ?";
   try {
     const queryRes = await connection.query(query, req.body.email);
@@ -89,6 +93,8 @@ router.post("/login", async (req, res) => {
     //email not found or server error happened
     console.error("login error: ", err);
     res.json({ valid: false, queryFailed: true });
+  } finally {
+    if (connection) connection.release();
   }
 });
 
@@ -112,8 +118,9 @@ router.post("/logout", (req, res) => {
 router.post("/refresh-token", async (req: any, res: any) => {
   const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) {return res.sendStatus(403);}
+  const pool = getPool();
+  const connection = await pool.getConnection();
   try {
-    const connection = await getConnection();
     const row = await connection.query(
       "SELECT * FROM user WHERE refresh_token = ?",
       [refreshToken]
@@ -144,6 +151,8 @@ router.post("/refresh-token", async (req: any, res: any) => {
   } catch (err) {
     console.error(err);
     return res.sendStatus(403);
+  } finally {
+    if (connection) connection.release();
   }
 });
 

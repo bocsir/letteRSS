@@ -160,16 +160,20 @@ export const FeedContainer: React.FC<FeedListProps> = ({
       return;
     }
 
-    const res = await api.post('/feed/deleteFeeds', selectedFeeds);
-    if (res.status === 200) {
-      selectedFeeds.map(item => {
-        delete feeds[item]
-        Object.keys(populatedFolders).forEach((name) => {
-          delete populatedFolders[name].feeds[item];
+    try {
+      const res = await api.post('/feed/deleteFeeds', selectedFeeds);
+      if (res.status === 200) {
+        selectedFeeds.map(item => {
+          delete feeds[item]
+          Object.keys(populatedFolders).forEach((name) => {
+            delete populatedFolders[name].feeds[item];
+          });
+          setSelectedFeeds([]);
+          setIsEditable(false);
         });
-        setSelectedFeeds([]);
-        setIsEditable(false);
-      });
+      }  
+    } catch (err) {
+      console.error('erorr deleting feed', err);
     }
   }
 
