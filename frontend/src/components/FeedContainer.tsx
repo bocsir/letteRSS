@@ -21,7 +21,6 @@ interface FeedListProps {
 export const FeedContainer: React.FC<FeedListProps> = ({
   isAuthenticated,
 }) => {
-  //useState is useful because calling its update function will trigger re-render
   const [feeds, setFeeds] = useState<Feeds>({});
   const [feedVisibility, setFeedVisibility] = useState<{
     [key: string]: boolean;
