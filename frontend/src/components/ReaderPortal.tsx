@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ToggleSwitch } from "./ToggleSwitch";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FeedItem } from "../interfaces";
 import DOMPurify from "dompurify";
 
@@ -29,7 +29,6 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
     setIsPortalVisible(false);
     setIsYellow(false);
   };
-
 
   return createPortal(
     <div
@@ -60,7 +59,6 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
           <br />
         </div>
       </div>
-
       <div
         className={`w-full max-h-[80vh] md:w-5/6 md: ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
           isChecked
@@ -69,8 +67,6 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* <div className="relative w-full"></div> */}
-
         {isChecked ? (
           <iframe
             className="w-full h-full"

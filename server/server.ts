@@ -64,14 +64,12 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
 
 process.on("SIGTERM", () => {
-  server.close(() => {
-    console.log("Server terminated");
-  });
+  console.log("Server terminated");
 });
 
-export default server;
+export default app;

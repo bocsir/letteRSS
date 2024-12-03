@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 const opml = require('opml');
-import { getPool } from "../database";
+import { query } from "../database";
 import { authenticateToken } from "../auth";
 import { getDefaultFeedName, renderFeed, parse } from '../rss';
 import { getUserId } from '../utils';
@@ -11,8 +11,6 @@ import { getUserId } from '../utils';
 const router = express.Router();
 
 async function updateFeedDB(newURLs: string[], userID: number) {
-  const pool = getPool();
-  const connection = await pool.getConnection();
   const data = await getFeedData(null, userID);
   let feedURLs: string[] = [];
   let names: string[] = [];
@@ -32,16 +30,14 @@ async function updateFeedDB(newURLs: string[], userID: number) {
   feedURLs = [...new Set([...feedURLs, ...newURLs])];
 
   try {
-    const query = "INSERT INTO url (user_id, url, name) VALUES (?, ?, ?)";
+    const queryText = "INSERT INTO url (user_id, url, name) VALUES (?, ?, ?)";
   
     for (const url of uniqueURLs) {
       const feedName = await getDefaultFeedName(url);
-      await connection.execute(query, [userID, url, feedName]);
+      await query(queryText, [userID, url, feedName]);
     }  
   } catch(err) {
     console.error('error updating feed db', err);
-  } finally {
-    if (connection) connection.release();
   }
 
   return renderFeed(names, feedURLs);
@@ -49,8 +45,6 @@ async function updateFeedDB(newURLs: string[], userID: number) {
 
 //get names and urls and folders from db
 async function getFeedData(req: any, id?: number): Promise<string[][]> {
-  const pool = getPool();
-  const connection = await pool.getConnection();
   const userId = req ? getUserId(req) : id;
 
   let urls: string[] = [];
@@ -58,8 +52,8 @@ async function getFeedData(req: any, id?: number): Promise<string[][]> {
   let folders: string[] = [];
 
   try {
-    const query = "SELECT url, name, folder FROM url WHERE user_id = ?";
-    const rows = await connection.execute(query, [userId]);
+    const queryText = "SELECT url, name, folder FROM url WHERE user_id = ?";
+    const rows = await query(queryText, [userId]);
 
     rows.forEach((item: {url: string, name: string, folder: string}) => {
       urls.push(item.url);
@@ -69,8 +63,6 @@ async function getFeedData(req: any, id?: number): Promise<string[][]> {
 
   } catch (err) {
     console.error(err);
-  } finally {
-    if (connection) connection.release();
   }
 
   return [urls, names, folders];
@@ -111,22 +103,18 @@ router.post("/newFeed", authenticateToken, async (req: any, res: any) => {
 });
 
 router.post("/changeFeedName", authenticateToken, async(req, res) => {
-  const pool = getPool();
-  const connection = await pool.getConnection();
-  const query = "UPDATE url SET name = ? WHERE name = ?";
+  const queryText = "UPDATE url SET name = ? WHERE name = ?";
   const values = [req.body.newName, req.body.oldName];
 
   console.log(req);
   console.log(values);
 
   try {
-    await connection.execute(query, values);
+    await query(queryText, values);
     res.status(200).json({ message: "DB updated successfully" });
   } catch(err) {
     console.error(err);
     res.status(500).json({ message: "Error updating feed name" });
-  } finally {
-    if (connection) connection.release();
   }
 });
 
@@ -167,18 +155,14 @@ router.post('/updateFolderStatus', authenticateToken, async(req, res) => {
   console.log('feeds: ', feeds);
   console.log('folder: ', folderName);
 
-  const query = `UPDATE url SET folder = ? WHERE name IN (${feeds.map((feed: string) => `'${feed}'`).join(',')})`;
+  const queryText = `UPDATE url SET folder = ? WHERE name IN (${feeds.map((feed: string) => `'${feed}'`).join(',')})`;
 
-  const pool = getPool();
-  const connection = await pool.getConnection();
   try {
-    await connection.execute(query, [folderName]);
+    await query(queryText, [folderName]);
     res.status(200).json({ message: "folder status updated" });
   } catch (err) {
     console.error(err);
     res.status(500)
-  } finally {
-    if (connection) connection.release();
   }
 });
 
@@ -218,22 +202,17 @@ router.post("/fileImport", authenticateToken, upload.single("file"), async (req:
 router.post('/deleteFeeds', authenticateToken, async(req, res) => {
   const names = req.body;
   const formattedValues: string = names.map((name: string) => `'${name.replace(/'/g, "''")}'`).join(', ');
-  const query = `DELETE FROM url WHERE name IN (${formattedValues})`;
+  const queryText = `DELETE FROM url WHERE name IN (${formattedValues})`;
 
   console.log('formatted vals: ', formattedValues);
   
-  const pool = getPool();
-  const connection = await pool.getConnection();
   try {
-    await connection.execute(query, formattedValues);
+    await query(queryText);
     res.status(200).json({ message: "RSS feed successfully removed" });
   } catch (err) {
     console.error(err);
     res.status(500)
-  } finally {
-    if (connection) connection.release();
   }
-
 });
 
 // Error handling middleware

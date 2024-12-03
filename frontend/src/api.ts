@@ -6,6 +6,7 @@ const api: AxiosInstance = axios.create({
 });
 
 export const interceptors = (navigate: any) => {
+    let isRefreshing = false;
 
     api.interceptors.response.use(
         (response) => response,

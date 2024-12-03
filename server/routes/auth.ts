@@ -1,5 +1,5 @@
 import express from "express";
-import { getPool } from "../database";
+import { query } from "../database";
 import { getHashedPw, generateRefreshToken, authenticateToken } from "../auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -10,29 +10,25 @@ const router = express.Router();
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 
 router.post("/signup", async (req, res) => {
-  const pool = getPool();
-  const connection = await pool.getConnection();
   try {
     const hashedPw = await getHashedPw(req.body.password);
     const signupValues = [req.body.email.toLowerCase(), hashedPw];
 
-    const query = "INSERT INTO user (email, password) VALUES (?, ?)";
-    await connection.query(query, signupValues);
+    await query(
+      "INSERT INTO user (email, password) VALUES (?, ?)",
+      signupValues
+    );
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Signup error: ", err);
     res.status(500).json({ error: "Error creating user" });
-  } finally {
-    if (connection) connection.release();
   }
 });
-
+  
 router.post("/login", async (req, res) => {
-  const pool = getPool();
-  const connection = await pool.getConnection();
-  const query = "SELECT * FROM user WHERE email = ?";
+  const queryText = "SELECT * FROM user WHERE email = ?";
   try {
-    const queryRes = await connection.query(query, req.body.email);
+    const queryRes = await query(queryText, [req.body.email]);
     const hashedPw = queryRes[0].password;
 
     bcrypt.compare(req.body.password, hashedPw, async (err, passwordRes) => {
@@ -50,7 +46,7 @@ router.post("/login", async (req, res) => {
         const refreshToken = generateRefreshToken(email);
 
         //send refresh token to DB
-        await connection.query(
+        await query(
           "UPDATE user SET refresh_token = ? WHERE id = ?",
           [refreshToken, userId]
         );
@@ -93,8 +89,6 @@ router.post("/login", async (req, res) => {
     //email not found or server error happened
     console.error("login error: ", err);
     res.json({ valid: false, queryFailed: true });
-  } finally {
-    if (connection) connection.release();
   }
 });
 
@@ -158,10 +152,8 @@ router.post("/logout", async (req: any, res: any) => {
 router.post("/refresh-token", async (req: any, res: any) => {
   const refreshToken = getCookieValue("refreshToken", req);
   if (!refreshToken) {return res.sendStatus(403);}
-  const pool = getPool();
-  const connection = await pool.getConnection();
   try {
-    const row = await connection.query(
+    const row = await query(
       "SELECT * FROM user WHERE refresh_token = ?",
       [refreshToken]
     );
@@ -191,8 +183,6 @@ router.post("/refresh-token", async (req: any, res: any) => {
   } catch (err) {
     console.error(err);
     return res.sendStatus(403);
-  } finally {
-    if (connection) connection.release();
   }
 });
 

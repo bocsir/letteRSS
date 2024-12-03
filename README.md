@@ -4,7 +4,7 @@ Minimal RSS reader
 The goal of this project is to create an RSS reader that doesn't feel as busy as other readers.
 Its built to show as little information at a time as possible.
 
-Find it at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'
+Find it at https://letterss.net. If you want to see what its like without adding your feeds first, login with 'example@email.com' and 'asdfgh'.
 
 #### Tip:
 If you want to add a blog that doesn't have a url that works, create one using https://fetchrss.com.
