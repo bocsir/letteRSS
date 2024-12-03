@@ -98,21 +98,61 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/auth", authenticateToken, (req: AuthenticatedRequest, res) => {
-  res.json({ authenticated: true, user: req.user });
+//check if refresh token in db matches the current one in client after first checking if the clients is null
+router.get("/auth", authenticateToken, async (req: any, res: any) => {
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  const refreshToken = getCookieValue("refreshToken", req);
+  try {
+    const query = "SELECT refresh_token FROM user WHERE id = ?";
+    const queryRes = await connection.query(query, [req.user.userId]);
+    const dbRefreshToken = queryRes[0].refresh_token;
+
+    if (refreshToken !== dbRefreshToken) {
+      return res.status(401).json({ authenticated: false, message: "Invalid refresh token" });
+    }
+
+    res.json({ authenticated: true, user: req.user });
+  } catch (err) {
+    console.error("Auth check error: ", err);
+    res.status(500).json({ authenticated: false, message: "Server error" });
+  } finally {
+    if (connection) connection.release();
+  }
 });
 
-router.post("/logout", (req, res) => {
-  //clear all cookies
-  res.setHeader(
-    "Set-Cookie",
-    [
-      "accessToken=; HttpOnly=false; Secure=false; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
-      "refreshToken=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
-      "user=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1960 00:00:00 GMT"
-    ]
-  );
-  res.status(200).json({ message: "logged out successfully" });
+router.post("/logout", async (req: any, res: any) => {
+  // Expire or delete the refresh token in the client
+  res.cookie("refreshToken", "", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    expires: new Date(0),
+  });
+
+  //clear refresh token from db to logout all devices
+  const pool = getPool();
+  const connection = await pool.getConnection();
+  console.log(req.body.email)
+  try {
+    await connection.query("UPDATE user SET refresh_token = NULL WHERE email = ?", [
+      req.body.email
+    ]);
+    res.status(200).json({ message: "logged out successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  } finally {
+    if (connection) connection.release();
+  }
+  // res.setHeader(
+  //   "Set-Cookie",
+  //   [
+  //     "accessToken=; HttpOnly=false; Secure=false; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+  //     "refreshToken=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+  //     "user=; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1960 00:00:00 GMT"
+  //   ]
+  // );
 });
 
 router.post("/refresh-token", async (req: any, res: any) => {

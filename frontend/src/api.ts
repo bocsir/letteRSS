@@ -10,7 +10,7 @@ export const interceptors = (navigate: any) => {
     api.interceptors.response.use(
         (response) => response,
         async (err) => {
-            if (err.response.status === 403) {
+            if (err.response.status === 403) { //forbidden (access token expired)
                 //refresh token then re call the function that triggered the error
                 try {
                     const res = await api.post('/auth/refresh-token');
@@ -22,7 +22,7 @@ export const interceptors = (navigate: any) => {
                     console.error(err);
                     navigate("/login");
                 }
-            } else if (err.response.status === 401) {
+            } else if (err.response.status === 401) { //unauthorized (refresh token expired)
                 console.error(err);
                 navigate("/login");
             }

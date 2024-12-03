@@ -7,8 +7,6 @@ const pool: Pool = mariadb.createPool({
   database: process.env.DB_NAME,
   port: parseInt(process.env.DB_PORT || "3306", 10),
   connectionLimit: 5,
-  acquireTimeout: 30000,
-  idleTimeout: 60000,
 });
 
 //test db connection

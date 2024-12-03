@@ -1,28 +1,4 @@
-  /*
-  *TODO:
-    *feed stuff
-      *mark read/ unread
-      *dot for unread?
-
-      *search feeds
-        *ctrl+k brings up search box to look through all feeds by name with suggestions
-
-      *auto-discovery
-        *enter site url, automatically find feed
-          *maybe use a library???? (fetchRSS)
-
-      *hide iframe option if unavailable 
-        *tried but failed to get it to work by creating an example iframe and checking for errors
-      
-    *change theme like https://tty1.blog/
-
-  *MORE THINGS:
-    *READER VIEW
-      *next, prev buttons for feed 
-    *keybinds for each click?
-      *alt text describing keybind or show them in help menu
-  */
-  import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
   import FeedContainer from "./components/FeedContainer";
   import { Logo } from "./components/Logo";
   import { AxiosResponse } from "axios";
@@ -31,35 +7,22 @@
   import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
   import { faUser } from "@fortawesome/free-solid-svg-icons";
   import AccountMenu from './components/AccountMenu';
+  import { User, AuthStatusResponse } from "./interfaces";
 
   const App: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [userEmail, setUserEmail] = useState<string>("");
     const [accountMenuVisible, setAccountMenuVisible] = useState<boolean>(false);
-
-    //pass to AccountMenu for x btn
-    const toggleMenuVis = () => {
-      setAccountMenuVisible(!accountMenuVisible);
-    };
-
-    const navigate = useNavigate();
-    
+   
     useEffect(() => {
       getAuthStatus();
     }, []);
-
-    //set interceptors for auth errors
+    
+    //handle navigation for auth errors in api response
+    const navigate = useNavigate();
     useEffect(() => {
       interceptors(navigate);
     }, [navigate]);
-
-    interface User {
-      email: string;
-    }
-    interface AuthStatusResponse {
-      authenticated: boolean;
-      user: User;
-    }
 
     //check for access and refresh token status
     async function getAuthStatus() {
@@ -95,7 +58,7 @@
         <FeedContainer isAuthenticated={isAuthenticated}/>
 
         {accountMenuVisible && (
-          <AccountMenu toggleAccountMenu={toggleMenuVis} userEmail={userEmail} navigate={navigate}/>
+          <AccountMenu setAccountMenuVisible={setAccountMenuVisible} isVisible={accountMenuVisible} userEmail={userEmail} navigate={navigate}/>
         )}
       </>
     );

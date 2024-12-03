@@ -14,3 +14,10 @@ export interface Feeds {
   [feedIndex: string]: ArticleItem[] | [];
 }
   
+export interface User {
+  email: string;
+}
+export interface AuthStatusResponse {
+  authenticated: boolean;
+  user: User;
+}
