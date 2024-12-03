@@ -10,6 +10,8 @@ const pool: Pool = mariadb.createPool({
   connectionLimit: 100,
 });
 
+export const getPool = () => pool;
+
 export async function setupDatabase() {
   try {
     const connection = await pool.getConnection();
@@ -26,35 +28,6 @@ export async function getConnection(): Promise<Connection> {
   } catch (error) {
     console.error("Error getting database connection: ", error);
     throw error;
-  }
-}
-
-export async function getConnection(): Promise<Connection> {
-  try {
-    return await pool.getConnection();
-  } catch (error) {
-    console.error("Error getting database connection: ", error);
-    throw error;
-  }
-}
-
-export async function query(sql: string, params?: any[]): Promise<any> {
-  let conn: Connection | null = null;
-  try {
-    conn = await getConnection();
-    const result = await conn.query(sql, params);
-    return result;
-  } catch (err) {
-    console.error("Error executing database query:", err);
-    throw err;
-  } finally {
-    if (conn) {
-      try {
-        conn.end();
-      } catch (err) {
-        console.error("Error releasing connection: ", err);
-      }
-    }
   }
 }
 
