@@ -1,30 +1,29 @@
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import api from "../api";
-import { NavigateFunction } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface AccountMenuProps {
   setAccountMenuVisible: React.Dispatch<React.SetStateAction<boolean>>
   isVisible: boolean
   userEmail: string
-  navigate: NavigateFunction
 }
 
-const AccountMenu = ({ setAccountMenuVisible, isVisible, userEmail, navigate }: AccountMenuProps) => {
+const AccountMenu = ({ setAccountMenuVisible, isVisible, userEmail }: AccountMenuProps) => {
+  const navigate = useNavigate();
 
-  //call server endpoint to clear the refresh token at '/logout'
-  const logoutUser = async () => {
+  const logoutUser = () => {
     navigate('/login');
   }
 
-  //call endponit to clear refresh token
+  //call endpoint to clear refresh token in db and cookie
   const logoutAllDevices = async () => {
     try {
-      const res = await api.post('/auth/logout', { email: userEmail});
+      const res = await api.post('/auth/logout', { email: userEmail });
       console.log(res);
       navigate('/login');  
     } catch (err) {
-      console.error("error loggin out", err);
+      console.error("error logging out", err);
     }
   }
 
@@ -33,7 +32,6 @@ const AccountMenu = ({ setAccountMenuVisible, isVisible, userEmail, navigate }: 
       onClick={() => setAccountMenuVisible(!isVisible)}
       className="w-screen h-full backdrop-blur-[2px] absolute top-0 left-0 z-20 flex flex-col items-center justify-start pt-36"
     >
-
       <div
         onClick={(e) => e.stopPropagation()}
         className="flex flex-col gap-3 p-4 h-min relative border-gray-400 border-2 bg-black rounded-md z-10"
@@ -61,7 +59,6 @@ const AccountMenu = ({ setAccountMenuVisible, isVisible, userEmail, navigate }: 
           >
             logout all devices
           </button>
-
         </div>
       </div>
     </div>

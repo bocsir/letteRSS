@@ -1,14 +1,21 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import grid2 from "../../assets/images/grid-bg_4x.webp";
-import { FormEvent, useEffect, useState } from "react";
-import {Link} from 'react-router-dom';
+import { FormEvent, useState } from "react";
+import { Link } from 'react-router-dom';
 import { Logo } from "../Logo";
 import api from '../../api';
-import { AxiosResponse } from "axios";
+
+interface User {
+  email: string;
+}
+
+interface AuthStatusResponse {
+  authenticated: boolean;
+  user: User;
+}
 
 const Login: React.FC = () => {
-
   const [eyeIcon, setEyeIcon] = useState(faEye);
   const [passVis, setPassVis] = useState<string>("password");
 
@@ -18,16 +25,6 @@ const Login: React.FC = () => {
   const [passwordValid, setPasswordValid] = useState<boolean>(true);
   const [queryFailed, setQueryFailed] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  // const [isLogin, setIsLogin] = useState(false);
-
-  interface User {
-    email: string;
-  }
-
-  interface AuthStatusResponse {
-    authenticated: boolean;
-    user: User;
-  }
 
   const togglePasswordVis = () => {
     if (eyeIcon.iconName === "eye") {
@@ -42,16 +39,14 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-        const response = await api.post('/auth/login', { email: email, password: password });
-        console.log("password valid: ", response.data.valid , ", query failed: ", response.data.queryFailed, ", response: ", response);
-        if (!response.data.queryFailed) setPasswordValid(response.data.valid);
-        setQueryFailed(response.data.queryFailed);
-        //successful login
-        if(response.data.valid && !response.data.queryFailed) {
-          window.location.href="/";
-        }
-        
-      
+      const response = await api.post('/auth/login', { email: email, password: password });
+      console.log("password valid: ", response.data.valid, ", query failed: ", response.data.queryFailed, ", response: ", response);
+      if (!response.data.queryFailed) setPasswordValid(response.data.valid);
+      setQueryFailed(response.data.queryFailed);
+      //successful login
+      if (response.data.valid && !response.data.queryFailed) {
+        window.location.href = "/";
+      }
     } catch (err) {
       console.error('login failed: ', err);
     }
@@ -62,9 +57,9 @@ const Login: React.FC = () => {
       <div
         className="flex sm:items-center justify-center relative w-screen h-screen"
       >
-        <img src={grid2} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30"/>
+        <img src={grid2} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30" />
         <Link to="/" className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen">
-          <Logo isWhite={false}/>
+          <Logo isWhite={false} />
         </Link>
         <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-black border rounded-lg text-white p-4 relative z-10">
           <h1 className="text-3xl text-center">Login to your account</h1>
@@ -84,9 +79,9 @@ const Login: React.FC = () => {
               </span>
             )}
 
-            <input className={`border ${queryFailed ? "border-red-500" : "border-transparent"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)}/>
+            <input className={`border ${queryFailed ? "border-red-500" : "border-transparent"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)} />
             <label htmlFor="password">Password:</label>
-            {(!passwordValid ) && (
+            {(!passwordValid) && (
               <span className="text-red-500 text-sm -mt-1">
                 Password incorrect
               </span>
@@ -95,7 +90,7 @@ const Login: React.FC = () => {
             <div className="flex justify-between h-min items-center mb-4">
 
               <input
-                className={`w-11/12 text-black pl-1 rounded-sm border ${!passwordValid || queryFailed ? "border-red-500" : "border-transparent" }`}
+                className={`w-11/12 text-black pl-1 rounded-sm border ${!passwordValid || queryFailed ? "border-red-500" : "border-transparent"}`}
                 type={passVis}
                 id="password"
                 name="password"
@@ -112,10 +107,10 @@ const Login: React.FC = () => {
                 className="bg-amber-300 w-min p-3 mt-3 mb-2 rounded-lg leading-3 cursor-pointer text-stone-800 font-bold transition-shadow duration-200 ease-in-out hover:shadow-[0px_0px_10px_4px_rgb(147,91,9)] hover:text-amber-800"
                 type="submit"
                 value="Submit"
-                onClick={handleSubmit} 
+                onClick={handleSubmit}
               />
             </div>
-            
+
           </form>
         </div>
       </div>
