@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import grid2 from "../../assets/images/grid-bg_4x.webp";
+import grid from "../../assets/images/grid.jpg";
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { Logo } from "../Logo";
@@ -91,7 +91,7 @@ const SignUp = () => {
     <>
       <div className="flex flex-col sm:justify-center items-center relative w-screen h-screen">
         <img
-          src={grid2}
+          src={grid}
           className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30"
         />
         <Link

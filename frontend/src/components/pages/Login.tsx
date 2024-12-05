@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import grid2 from "../../assets/images/grid-bg_4x.webp";
+import grid from "../../assets/images/grid.jpg";
 import { FormEvent, useState } from "react";
 import { Link } from 'react-router-dom';
 import { Logo } from "../Logo";
@@ -57,7 +57,7 @@ const Login: React.FC = () => {
       <div
         className="flex sm:items-center justify-center relative w-screen h-screen"
       >
-        <img src={grid2} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30" />
+        <img src={grid} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30" loading="lazy" />
         <Link to="/" className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen">
           <Logo isWhite={false} />
         </Link>

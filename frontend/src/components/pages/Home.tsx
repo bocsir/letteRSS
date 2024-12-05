@@ -1,6 +1,6 @@
 const Home = () => {
     return(
-        <div>welcomehomecaptain</div>
+        <div>this page not yet implemented</div>
     )
 }
 
