@@ -4,7 +4,6 @@ import App from './App'
 import Login from './components/pages/Login'
 import SignUp from './components/pages/SignUp'
 import './index.css'
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import NotFound from './components/pages/NotFound'
 
@@ -14,7 +13,6 @@ const router = createBrowserRouter([
     element: <App/>,
     errorElement: <NotFound/>
   },
-
   {
     path: '/login',
     element: <Login/>,
@@ -27,7 +25,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* set entry point of app as router */}
-      <RouterProvider router={router} />
+    <RouterProvider router={router} />
   </StrictMode>,
 );

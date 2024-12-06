@@ -106,9 +106,6 @@ router.post("/changeFeedName", authenticateToken, async(req, res) => {
   const queryText = "UPDATE url SET name = ? WHERE name = ?";
   const values = [req.body.newName, req.body.oldName];
 
-  console.log(req);
-  console.log(values);
-
   try {
     await query(queryText, values);
     res.status(200).json({ message: "DB updated successfully" });
@@ -152,8 +149,6 @@ const upload = multer({
 router.post('/updateFolderStatus', authenticateToken, async(req, res) => {
   const folderName: string = req.body.folderName;
   const feeds = req.body.feedsInFolder;
-  console.log('feeds: ', feeds);
-  console.log('folder: ', folderName);
 
   const queryText = `UPDATE url SET folder = ? WHERE name IN (${feeds.map((feed: string) => `'${feed}'`).join(',')})`;
 
@@ -203,8 +198,6 @@ router.post('/deleteFeeds', authenticateToken, async(req, res) => {
   const names = req.body;
   const formattedValues: string = names.map((name: string) => `'${name.replace(/'/g, "''")}'`).join(', ');
   const queryText = `DELETE FROM url WHERE name IN (${formattedValues})`;
-
-  console.log('formatted vals: ', formattedValues);
   
   try {
     await query(queryText);

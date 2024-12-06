@@ -11,7 +11,7 @@ export interface ArticleItem {
 }
 
 export interface Feeds {
-  [feedIndex: string]: ArticleItem[] | [];
+  [feedName: string]: ArticleItem[] | [];
 }
   
 export interface User {
