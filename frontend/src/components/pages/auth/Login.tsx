@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import grid from "../../assets/images/grid.jpg";
+import grid from "../../../assets/images/grid.jpg";
 import { FormEvent, useState } from "react";
 import { Link } from 'react-router-dom';
-import { Logo } from "../Logo";
-import api from '../../api';
+import { Logo } from "../../Logo";
+import DefaultLogin from './DefaultLogin';
+import api from '../../../api';
 
 interface User {
   email: string;
@@ -24,7 +25,6 @@ const Login: React.FC = () => {
 
   const [passwordValid, setPasswordValid] = useState<boolean>(true);
   const [queryFailed, setQueryFailed] = useState<boolean>(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const togglePasswordVis = () => {
     if (eyeIcon.iconName === "eye") {
@@ -35,6 +35,7 @@ const Login: React.FC = () => {
       setPassVis("password");
     }
   };
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -112,6 +113,7 @@ const Login: React.FC = () => {
             </div>
 
           </form>
+          <DefaultLogin/>
         </div>
       </div>
     </>

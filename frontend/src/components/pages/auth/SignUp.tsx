@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import grid from "../../assets/images/grid.jpg";
+import grid from "../../../assets/images/grid.jpg";
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { Logo } from "../Logo";
-import api from "../../api";
+import { Logo } from "../../Logo";
+import api from "../../../api";
+import DefaultLogin from "./DefaultLogin";
 
 const SignUp = () => {
   const [eyeIcon, setEyeIcon] = useState(faEye);
@@ -168,6 +168,7 @@ const SignUp = () => {
               />
             </div>
           </form>
+          <DefaultLogin />
         </div>
       </div>
     </>
