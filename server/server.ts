@@ -30,11 +30,12 @@ app.use(helmet.contentSecurityPolicy({
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", "'unsafe-inline'"],
     styleSrc: ["'self'", "'unsafe-inline'"],
-    imgSrc: ["'self'", "data:"],
-    connectSrc: ["'self'", ...allowedOrigins],
+    imgSrc: ["'self'", "data:", "https://assets.amuniversal.com"],
+    connectSrc: ["'self'", ...allowedOrigins, "http://localhost:3000"],
     fontSrc: ["'self'", "https:", "data:"],
     objectSrc: ["'none'"],
     upgradeInsecureRequests: [],
+    frameSrc: ["*"],
   },
 }));
 
