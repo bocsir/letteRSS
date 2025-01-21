@@ -12,7 +12,7 @@ const TopSection: FC<TopSectionProps> = ({ userEmail, setAccountMenuVisible }) =
   return (
     <>
       <a href="/" className="absolute top-2 left-3">
-        <Logo isWhite={false} />
+        <Logo color={1} />
       </a>
       <div className="flex items-center text-gray-200 w-full justify-end pr-2 ml-1">
         <p className="hidden sm:block">{userEmail}</p>

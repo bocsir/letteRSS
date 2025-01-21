@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
-import yellowLogo from '../assets/images/yellow-rss-logo.svg';
-import whiteLogo from '../assets/images/white-rss-logo.svg';
+import whiteLogo from '../assets/images/white-rss-logo.svg';    //0
+import yellowLogo from '../assets/images/yellow-rss-logo.svg';  //1
+import grayLogo from '../assets/images/gray-rss-logo.svg';      //2
 
 interface LogoProps {
-    isWhite: boolean;
+    color: number;
 }
 
-export const Logo: React.FC<LogoProps> = ({isWhite}) => {
+export const Logo: React.FC<LogoProps> = ({color}) => {
+
+    const logos = [whiteLogo, yellowLogo, grayLogo];
 
     //favicon
     useEffect(() => {
@@ -20,7 +23,7 @@ export const Logo: React.FC<LogoProps> = ({isWhite}) => {
         <div className="flex gap-2 items-center">
             <h2 className="text-2xl">LetteRSS</h2>
             <img 
-                src={(isWhite) ? whiteLogo : yellowLogo} alt="LetteRSS logo"
+                src={logos[color]} alt="LetteRSS logo"
                 className="h-8 w-8"
             />
         </div>

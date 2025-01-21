@@ -15,7 +15,7 @@
 body {
   margin: 0;
   /* background-color: #030d1b; */
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.83);
   font-family: monospace;
   color: white;
   height: 100vh;

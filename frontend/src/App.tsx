@@ -1,6 +1,7 @@
 import FeedContainer from "./components/FeedContainer";
 import AccountMenu from './components/AccountMenu';
 import TopSection from "./components/TopSection";
+import Background from "./components/Background";
 import { useState } from "react";
 import { useAuthStatus } from './hooks/useAuthStatus';
 import { useApiInterceptors } from './hooks/useApiInterceptors';
@@ -18,6 +19,7 @@ const App = () => {
       {accountMenuVisible && (
         <AccountMenu setAccountMenuVisible={setAccountMenuVisible} isVisible={accountMenuVisible} userEmail={userEmail} />
       )}
+      <Background/>
     </>
   );
 }
