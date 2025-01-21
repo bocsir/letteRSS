@@ -9,6 +9,7 @@ import FeedList from './FeedList';
 import SortingMenu from "./SortingMenu";
 import FolderList from "./FolderList";
 import useFeedEditing from "../hooks/useFeedEditing";
+import Introduction from "./Introduction";
 
 interface FeedListProps {
   isAuthenticated: boolean;
@@ -212,6 +213,10 @@ export const FeedContainer: React.FC<FeedListProps> = ({ isAuthenticated }) => {
           isInFolder={false}
         />
         <hr className="border-neutral-500 mb-2 mt-2" />
+        {Object.entries(feedNames).length === 0 && (
+          <Introduction />
+        )}
+
         <FolderList
           populatedFolders={populatedFolders}
           toggleFolderOpen={toggleFolderOpen}
