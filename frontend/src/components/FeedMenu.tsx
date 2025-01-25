@@ -56,7 +56,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     0: false,
     1: false,
   });
-  const [isLaoding, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
     setNewFeedUrl(e.target.value);
@@ -73,6 +73,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setMenuBtnHover(menuBtnHoverStatus);
   };
 
+  //for opml file import
   const sendFile = async (e: FormEvent) => {
     setIsLoading(true);
 
@@ -104,11 +105,13 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setIsLoading(false);
   };
 
+  //for url feed add
   const sendURL = async (e: FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
     if (!newFeedUrl.startsWith("http")) {
       setShowUrlError(true);
+      setIsLoading(false);
       return;
     }
     try {
@@ -163,7 +166,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
 
   return (
     <>
-      <LoadingAnimation isLoading={isLaoding} />
+      <LoadingAnimation isLoading={isLoading} />
 
       <div className="relative">
         {doneBtnVis ? (
