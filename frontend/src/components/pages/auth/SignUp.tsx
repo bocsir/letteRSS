@@ -98,7 +98,7 @@ const SignUp = () => {
           to="/"
           className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen"
         >
-          <Logo isWhite={false} />
+          <Logo color={1} />
         </Link>
         {showBackendError && (
             <div className="w-[400px] mb-3 text-sm text-red-500 bg-black relative z-10 shadow-[0px_0px_3px_3px_#681d1d] rounded-md p-3 pt-2 mt-2">

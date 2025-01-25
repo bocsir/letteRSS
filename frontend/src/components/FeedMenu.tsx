@@ -1,9 +1,8 @@
 //top section with menu to add feeds
 //calling feedComponent logic could be a separate component
 
-import axios from "axios";
 // import opml from 'opml';
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -31,7 +30,7 @@ interface FeedMenuProps {
   };
   getFeedNames: any
 }
-//somehow FeedMenu needs to tell FeedList to call getFeeds again
+
 const FeedMenu: React.FC<FeedMenuProps> = ({
   callGetFeeds,
   closeAllFeeds,
@@ -244,7 +243,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
         {newFeedMenuVis && (
           <div
             onClick={toggleNewFeedMenuVis}
-            className="w-screen h-screen backdrop-blur-[2px] fixed top-0 left-0 z-10 flex flex-col items-center justify-start"
+            className="w-screen h-screen fixed top-0 left-0 z-10 flex flex-col items-center justify-start"
           >
             <div className="w-96 flex justify-end mt-36">
               <button

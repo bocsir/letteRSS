@@ -2,7 +2,8 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ArticleItem, Feeds } from "../interfaces";
 import Feed from "./Feed";
-import React, { useEffect } from "react";
+import Introduction from "./Introduction";
+import React, { useState, useEffect } from "react";
 
 interface FeedListProps {
   feeds: Feeds;
@@ -49,13 +50,23 @@ const FeedList: React.FC<FeedListProps> = ({
   feedVisibility,
   toggleFeedVisibility
 }) => {
+  const [showIntro, setShowIntro] = useState<boolean>(false);
 
   const preventFeedOpenOnEdit = ( e: React.MouseEvent<HTMLInputElement, MouseEvent> ) => {
     if (isEditable) e.stopPropagation();
   }
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowIntro(Object.entries(feeds).length < 1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [Object.entries(feeds).length]);
+
   return (
     <>
+      {showIntro && <Introduction />}
       {Object.entries(feeds).filter(([feedIndex, feedArray]: [string, ArticleItem[]]) => (isInFolder || !(folders[feedIndex]))).map(
         ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
 

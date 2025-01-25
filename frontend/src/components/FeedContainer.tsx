@@ -26,6 +26,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({ isAuthenticated }) => {
   const [isParsing, setIsParsing] = useState<{ [key: string]: boolean }>({});
   const [folders, setFolders] = useState<{ [feedName: string]: string | null }>({});
   const [populatedFolders, setPopulatedFolders] = useState<any>({});
+  const [showIntro, setShowIntro] = useState<boolean>(false);
 
   const {
     selectedFeeds,
@@ -213,9 +214,6 @@ export const FeedContainer: React.FC<FeedListProps> = ({ isAuthenticated }) => {
           isInFolder={false}
         />
         <hr className="border-neutral-500 mb-2 mt-2" />
-        {Object.entries(feedNames).length === 0 && (
-          <Introduction />
-        )}
 
         <FolderList
           populatedFolders={populatedFolders}

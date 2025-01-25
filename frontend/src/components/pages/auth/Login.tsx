@@ -60,7 +60,7 @@ const Login: React.FC = () => {
       >
         <img src={grid} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30" loading="lazy" />
         <Link to="/" className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen">
-          <Logo isWhite={false} />
+          <Logo color={1} />
         </Link>
         <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-black border rounded-lg text-white p-4 relative z-10">
           <h1 className="text-3xl text-center">Login to your account</h1>
