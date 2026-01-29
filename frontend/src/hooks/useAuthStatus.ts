@@ -10,7 +10,7 @@ export const useAuthStatus = () => {
 
   async function getAuthStatus() {
     try {
-      const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth/auth');
+      const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth/authStatus');
       setIsAuthenticated(response.data.authenticated);
       setUserEmail(response.data.user.email);
     } catch (err) {

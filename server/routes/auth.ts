@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
 });
 
 //check if refresh token in db matches the current one in client after first checking if the clients is null
-router.get("/auth", authenticateToken, async (req: any, res: any) => {
+router.get("/authStatus", authenticateToken, async (req: any, res: any) => {
   const pool = getPool();
   const connection = await pool.getConnection();
   const refreshToken = getCookieValue("refreshToken", req);
