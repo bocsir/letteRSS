@@ -3,8 +3,7 @@ import { query, getPool } from "../database";
 import { getHashedPw, generateRefreshToken, authenticateToken } from "../auth";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { AuthenticatedRequest } from "../types";
-import { getCookieValue } from '../utils';
+import { getCookieValue } from "../utils";
 
 const router = express.Router();
 const JWT_SECRET: string = process.env.JWT_SECRET!;
@@ -14,17 +13,14 @@ router.post("/signup", async (req, res) => {
     const hashedPw = await getHashedPw(req.body.password);
     const signupValues = [req.body.email.toLowerCase(), hashedPw];
 
-    await query(
-      "INSERT INTO user (email, password) VALUES (?, ?)",
-      signupValues
-    );
+    await query("INSERT INTO user (email, password) VALUES (?, ?)", signupValues);
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Signup error: ", err);
     res.status(500).json({ error: "Error creating user" });
   }
 });
-  
+
 router.post("/login", async (req, res) => {
   const queryText = "SELECT * FROM user WHERE email = ?";
   try {
@@ -38,18 +34,13 @@ router.post("/login", async (req, res) => {
         const email = queryRes[0].email;
 
         //make the tokens
-        const accessToken = jwt.sign(
-          { userId: userId, email: email },
-          JWT_SECRET,
-          { expiresIn: "1h" }
-        );
+        const accessToken = jwt.sign({ userId: userId, email: email }, JWT_SECRET, {
+          expiresIn: "1h",
+        });
         const refreshToken = generateRefreshToken(email);
 
         //send refresh token to DB
-        await query(
-          "UPDATE user SET refresh_token = ? WHERE id = ?",
-          [refreshToken, userId]
-        );
+        await query("UPDATE user SET refresh_token = ? WHERE id = ?", [refreshToken, userId]);
 
         //store tokens in cookies
         res.cookie("accessToken", accessToken, {
@@ -93,7 +84,7 @@ router.post("/login", async (req, res) => {
 });
 
 //check if refresh token in db matches the current one in client after first checking if the clients is null
-router.get("/authStatus", authenticateToken, async (req: any, res: any) => {
+router.get("/auth-status", authenticateToken, async (req: any, res: any) => {
   const pool = getPool();
   const connection = await pool.getConnection();
   const refreshToken = getCookieValue("refreshToken", req);
@@ -127,10 +118,10 @@ router.post("/logout", async (req: any, res: any) => {
   //clear refresh token from db to logout all devices
   const pool = getPool();
   const connection = await pool.getConnection();
-  console.log(req.body.email)
+  console.log(req.body.email);
   try {
     await connection.query("UPDATE user SET refresh_token = NULL WHERE email = ?", [
-      req.body.email
+      req.body.email,
     ]);
     res.status(200).json({ message: "logged out successfully" });
   } catch (err) {
@@ -151,18 +142,15 @@ router.post("/logout", async (req: any, res: any) => {
 
 router.post("/refresh-token", async (req: any, res: any) => {
   const refreshToken = getCookieValue("refreshToken", req);
-  if (!refreshToken) {return res.sendStatus(403);}
+  if (!refreshToken) {
+    return res.sendStatus(403);
+  }
   try {
-    const row = await query(
-      "SELECT * FROM user WHERE refresh_token = ?",
-      [refreshToken]
-    );
+    const row = await query("SELECT * FROM user WHERE refresh_token = ?", [refreshToken]);
     if (!row) return res.sendStatus(403);
-    const newAccessToken = jwt.sign(
-      { userId: row[0].id, email: row[0].email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const newAccessToken = jwt.sign({ userId: row[0].id, email: row[0].email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.cookie("accessToken", newAccessToken, {
       httpOnly: false,
@@ -177,8 +165,8 @@ router.post("/refresh-token", async (req: any, res: any) => {
       sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
-    
-    console.log('access token refreshed :)');
+
+    console.log("access token refreshed :)");
     res.sendStatus(200);
   } catch (err) {
     console.error(err);

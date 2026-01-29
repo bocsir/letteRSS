@@ -4,28 +4,28 @@ import api from "../api";
 import { useNavigate } from "react-router-dom";
 
 interface AccountMenuProps {
-  setAccountMenuVisible: React.Dispatch<React.SetStateAction<boolean>>
-  isVisible: boolean
-  userEmail: string
+  setAccountMenuVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isVisible: boolean;
+  userEmail: string;
 }
 
 const AccountMenu = ({ setAccountMenuVisible, isVisible, userEmail }: AccountMenuProps) => {
   const navigate = useNavigate();
 
   const logoutUser = () => {
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
   //call endpoint to clear refresh token in db and cookie
   const logoutAllDevices = async () => {
     try {
-      const res = await api.post('/auth/logout', { email: userEmail });
+      const res = await api.post("/auth/logout", { email: userEmail });
       console.log(res);
-      navigate('/login');  
+      navigate("/login");
     } catch (err) {
       console.error("error logging out", err);
     }
-  }
+  };
 
   return (
     <div

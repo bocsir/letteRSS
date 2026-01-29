@@ -28,7 +28,7 @@ interface FeedMenuProps {
   folders: {
     [key: string]: string | null;
   };
-  getFeedNames: any
+  getFeedNames: any;
 }
 
 const FeedMenu: React.FC<FeedMenuProps> = ({
@@ -121,7 +121,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
-        }
+        },
       );
 
       //call async getFeeds in parent to update frontend after new url addition
@@ -162,7 +162,6 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
     setDoneBtnVis(false);
   };
 
-
   return (
     <>
       <LoadingAnimation isLoading={isLoading} />
@@ -170,7 +169,12 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
       <div className="relative">
         {doneBtnVis ? (
           <div className="flex gap-3 items-center h-max">
-            <FolderMenu updateMenuBtnHover={updateMenuBtnHover} selectedFeeds={selectedFeeds} getFeedNames={getFeedNames} folders={folders}/>
+            <FolderMenu
+              updateMenuBtnHover={updateMenuBtnHover}
+              selectedFeeds={selectedFeeds}
+              getFeedNames={getFeedNames}
+              folders={folders}
+            />
             {menuBtnHover[1] && (
               <div className="bg-amber-300 z-30 absolute -left-16 top-7 pl-2 pr-2 w-max h-min cursor-none">
                 <p className="text-sm text-black">organize selected</p>
@@ -186,8 +190,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
               <FontAwesomeIcon icon={faTrashCan} />
             </button>
             {menuBtnHover[0] && (
-              <div
-                className="bg-amber-300 z-30 absolute top-7 pl-2 pr-2 -left-8 w-max h-min cursor-none">
+              <div className="bg-amber-300 z-30 absolute top-7 pl-2 pr-2 -left-8 w-max h-min cursor-none">
                 <p className="text-sm text-black">remove selected</p>
               </div>
             )}
@@ -202,13 +205,12 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
           <button className="" onClick={toggleMenuVis}>
             <FontAwesomeIcon
               icon={faEllipsis}
-              className={`text-2xl text-neutral-500 pointer relative active:text-yellow-500 ${newFeedMenuVis ? "z-10" : "z-20"
-                } mr-2.5`}
+              className={`text-2xl text-neutral-500 pointer relative active:text-yellow-500 ${
+                newFeedMenuVis ? "z-10" : "z-20"
+              } mr-2.5`}
             />
           </button>
         )}
-
-
 
         {menuVis && (
           <>
@@ -246,10 +248,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
             className="w-screen h-screen fixed top-0 left-0 z-10 flex flex-col items-center justify-start"
           >
             <div className="w-96 flex justify-end mt-36">
-              <button
-                onClick={toggleNewFeedMenuVis}
-                className="text-xl hover:text-amber-300"
-              >
+              <button onClick={toggleNewFeedMenuVis} className="text-xl hover:text-amber-300">
                 <FontAwesomeIcon className="text-2xl" icon={faXmark} />
               </button>
             </div>
@@ -263,12 +262,8 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                 <label htmlFor="feed-url" className="text-base">
                   Enter a URL:
                 </label>
-                {showUrlError && (
-                  <p className="text-red-500 text-sm mb-1">Invalid URL</p>
-                )}
-                {urlNotFound && (
-                  <p className="text-red-500 text-sm mb-1">URL not found</p>
-                )}
+                {showUrlError && <p className="text-red-500 text-sm mb-1">Invalid URL</p>}
+                {urlNotFound && <p className="text-red-500 text-sm mb-1">URL not found</p>}
                 <div className="flex items-center relative">
                   <input
                     type="text"
@@ -300,8 +295,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                   >
                     <div>
                       <FontAwesomeIcon
-                        className={`text-2xl ${importHover ? "text-gray-200" : ""
-                          }`}
+                        className={`text-2xl ${importHover ? "text-gray-200" : ""}`}
                         icon={faFileArrowUp}
                       />
                     </div>
@@ -312,7 +306,9 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                           {file.map((file) => file.name)}
                         </p>
                       ) : (
-                        <p className={`${importHover ? "text-gray-200" : ""}`}>click to browse files</p>
+                        <p className={`${importHover ? "text-gray-200" : ""}`}>
+                          click to browse files
+                        </p>
                       )}
                     </div>
                   </label>

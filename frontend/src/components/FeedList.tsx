@@ -13,16 +13,13 @@ interface FeedListProps {
   feedNames: {
     [key: string]: string;
   };
-  updateFeedName: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    feedIndex: string
-  ) => void;
+  updateFeedName: (e: React.ChangeEvent<HTMLInputElement>, feedIndex: string) => void;
   showSaveBtn: {
     [key: string]: boolean;
   };
   sendFeedNames: (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    name: string
+    name: string,
   ) => Promise<void>;
   folders: {
     [key: string]: string | null;
@@ -48,13 +45,13 @@ const FeedList: React.FC<FeedListProps> = ({
   isInFolder,
   isParsing,
   feedVisibility,
-  toggleFeedVisibility
+  toggleFeedVisibility,
 }) => {
   const [showIntro, setShowIntro] = useState<boolean>(false);
 
-  const preventFeedOpenOnEdit = ( e: React.MouseEvent<HTMLInputElement, MouseEvent> ) => {
+  const preventFeedOpenOnEdit = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     if (isEditable) e.stopPropagation();
-  }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -67,20 +64,20 @@ const FeedList: React.FC<FeedListProps> = ({
   return (
     <>
       {showIntro && <Introduction />}
-      {Object.entries(feeds).filter(([feedIndex, feedArray]: [string, ArticleItem[]]) => (isInFolder || !(folders[feedIndex]))).map(
-        ([feedIndex, feedArray]: [string, ArticleItem[]]) => (
-
+      {Object.entries(feeds)
+        .filter(
+          ([feedIndex, feedArray]: [string, ArticleItem[]]) => isInFolder || !folders[feedIndex],
+        )
+        .map(([feedIndex, feedArray]: [string, ArticleItem[]]) => (
           <div
             key={feedIndex}
             className={`max-w-96 rounded pl-3 pr-3 border-2 ${isInFolder ? "ml-2" : "ml-0"}
-              ${feedVisibility[feedIndex]
-                ? "border-neutral-500 bg-black"
-                : "border-transparent"
-              }`}
+              ${feedVisibility[feedIndex] ? "border-neutral-500 bg-black" : "border-transparent"}`}
           >
             <div
-              className={`h-6 flex justify-between items-center relative ${!isEditable ? "cursor-pointer" : ""
-                }`}
+              className={`h-6 flex justify-between items-center relative ${
+                !isEditable ? "cursor-pointer" : ""
+              }`}
               onClick={() => toggleFeedVisibility(feedIndex)}
             >
               {isEditable && (
@@ -94,14 +91,10 @@ const FeedList: React.FC<FeedListProps> = ({
                 type="text"
                 maxLength={50}
                 className={`no-select relative focus:outline-none overflow-x cursor-pointer text-base whitespace-nowrap text-clip w-full pr-3
-                      ${feedVisibility[feedIndex]
-                    ? "text-amber-300"
-                    : "text-white"
-                  }
-                      ${isEditable
-                    ? " pl-1 rounded bg-neutral-500 cursor-text"
-                    : "bg-transparent "
-                  }`}
+                      ${feedVisibility[feedIndex] ? "text-amber-300" : "text-white"}
+                      ${
+                        isEditable ? " pl-1 rounded bg-neutral-500 cursor-text" : "bg-transparent "
+                      }`}
                 // feedNames[feedIndex] || ''
                 value={feedNames[feedIndex] || ""}
                 onClick={preventFeedOpenOnEdit}
@@ -121,10 +114,9 @@ const FeedList: React.FC<FeedListProps> = ({
               )}
               {!isEditable && (
                 <button
-                  className={`text-sm pl-2 font-bold relative z-1 ${feedVisibility[feedIndex]
-                      ? "text-yellow-500"
-                      : "text-neutral-500"
-                    }`}
+                  className={`text-sm pl-2 font-bold relative z-1 ${
+                    feedVisibility[feedIndex] ? "text-yellow-500" : "text-neutral-500"
+                  }`}
                 >
                   {feedVisibility[feedIndex] ? (
                     <FontAwesomeIcon icon={faMinus} />
@@ -153,8 +145,7 @@ const FeedList: React.FC<FeedListProps> = ({
               </>
             )}
           </div>
-        )
-      )}
+        ))}
     </>
   );
 };

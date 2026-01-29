@@ -58,7 +58,7 @@ const SignUp = () => {
         });
 
         //automatically try to log user in
-        console.log('loggin user in automatically');
+        console.log("loggin user in automatically");
         try {
           //generate access token and refresh token
           const response = await api.post("/auth/login", {
@@ -71,7 +71,7 @@ const SignUp = () => {
             ", query failed: ",
             response.data.queryFailed,
             ", response: ",
-            response
+            response,
           );
           //successful login
           if (response.data.valid) {
@@ -101,14 +101,14 @@ const SignUp = () => {
           <Logo color={1} />
         </Link>
         {showBackendError && (
-            <div className="w-[400px] mb-3 text-sm text-red-500 bg-black relative z-10 shadow-[0px_0px_3px_3px_#681d1d] rounded-md p-3 pt-2 mt-2">
-              Sorry, there was a server error creating your account. If you alrady have one, please{" "}
-              <Link className="underline decoration-solid text-white" to="/login">
-                login here.
-              </Link>
-              {" "} If you dont, please try again.
-            </div>
-          )}
+          <div className="w-[400px] mb-3 text-sm text-red-500 bg-black relative z-10 shadow-[0px_0px_3px_3px_#681d1d] rounded-md p-3 pt-2 mt-2">
+            Sorry, there was a server error creating your account. If you alrady have one, please{" "}
+            <Link className="underline decoration-solid text-white" to="/login">
+              login here.
+            </Link>{" "}
+            If you dont, please try again.
+          </div>
+        )}
 
         <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-black border rounded-lg text-white p-4 relative z-10">
           <h1 className="text-3xl text-center">Create your account</h1>
@@ -124,14 +124,10 @@ const SignUp = () => {
           <form className="flex flex-col h-5/6 w-full text-lg mt-2 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
             <label htmlFor="email">Email:</label>
             {!emailFormatValid && (
-              <span className="text-red-500 text-sm -mt-1">
-                Invalid email format
-              </span>
+              <span className="text-red-500 text-sm -mt-1">Invalid email format</span>
             )}
             <input
-              className={`border ${
-                emailFormatValid ? "border-transparent" : "border-red-500"
-              }`}
+              className={`border ${emailFormatValid ? "border-transparent" : "border-red-500"}`}
               type="text"
               id="email"
               name="email"
@@ -139,9 +135,7 @@ const SignUp = () => {
             />
             <label htmlFor="password">Password:</label>
             {!passwordValid && (
-              <span className="text-red-500 text-sm -mt-1">
-                Password too short
-              </span>
+              <span className="text-red-500 text-sm -mt-1">Password too short</span>
             )}
             <span className="flex justify-between h-min items-center mb-4">
               <input

@@ -1,9 +1,19 @@
-
 import { useState } from "react";
 import api from "../api";
 import { ArticleItem, Feeds } from "../interfaces";
 
-const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeeds: any, populatedFolders: any, setPopulatedFolders: any, showSaveBtn: any, setShowSaveBtn: any, folders: any, setFolders: any) => {
+const useFeedEditing = (
+  feedNames: any,
+  setFeedNames: any,
+  feeds: Feeds,
+  setFeeds: any,
+  populatedFolders: any,
+  setPopulatedFolders: any,
+  showSaveBtn: any,
+  setShowSaveBtn: any,
+  folders: any,
+  setFolders: any,
+) => {
   const [selectedFeeds, setSelectedFeeds] = useState<string[]>([]);
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
@@ -14,12 +24,12 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
       currentFeeds.push(name);
     });
 
-    const sortedFeeds = (isAlphabetical)
+    const sortedFeeds = isAlphabetical
       ? currentFeeds.sort((a, b) => a.localeCompare(b))
       : currentFeeds.sort((a, b) => b.localeCompare(a));
 
     const sortedObj: Record<string, null> = {};
-    sortedFeeds.forEach(item => {
+    sortedFeeds.forEach((item) => {
       sortedObj[item] = null;
     });
 
@@ -30,12 +40,9 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
   const updateSelectedItems = (e: any, feedIndex: string) => {
     let newFeeds;
     if (e.target.checked) {
-      newFeeds = [
-        ...selectedFeeds,
-        feedIndex
-      ];
+      newFeeds = [...selectedFeeds, feedIndex];
     } else {
-      newFeeds = selectedFeeds.filter(item => item !== feedIndex);
+      newFeeds = selectedFeeds.filter((item) => item !== feedIndex);
     }
     setSelectedFeeds(newFeeds);
   };
@@ -46,9 +53,9 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
     }
 
     try {
-      const res = await api.post('/feed/deleteFeeds', selectedFeeds);
+      const res = await api.post("/feed/deleteFeeds", selectedFeeds);
       if (res.status === 200) {
-        selectedFeeds.map(item => {
+        selectedFeeds.map((item) => {
           delete feeds[item];
           Object.keys(populatedFolders).forEach((name) => {
             delete populatedFolders[name].feeds[item];
@@ -58,15 +65,12 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
         });
       }
     } catch (err) {
-      console.error('error deleting feed', err);
+      console.error("error deleting feed", err);
     }
   };
 
   //changes not reflected in input element in FeedList.tsx
-  const updateFeedName = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    feedIndex: string
-  ) => {
+  const updateFeedName = (e: React.ChangeEvent<HTMLInputElement>, feedIndex: string) => {
     const newName = e.target.value;
 
     //swap last feed name with new feed name
@@ -78,23 +82,26 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
     //update name and set to show save button
     const updatedSaveBtnStatus = {
       ...showSaveBtn,
-      [feedIndex]: true
+      [feedIndex]: true,
     };
 
     setShowSaveBtn(updatedSaveBtnStatus);
     setFeedNames(updatedFeedNames);
   };
 
-//need to get folders and update it with new name
+  //need to get folders and update it with new name
 
   //on save button click
-  const sendFeedNames = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, name: string) => {
+  const sendFeedNames = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    name: string,
+  ) => {
     e.stopPropagation();
 
     //hide save button
     const updatedSaveBtnStatus = {
       ...showSaveBtn,
-      [name]: false
+      [name]: false,
     };
     setShowSaveBtn(updatedSaveBtnStatus);
 
@@ -108,13 +115,10 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
     delete newFeeds[name];
     setFeeds(newFeeds);
 
-    const res = await api.post(
-      "/feed/changeFeedName",
-      {
-        newName: feedNames[name],
-        oldName: name
-      }
-    );
+    const res = await api.post("/feed/changeFeedName", {
+      newName: feedNames[name],
+      oldName: name,
+    });
   };
 
   return {
@@ -126,7 +130,7 @@ const useFeedEditing = (feedNames: any, setFeedNames: any, feeds: Feeds, setFeed
     updateSelectedItems,
     deleteSelected,
     updateFeedName,
-    sendFeedNames
+    sendFeedNames,
   };
 };
 

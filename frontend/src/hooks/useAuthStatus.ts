@@ -1,8 +1,7 @@
-
-import { useState, useEffect } from 'react';
-import { AxiosResponse } from 'axios';
-import api from '../api';
-import { AuthStatusResponse } from '../interfaces';
+import { useState, useEffect } from "react";
+import { AxiosResponse } from "axios";
+import api from "../api";
+import { AuthStatusResponse } from "../interfaces";
 
 export const useAuthStatus = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -10,11 +9,11 @@ export const useAuthStatus = () => {
 
   async function getAuthStatus() {
     try {
-      const response: AxiosResponse<AuthStatusResponse> = await api.get('/auth/authStatus');
+      const response: AxiosResponse<AuthStatusResponse> = await api.get("/auth/auth-status");
       setIsAuthenticated(response.data.authenticated);
       setUserEmail(response.data.user.email);
     } catch (err) {
-      if (window.location.pathname === '/') {
+      if (window.location.pathname === "/") {
         await getAuthStatus();
       }
     }

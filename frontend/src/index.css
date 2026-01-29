@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'ibm-mono';
+  font-family: "ibm-mono";
   src: url(./assets/fonts/IBMPlexMono-Regular.ttf);
 }
 
 * {
-  font-family: 'ibm-mono';
+  font-family: "ibm-mono";
   box-sizing: border-box;
 }
 
@@ -38,25 +38,25 @@ html {
   height: 100%;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-button[data-title]:hover:after{
+button[data-title]:hover:after {
   content: attr(data-title);
-  font-size: .8rem;
+  font-size: 0.8rem;
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
   position: relative;
   width: max-content;
   height: min-content;
   padding: 0 8px;
-  line-height: 80%
+  line-height: 80%;
 }

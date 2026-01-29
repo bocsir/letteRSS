@@ -12,11 +12,7 @@ interface ReaderPortalProps {
   setIsYellow: any;
 }
 
-const ReaderPortal: React.FC<ReaderPortalProps> = ({
-  item,
-  setIsPortalVisible,
-  setIsYellow
-}) => {
+const ReaderPortal: React.FC<ReaderPortalProps> = ({ item, setIsPortalVisible, setIsYellow }) => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const sanitizedContent = useMemo(() => {
@@ -41,19 +37,12 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
           ${isChecked ? "max-w-5/6" : "max-w-[800px]"}
           `}
       >
-        <a
-          href={item.link}
-          target="_blank"
-          className="hover:text-amber-300 text-sm font-medium"
-        >
+        <a href={item.link} target="_blank" className="hover:text-amber-300 text-sm font-medium">
           {minimalLink}
         </a>
         <div className="flex relative z-60">
           <ToggleSwitch isChecked={isChecked} setIsChecked={setIsChecked} />
-          <button
-            onClick={changePortalState}
-            className="relative text-xl hover:text-amber-300"
-          >
+          <button onClick={changePortalState} className="relative text-xl hover:text-amber-300">
             <FontAwesomeIcon className="text-2xl" icon={faXmark} />
           </button>
           <br />
@@ -61,18 +50,12 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
       </div>
       <div
         className={`w-full max-h-[80vh] md:w-5/6 md: ml-6 mr-6 max-w-[800px] bg-black content overflow-auto border border-white rounded text-white ${
-          isChecked
-            ? "p-0 w-5/6 max-w-none min-h-[80vh] h-[80vh]"
-            : "h-min p-4 pt-2"
+          isChecked ? "p-0 w-5/6 max-w-none min-h-[80vh] h-[80vh]" : "h-min p-4 pt-2"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
         {isChecked ? (
-          <iframe
-            className="w-full h-full"
-            src={item.link}
-            title={item.link}
-          ></iframe>
+          <iframe className="w-full h-full" src={item.link} title={item.link}></iframe>
         ) : sanitizedContent ? (
           <div className="text-gray-300">
             <a href={item.link} target="_blank" className="text-xl underline">
@@ -88,7 +71,7 @@ const ReaderPortal: React.FC<ReaderPortalProps> = ({
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

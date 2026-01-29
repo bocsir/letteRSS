@@ -1,11 +1,11 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import ReaderButton from './ReaderButton';
+import ReaderButton from "./ReaderButton";
 import { FeedItem } from "../interfaces";
 
 interface FeedProps {
-  item: any
+  item: any;
 }
 
 const Feed: React.FC<FeedProps> = ({ item }) => {
@@ -14,7 +14,7 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
   const dateFormat: Intl.DateTimeFormatOptions = {
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
   };
 
   let articleDate = new Date(item.pubDate).toLocaleDateString("en-US", dateFormat);
@@ -26,7 +26,7 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         href={item.link}
         target="_blank"
         rel="noopener noreferrer"
-        className={`mt-2 relative ${isYellow ? 'text-amber-300' : ''}`}
+        className={`mt-2 relative ${isYellow ? "text-amber-300" : ""}`}
         onMouseEnter={() => setisYellow(true)}
         onMouseLeave={() => setisYellow(false)}
       >
@@ -37,11 +37,7 @@ const Feed: React.FC<FeedProps> = ({ item }) => {
         <br />
         <span className="font-light text-sm">{articleDate}</span>
       </a>
-      <ReaderButton
-        item={articleContent}
-        isYellow={isYellow}
-        setIsYellow={setisYellow}
-      />
+      <ReaderButton item={articleContent} isYellow={isYellow} setIsYellow={setisYellow} />
     </>
   );
 };

@@ -2,10 +2,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import grid from "../../../assets/images/grid.jpg";
 import { FormEvent, useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { Logo } from "../../Logo";
-import DefaultLogin from './DefaultLogin';
-import api from '../../../api';
+import DefaultLogin from "./DefaultLogin";
+import api from "../../../api";
 
 interface User {
   email: string;
@@ -36,12 +36,18 @@ const Login: React.FC = () => {
     }
   };
 
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post('/auth/login', { email: email, password: password });
-      console.log("password valid: ", response.data.valid, ", query failed: ", response.data.queryFailed, ", response: ", response);
+      const response = await api.post("/auth/login", { email: email, password: password });
+      console.log(
+        "password valid: ",
+        response.data.valid,
+        ", query failed: ",
+        response.data.queryFailed,
+        ", response: ",
+        response,
+      );
       if (!response.data.queryFailed) setPasswordValid(response.data.valid);
       setQueryFailed(response.data.queryFailed);
       //successful login
@@ -49,17 +55,22 @@ const Login: React.FC = () => {
         window.location.href = "/";
       }
     } catch (err) {
-      console.error('login failed: ', err);
+      console.error("login failed: ", err);
     }
-  }
+  };
 
   return (
     <>
-      <div
-        className="flex sm:items-center justify-center relative w-screen h-screen"
-      >
-        <img src={grid} className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30" loading="lazy" />
-        <Link to="/" className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen">
+      <div className="flex sm:items-center justify-center relative w-screen h-screen">
+        <img
+          src={grid}
+          className="w-screen h-screen absolute inset-0 object-cover object-center opacity-30"
+          loading="lazy"
+        />
+        <Link
+          to="/"
+          className="absolute top-0 p-3 shadow-[0px_0px_3px_1px_rgb(255,255,255)] bg-black w-screen"
+        >
           <Logo color={1} />
         </Link>
         <div className="mt-36 sm:mt-0 pl-8 pr-8 flex flex-col items-center h-max w-[400px] bg-black border rounded-lg text-white p-4 relative z-10">
@@ -71,31 +82,29 @@ const Login: React.FC = () => {
             </Link>
           </span>
 
-          <form
-            className="flex flex-col h-5/6 w-full text-lg mt-2 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
+          <form className="flex flex-col h-5/6 w-full text-lg mt-2 [&>input]:mb-4 [&>input]:text-black [&>input]:pl-1 [&>input]:rounded-sm text-left">
             <label htmlFor="email">Email:</label>
-            {(queryFailed) && (
-              <span className="text-red-500 text-sm -mt-1">
-                Email not found
-              </span>
-            )}
+            {queryFailed && <span className="text-red-500 text-sm -mt-1">Email not found</span>}
 
-            <input className={`border ${queryFailed ? "border-red-500" : "border-transparent"}`} type="text" id="email" name="email" onChange={e => setEmail(e.target.value)} />
+            <input
+              className={`border ${queryFailed ? "border-red-500" : "border-transparent"}`}
+              type="text"
+              id="email"
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <label htmlFor="password">Password:</label>
-            {(!passwordValid) && (
-              <span className="text-red-500 text-sm -mt-1">
-                Password incorrect
-              </span>
+            {!passwordValid && (
+              <span className="text-red-500 text-sm -mt-1">Password incorrect</span>
             )}
 
             <div className="flex justify-between h-min items-center mb-4">
-
               <input
                 className={`w-11/12 text-black pl-1 rounded-sm border ${!passwordValid || queryFailed ? "border-red-500" : "border-transparent"}`}
                 type={passVis}
                 id="password"
                 name="password"
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <FontAwesomeIcon
                 className="cursor-pointer w-6 mr-2 ml-2"
@@ -111,13 +120,12 @@ const Login: React.FC = () => {
                 onClick={handleSubmit}
               />
             </div>
-
           </form>
-          <DefaultLogin/>
+          <DefaultLogin />
         </div>
       </div>
     </>
   );
 };
 
-export default Login
+export default Login;

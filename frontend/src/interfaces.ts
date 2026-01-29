@@ -1,9 +1,9 @@
 export interface FeedItem {
-    title: string;
-    link: string;
-    pubDate: string;
-    content?: string;
-    ['content:encoded']?: string
+  title: string;
+  link: string;
+  pubDate: string;
+  content?: string;
+  ["content:encoded"]?: string;
 }
 
 export interface ArticleItem {
@@ -13,7 +13,7 @@ export interface ArticleItem {
 export interface Feeds {
   [feedName: string]: ArticleItem[] | [];
 }
-  
+
 export interface User {
   email: string;
 }
