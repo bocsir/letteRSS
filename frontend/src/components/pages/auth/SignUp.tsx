@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import grid from "../../../assets/images/grid.jpg";
+import grid from "../../../assets/images/grid.webp";
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import { Logo } from "../../Logo";
