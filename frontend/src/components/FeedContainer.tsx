@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { ArticleItem, Feeds } from "../interfaces";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareRss } from "@fortawesome/free-solid-svg-icons";
 import FeedMenu from "./FeedMenu";
 import api from "../api";
 import LoadingAnimation from "./LoadingAnimation";
@@ -184,12 +182,7 @@ export const FeedContainer: React.FC<FeedListProps> = ({ isAuthenticated }) => {
       >
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <h2 className="text-lg font-bold ml-3 text-neutral-500">
-              <span>
-                <FontAwesomeIcon className="text-lg mr-1" icon={faSquareRss} />
-              </span>
-              Feeds
-            </h2>
+            <h2 className="text-lg font-bold ml-3 text-neutral-500">Feeds</h2>
             <SortingMenu sortMenu={sortMenu} setSortMenu={setSortMenu} sortFeeds={sortFeeds} />
           </div>
           <FeedMenu
