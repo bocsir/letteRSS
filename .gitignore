@@ -6,3 +6,4 @@ server/.env
 server/dist
 
 create_rss_db.sql
+todo.md
