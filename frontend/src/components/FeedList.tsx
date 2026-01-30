@@ -99,7 +99,7 @@ const FeedList: React.FC<FeedListProps> = ({
                 value={feedNames[feedIndex] || ""}
                 onClick={preventFeedOpenOnEdit}
                 onChange={(e) => updateFeedName(e, feedIndex)}
-                readOnly={!isEditable}
+                onFocus={(e) => !isEditable && e.target.blur()}
               ></input>
               {showSaveBtn[feedIndex] && (
                 <button
@@ -107,7 +107,7 @@ const FeedList: React.FC<FeedListProps> = ({
                     sendFeedNames(e, feedIndex);
                   }}
                   type="submit"
-                  className="flex items-center text-white h-min leading-3 p-1 rounded bg-neutral-900 hover:text-amber-300 transition-color duration-150 ease-in-out text-base flex items-center absolute right-2"
+                  className="text-white h-min leading-3 p-1 rounded bg-neutral-900 hover:text-amber-300 transition-color duration-150 ease-in-out text-base flex items-center absolute right-2"
                 >
                   save
                 </button>
