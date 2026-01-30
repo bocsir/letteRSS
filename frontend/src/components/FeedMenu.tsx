@@ -48,7 +48,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   const [file, setfile] = useState<File[]>();
   const [newFeedUrl, setNewFeedUrl] = useState<string>("");
   const [showUrlError, setShowUrlError] = useState<boolean>(false);
-  const [urlNotFound, seturlNotFound] = useState<boolean>(false);
+  const [urlNotFound, setUrlNotFound] = useState<boolean>(false);
   const [menuVis, setMenuVis] = useState<boolean>(false);
   const [doneBtnVis, setDoneBtnVis] = useState<boolean>(false);
   const [menuBtnHover, setMenuBtnHover] = useState<{ [key: number]: boolean }>({
@@ -60,7 +60,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   const updateFeedUrl = (e: ChangeEvent<HTMLInputElement>) => {
     setNewFeedUrl(e.target.value);
     setShowUrlError(false);
-    seturlNotFound(false);
+    setUrlNotFound(false);
   };
 
   const updateMenuBtnHover = (index: number, isHovering: boolean) => {
@@ -73,12 +73,13 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
   };
 
   //for opml file import
-  const sendFile = async (e: FormEvent) => {
+  const addOpmlFile = async (e: FormEvent) => {
     setIsLoading(true);
 
     e.preventDefault();
     if (!file || file.length === 0) {
       alert("please select a file");
+      setIsLoading(false);
       return;
     }
 
@@ -126,9 +127,9 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
 
       //call async getFeeds in parent to update frontend after new url addition
       callGetFeeds();
-      setMenuVis(false);
+      toggleNewFeedMenuVis();
     } catch (error) {
-      seturlNotFound(true);
+      setUrlNotFound(true);
       console.error(error);
     }
     setNewFeedUrl(""); //clear input filed
@@ -260,7 +261,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
               <p className="text-xl text-neutral-500">Add an RSS feed</p>
               <form className="flex flex-col" onSubmit={sendURL}>
                 <label htmlFor="feed-url" className="text-base">
-                  Enter a URL:
+                  Enter feed URL:
                 </label>
                 {showUrlError && <p className="text-red-500 text-sm mb-1">Invalid URL</p>}
                 {urlNotFound && <p className="text-red-500 text-sm mb-1">URL not found</p>}
@@ -284,7 +285,7 @@ const FeedMenu: React.FC<FeedMenuProps> = ({
                 </div>
               </form>
               <p className="text-lg text-neutral-500 -mb-1">or</p>
-              <form onSubmit={sendFile} className="flex flex-col">
+              <form onSubmit={addOpmlFile} className="flex flex-col">
                 <p>Import a file (.opml):</p>
                 <div className="relative flex gap-3 w-full items-center">
                   <label
